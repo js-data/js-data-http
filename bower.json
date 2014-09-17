@@ -1,0 +1,35 @@
+{
+  "name": "js-data-http",
+  "description": "http adapter for js-data.",
+  "version": "0.1.0",
+  "homepage": "http://www.js-data.io/js-data-http",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/js-data/js-data-http.git"
+  },
+  "author": {
+    "name": "Jason Dobry",
+    "url": "http://www.pseudobry.com",
+    "email": "jason.dobry@gmail.com"
+  },
+  "main": "./dist/js-data-http.min.js",
+  "ignore": [
+    ".idea/",
+    ".*",
+    "*.iml",
+    "src/",
+    "lib/",
+    "doc/",
+    "guide/",
+    "coverage/",
+    "Gruntfile.js",
+    "node_modules/",
+    "test/",
+    "package.json",
+    "karma.conf.js",
+    "karma.start.js"
+  ],
+  "peerDependencies": {
+    "js-data": "0.0.1"
+  }
+}
