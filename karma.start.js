@@ -1,5 +1,5 @@
 // Setup global test variables
-var dsHttpAdapter, User;
+var dsHttpAdapter, User, datastore, DSUtils, queryTransform, p1, p2, p3, p4, p5;
 
 // Helper globals
 var fail = function (msg) {
@@ -33,10 +33,43 @@ var TYPES_EXCEPT_FUNCTION = ['string', 123, 123.123, null, undefined, {}, [], tr
 
 // Setup before each test
 beforeEach(function () {
-  User = {
-    relationFields: [],
-    class: 'User',
-    idAttribute: 'id'
+  var JSData;
+  if (!window && typeof module !== 'undefined' && module.exports) {
+    JSData = require('js-data');
+  } else {
+    JSData = window.JSData;
+  }
+
+  queryTransform = function (resourceName, query) {
+    queryTransform.callCount += 1;
+    return query;
   };
-  dsHttpAdapter = new DSHttpAdapter();
+
+  DSUtils = JSData.DSUtils;
+  datastore = new JSData.DS();
+
+  User = datastore.defineResource('user');
+  dsHttpAdapter = new DSHttpAdapter({
+    queryTransform: queryTransform
+  });
+  queryTransform.callCount = 0;
+
+  p1 = { author: 'John', age: 30, id: 5 };
+  p2 = { author: 'Sally', age: 31, id: 6 };
+  p3 = { author: 'Mike', age: 32, id: 7 };
+  p4 = { author: 'Adam', age: 33, id: 8 };
+  p5 = { author: 'Adam', age: 33, id: 9 };
+
+  this.xhr = sinon.useFakeXMLHttpRequest();
+  // Create an array to store requests
+  var requests = this.requests = [];
+  // Keep references to created requests
+  this.xhr.onCreate = function (xhr) {
+    requests.push(xhr);
+  };
+});
+
+afterEach(function () {
+  // Restore the global timer functions to their native implementations
+  this.xhr.restore();
 });

@@ -31,5 +31,8 @@
   ],
   "peerDependencies": {
     "js-data": "0.0.1"
+  },
+  "devDependencies": {
+    "js-data": "~0.0.1"
   }
 }

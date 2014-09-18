@@ -78,6 +78,7 @@ module.exports = function (grunt) {
         browsers: ['Firefox', 'PhantomJS'],
         options: {
           files: [
+            'bower_components/js-data/dist/js-data.min.js',
             'dist/js-data-http.min.js',
             'karma.start.js',
             'test/**/*.js'
@@ -85,7 +86,7 @@ module.exports = function (grunt) {
         }
       },
       ci: {
-        browsers: ['Firefox']
+        browsers: ['Firefox', 'PhantomJS']
       }
     },
     coveralls: {
