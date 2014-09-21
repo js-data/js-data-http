@@ -1,14 +1,17 @@
-<img src="https://raw.githubusercontent.com/js-data/js-data/prototype/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64" />
+<img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64" />
 
 ## js-data-http
 
 http adapter for js-data.
 
-## Documentation
-[http://www.js-data.io/js-data-http](http://www.js-data.io/js-data-http)
+## Website
+[js-data.io/js-data-http](http://www.js-data.io/js-data-http)
+
+## API Documentation
+[DSHttpAdapter](https://github.com/js-data/js-data/wiki/DSHttpAdapter)
 
 ## Demo
-[https://js-data-http.firebaseapp.com/](https://js-data-http.firebaseapp.com/)
+[js-data-http.firebaseapp.com/](https://js-data-http.firebaseapp.com/)
 
 ## Project Status
 
@@ -22,7 +25,7 @@ http adapter for js-data.
 | Coverage | [![Coverage Status](https://coveralls.io/repos/js-data/js-data-http/badge.png?branch=master)](https://coveralls.io/r/js-data/js-data-http?branch=master) |
 
 ## Quick Start
-`bower install --save js-data-http` or `npm install --save js-data-http`.
+`bower install --save js-data js-data-http` or `npm install --save js-data js-data-http`.
 
 ## Changelog
 [CHANGELOG.md](https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md)
