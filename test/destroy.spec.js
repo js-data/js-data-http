@@ -3,22 +3,10 @@ describe('DSHttpAdapter.destroy(resourceConfig, id, options)', function () {
   it('should make a DELETE request', function (done) {
     var _this = this;
 
-    dsHttpAdapter.destroy({
-      baseUrl: 'api',
-      endpoint: 'posts',
-      getEndpoint: function () {
-        return 'posts';
-      }
-    }, 1).then(function (data) {
+    dsHttpAdapter.destroy(Post, 1).then(function (data) {
       assert.deepEqual(data, '1', 'post should have been deleted');
 
-      dsHttpAdapter.destroy({
-        baseUrl: 'api',
-        endpoint: 'posts',
-        getEndpoint: function () {
-          return 'posts';
-        }
-      }, 1, { baseUrl: 'api2' }).then(function (data) {
+      dsHttpAdapter.destroy(Post, 1, { baseUrl: 'api2' }).then(function (data) {
         assert.deepEqual(data, '1', 'post should have been deleted');
         assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');
         done();

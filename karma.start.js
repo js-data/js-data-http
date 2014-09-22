@@ -1,5 +1,5 @@
 // Setup global test variables
-var dsHttpAdapter, User, datastore, DSUtils, queryTransform, p1, p2, p3, p4, p5;
+var dsHttpAdapter, User, Post, datastore, DSUtils, queryTransform, p1, p2, p3, p4, p5;
 
 // Helper globals
 var fail = function (msg) {
@@ -49,6 +49,10 @@ beforeEach(function () {
   datastore = new JSData.DS();
 
   User = datastore.defineResource('user');
+  Post = datastore.defineResource({
+    name: 'posts',
+    baseUrl: 'api'
+  });
   dsHttpAdapter = new DSHttpAdapter({
     queryTransform: queryTransform
   });

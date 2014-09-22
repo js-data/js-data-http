@@ -3,22 +3,10 @@ describe('dsHttpAdapter.findAll(resourceConfig, params, options)', function () {
   it('should make a GET request', function (done) {
     var _this = this;
 
-    dsHttpAdapter.findAll({
-      baseUrl: 'api',
-      endpoint: 'posts',
-      getEndpoint: function () {
-        return 'posts';
-      }
-    }, {}).then(function (data) {
+    dsHttpAdapter.findAll(Post, {}).then(function (data) {
       assert.deepEqual(data, [p1], 'posts should have been found');
 
-      dsHttpAdapter.findAll({
-        baseUrl: 'api',
-        endpoint: 'posts',
-        getEndpoint: function () {
-          return 'posts';
-        }
-      }, {
+      dsHttpAdapter.findAll(Post, {
         where: {
           author: {
             '==': 'John'

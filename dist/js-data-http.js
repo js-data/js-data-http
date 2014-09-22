@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 0.2.0 - Homepage <http://www.js-data.iojs-data-http/>
+* @version 0.3.0 - Homepage <http://www.js-data.iojs-data-http/>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1330,17 +1330,9 @@ function DSHttpAdapter(options) {
 
 var dsHttpAdapterPrototype = DSHttpAdapter.prototype;
 
-dsHttpAdapterPrototype.HTTP = function (config, resourceConfig) {
+dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
   var start = new Date().getTime();
-  var deserialize;
-  if (config.deserialize) {
-    deserialize = config.deserialize;
-    delete config.deserialize;
-  } else {
-    deserialize = _this.defaults.deserialize;
-  }
-  resourceConfig = resourceConfig || {};
   config = deepMixIn(config, this.defaults.httpConfig);
   return http(config).then(function (data) {
     if (_this.defaults.log) {
@@ -1348,21 +1340,21 @@ dsHttpAdapterPrototype.HTTP = function (config, resourceConfig) {
       args.unshift(data.config.method + ' request: ' + data.config.url + ' Time taken: ' + (new Date().getTime() - start) + 'ms');
       _this.defaults.log.apply(_this.defaults.log, args);
     }
-    return deserialize(resourceConfig.name, data);
+    return data;
   });
 };
 
-dsHttpAdapterPrototype.GET = function (url, config, resourceConfig) {
+dsHttpAdapterPrototype.GET = function (url, config) {
   config = config || {};
   if (!('method' in config)) {
     config.method = 'get';
   }
   return this.HTTP(deepMixIn(config, {
     url: url
-  }), resourceConfig);
+  }));
 };
 
-dsHttpAdapterPrototype.POST = function (url, attrs, config, resourceConfig) {
+dsHttpAdapterPrototype.POST = function (url, attrs, config) {
   config = config || {};
   if (!('method' in config)) {
     config.method = 'post';
@@ -1370,10 +1362,10 @@ dsHttpAdapterPrototype.POST = function (url, attrs, config, resourceConfig) {
   return this.HTTP(deepMixIn(config, {
     url: url,
     data: attrs
-  }), resourceConfig);
+  }));
 };
 
-dsHttpAdapterPrototype.PUT = function (url, attrs, config, resourceConfig) {
+dsHttpAdapterPrototype.PUT = function (url, attrs, config) {
   config = config || {};
   if (!('method' in config)) {
     config.method = 'put';
@@ -1381,62 +1373,68 @@ dsHttpAdapterPrototype.PUT = function (url, attrs, config, resourceConfig) {
   return this.HTTP(deepMixIn(config, {
     url: url,
     data: attrs || {}
-  }), resourceConfig);
+  }));
 };
 
-dsHttpAdapterPrototype.DEL = function (url, config, resourceConfig) {
+dsHttpAdapterPrototype.DEL = function (url, config) {
   config = config || {};
   if (!('method' in config)) {
     config.method = 'delete';
   }
   return this.HTTP(deepMixIn(config, {
     url: url
-  }), resourceConfig);
+  }));
 };
 
 dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
+  var _this = this;
   options = options || {};
-  return this.GET(
+  return _this.GET(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(id, options), id),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
+  var _this = this;
   options = options || {};
   options.params = options.params || {};
   if (params) {
-    params = this.defaults.queryTransform(resourceConfig.name, params);
+    params = _this.defaults.queryTransform(resourceConfig.name, params);
     deepMixIn(options.params, params);
   }
-  return this.GET(
+  return _this.GET(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(null, options)),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
   var _this = this;
   options = options || {};
-  return this.POST(
+  return _this.POST(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(attrs, options)),
     options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
   var _this = this;
   options = options || {};
-  return this.PUT(
+  return _this.PUT(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(id, options), id),
     options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, options) {
@@ -1444,38 +1442,43 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
   options = options || {};
   options.params = options.params || {};
   if (params) {
-    params = this.defaults.queryTransform(resourceConfig.name, params);
+    params = _this.defaults.queryTransform(resourceConfig.name, params);
     deepMixIn(options.params, params);
   }
   return this.PUT(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(null, options)),
     options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
+  var _this = this;
   options = options || {};
-  return this.DEL(
+  return _this.DEL(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(id, options), id),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
+  var _this = this;
   options = options || {};
   options.params = options.params || {};
   if (params) {
-    params = this.defaults.queryTransform(resourceConfig.name, params);
+    params = _this.defaults.queryTransform(resourceConfig.name, params);
     deepMixIn(options.params, params);
   }
   return this.DEL(
     makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(null, options)),
-    options,
-    resourceConfig
-  );
+    options
+  ).then(function (data) {
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+    });
 };
 
 module.exports = DSHttpAdapter;

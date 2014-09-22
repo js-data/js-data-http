@@ -3,22 +3,10 @@ describe('DSHttpAdapter.updateAll(resourceConfig, attrs, params, options)', func
   it('should make a PUT request', function (done) {
     var _this = this;
 
-    dsHttpAdapter.updateAll({
-      baseUrl: 'api',
-      endpoint: 'posts',
-      getEndpoint: function () {
-        return 'posts';
-      }
-    }, { author: 'John', age: 30 }).then(function (data) {
+    dsHttpAdapter.updateAll(Post, { author: 'John', age: 30 }).then(function (data) {
       assert.deepEqual(data, [p1], 'posts should have been updated');
 
-      dsHttpAdapter.updateAll({
-        baseUrl: 'api',
-        endpoint: 'posts',
-        getEndpoint: function () {
-          return 'posts';
-        }
-      }, { author: 'John', age: 30 }, {
+      dsHttpAdapter.updateAll(Post, { author: 'John', age: 30 }, {
         where: {
           author: {
             '==': 'John'

@@ -3,22 +3,10 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
   it('should make a GET request', function (done) {
     var _this = this;
 
-    dsHttpAdapter.find({
-      baseUrl: 'api',
-      endpoint: 'posts',
-      getEndpoint: function () {
-        return 'posts';
-      }
-    }, 1).then(function (data) {
+    dsHttpAdapter.find(Post, 1).then(function (data) {
       assert.deepEqual(data, p1, 'post should have been found');
 
-      dsHttpAdapter.find({
-        baseUrl: 'api',
-        endpoint: 'posts',
-        getEndpoint: function () {
-          return 'posts';
-        }
-      }, 1, { baseUrl: 'api2' }).then(function (data) {
+      dsHttpAdapter.find(Post, 1, { baseUrl: 'api2' }).then(function (data) {
         assert.deepEqual(data, p1, 'post should have been found');
         assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');
         done();
@@ -52,13 +40,7 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
     dsHttpAdapter.defaults.httpConfig.params = { test: 'test' };
     dsHttpAdapter.defaults.httpConfig.headers = { Authorization: 'test' };
 
-    dsHttpAdapter.find({
-      baseUrl: 'api',
-      endpoint: 'posts',
-      getEndpoint: function () {
-        return 'posts';
-      }
-    }, 1).then(function (data) {
+    dsHttpAdapter.find(Post, 1).then(function (data) {
       assert.deepEqual(data, p1, 'post should have been found');
 
       delete dsHttpAdapter.defaults.httpConfig.params;

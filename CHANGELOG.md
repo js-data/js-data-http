@@ -1,4 +1,9 @@
-##### 0.2.0 - 2 September 2014
+##### 0.3.0 - 21 September 2014
+
+###### Backwards compatible API changes
+- Small re-organization.
+
+##### 0.2.0 - 21 September 2014
 
 ###### Backwards compatible API changes
 - Added deserialize and serialize.

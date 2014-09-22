@@ -3,22 +3,10 @@ describe('DSHttpAdapter.destroyAll(resourceConfig, params, options)', function (
   it('should make a DELETE request', function (done) {
     var _this = this;
 
-    dsHttpAdapter.destroyAll({
-      baseUrl: 'api',
-      endpoint: 'posts',
-      getEndpoint: function () {
-        return 'posts';
-      }
-    }, {}).then(function (data) {
+    dsHttpAdapter.destroyAll(Post, {}).then(function (data) {
       assert.equal('', data, 'posts should have been found');
 
-      dsHttpAdapter.destroyAll({
-        baseUrl: 'api',
-        endpoint: 'posts',
-        getEndpoint: function () {
-          return 'posts';
-        }
-      }, {
+      dsHttpAdapter.destroyAll(Post, {
         where: {
           author: {
             '==': 'John'
