@@ -33,12 +33,7 @@
 <h2>
 <a name="js-data-http" class="anchor" href="#js-data-http"><span class="octicon octicon-link"></span></a>js-data-http</h2>
 
-<p>http adapter for js-data.</p>
-
-<h2>
-<a name="website" class="anchor" href="#website"><span class="octicon octicon-link"></span></a>Website</h2>
-
-<p><a href="http://www.js-data.io/js-data-http">js-data.io/js-data-http</a></p>
+<p>http adapter for <a href="http://www.js-data.io/js-data">js-data</a>.</p>
 
 <h2>
 <a name="api-documentation" class="anchor" href="#api-documentation"><span class="octicon octicon-link"></span></a>API Documentation</h2>
@@ -88,6 +83,18 @@
 <a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h2>
 
 <p><code>bower install --save js-data js-data-http</code> or <code>npm install --save js-data js-data-http</code>.</p>
+
+<p>Load <code>js-data-http.js</code> after <code>js-data.js</code>.</p>
+
+<div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DSHttpAdapter</span><span class="p">();</span>
+
+<span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JSData</span><span class="p">.</span><span class="nx">DS</span><span class="p">();</span>
+
+<span class="nx">store</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">DSHttpAdapter</span> <span class="o">=</span> <span class="nx">adapter</span><span class="p">;</span>
+<span class="nx">store</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">defaultAdapter</span> <span class="o">=</span> <span class="s1">'DSHttpAdapter'</span><span class="p">;</span>
+
+<span class="c1">// "store" will now use the http adapter for all async operations</span>
+</pre></div>
 
 <h2>
 <a name="changelog" class="anchor" href="#changelog"><span class="octicon octicon-link"></span></a>Changelog</h2>
