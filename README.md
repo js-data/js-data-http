@@ -2,10 +2,7 @@
 
 ## js-data-http
 
-http adapter for js-data.
-
-## Website
-[js-data.io/js-data-http](http://www.js-data.io/js-data-http)
+http adapter for [js-data](http://www.js-data.io/js-data).
 
 ## API Documentation
 [DSHttpAdapter](https://github.com/js-data/js-data/wiki/DSHttpAdapter)
@@ -26,6 +23,19 @@ http adapter for js-data.
 
 ## Quick Start
 `bower install --save js-data js-data-http` or `npm install --save js-data js-data-http`.
+
+Load `js-data-http.js` after `js-data.js`.
+
+```js
+var adapter = new DSHttpAdapter();
+
+var store = new JSData.DS();
+
+store.defaults.DSHttpAdapter = adapter;
+store.defaults.defaultAdapter = 'DSHttpAdapter';
+
+// "store" will now use the http adapter for all async operations
+```
 
 ## Changelog
 [CHANGELOG.md](https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md)
