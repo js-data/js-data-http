@@ -51,7 +51,7 @@ beforeEach(function () {
   User = datastore.defineResource('user');
   Post = datastore.defineResource({
     name: 'posts',
-    baseUrl: 'api'
+    basePath: 'api'
   });
   dsHttpAdapter = new DSHttpAdapter({
     queryTransform: queryTransform

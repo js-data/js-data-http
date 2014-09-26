@@ -6,7 +6,7 @@ describe('DSHttpAdapter.create(resourceConfig, attrs, options)', function () {
     dsHttpAdapter.create(Post, { author: 'John', age: 30 }).then(function (data) {
       assert.deepEqual(data, p1, 'post should have been created');
 
-      dsHttpAdapter.create(Post, { author: 'John', age: 30 }, { baseUrl: 'api2' }).then(function (data) {
+      dsHttpAdapter.create(Post, { author: 'John', age: 30 }, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, p1, 'post should have been created');
 
         assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');

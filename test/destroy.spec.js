@@ -6,7 +6,7 @@ describe('DSHttpAdapter.destroy(resourceConfig, id, options)', function () {
     dsHttpAdapter.destroy(Post, 1).then(function (data) {
       assert.deepEqual(data, '1', 'post should have been deleted');
 
-      dsHttpAdapter.destroy(Post, 1, { baseUrl: 'api2' }).then(function (data) {
+      dsHttpAdapter.destroy(Post, 1, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, '1', 'post should have been deleted');
         assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');
         done();

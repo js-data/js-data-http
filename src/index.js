@@ -19,6 +19,8 @@ defaultsPrototype.queryTransform = function (resourceName, params) {
   return params;
 };
 
+defaultsPrototype.basePath = '';
+
 defaultsPrototype.httpConfig = {};
 
 defaultsPrototype.log = console ? console.log : function () {
@@ -38,6 +40,14 @@ function DSHttpAdapter(options) {
 }
 
 var dsHttpAdapterPrototype = DSHttpAdapter.prototype;
+
+dsHttpAdapterPrototype.getIdPath = function (resourceConfig, options, id) {
+  return makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(id, options), id);
+};
+
+dsHttpAdapterPrototype.getAllPath = function (resourceConfig, options) {
+  return makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(null, options));
+};
 
 dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
@@ -99,7 +109,7 @@ dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
   return _this.GET(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(id, options), id),
+    _this.getIdPath(resourceConfig, options, id),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
@@ -115,7 +125,7 @@ dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
     deepMixIn(options.params, params);
   }
   return _this.GET(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(null, options)),
+    _this.getAllPath(resourceConfig, options),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
@@ -126,7 +136,7 @@ dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
   var _this = this;
   options = options || {};
   return _this.POST(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(attrs, options)),
+    makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(attrs, options)),
     options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
     options
   ).then(function (data) {
@@ -138,7 +148,7 @@ dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
   var _this = this;
   options = options || {};
   return _this.PUT(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(id, options), id),
+    _this.getIdPath(resourceConfig, options, id),
     options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
     options
   ).then(function (data) {
@@ -155,7 +165,7 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
     deepMixIn(options.params, params);
   }
   return this.PUT(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(null, options)),
+    _this.getAllPath(resourceConfig, options),
     options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
     options
   ).then(function (data) {
@@ -167,7 +177,7 @@ dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
   return _this.DEL(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(id, options), id),
+    _this.getIdPath(resourceConfig, options, id),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
@@ -183,7 +193,7 @@ dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
     deepMixIn(options.params, params);
   }
   return this.DEL(
-    makePath(options.baseUrl || resourceConfig.baseUrl, resourceConfig.getEndpoint(null, options)),
+    _this.getAllPath(resourceConfig, options),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);

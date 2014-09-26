@@ -12,7 +12,7 @@ describe('DSHttpAdapter.destroyAll(resourceConfig, params, options)', function (
             '==': 'John'
           }
         }
-      }, { baseUrl: 'api2' }).then(function (data) {
+      }, { basePath: 'api2' }).then(function (data) {
         assert.equal('', data, 'posts should have been destroyed');
         assert.equal(queryTransform.callCount, 2, 'queryTransform should have been called');
         done();

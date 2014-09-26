@@ -12,7 +12,7 @@ describe('dsHttpAdapter.findAll(resourceConfig, params, options)', function () {
             '==': 'John'
           }
         }
-      }, { baseUrl: 'api2' }).then(function (data) {
+      }, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, [p1], 'posts should have been found');
         assert.equal(queryTransform.callCount, 2, 'queryTransform should have been called');
         done();

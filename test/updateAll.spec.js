@@ -12,7 +12,7 @@ describe('DSHttpAdapter.updateAll(resourceConfig, attrs, params, options)', func
             '==': 'John'
           }
         }
-      }, { baseUrl: 'api2' }).then(function (data) {
+      }, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, [p1], 'posts should have been updated');
         assert.equal(queryTransform.callCount, 1, 'queryTransform should have been called');
         done();
