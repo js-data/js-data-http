@@ -56,6 +56,8 @@ beforeEach(function () {
   dsHttpAdapter = new DSHttpAdapter({
     queryTransform: queryTransform
   });
+  datastore.registerAdapter('http', dsHttpAdapter, { default: true });
+
   queryTransform.callCount = 0;
 
   p1 = { author: 'John', age: 30, id: 5 };

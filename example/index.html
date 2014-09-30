@@ -5,9 +5,9 @@
   <title></title>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
   <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.25/angular.min.js"></script>
-  <script src="https://github.com/js-data/js-data/releases/download/0.0.1/js-data-0.0.1.min.js"></script>
+  <script src="https://github.com/js-data/js-data/releases/download/0.4.0/js-data-0.4.0.min.js"></script>
   <script
-    src="https://github.com/js-data/js-data-http/releases/download/0.1.0/js-data-http-0.1.0.min.js"></script>
+    src="https://github.com/js-data/js-data-http/releases/download/0.4.1/js-data-http-0.4.1.min.js"></script>
   <script src="./example.js"></script>
 </head>
 <body data-ng-controller="httpCtrl as lsCtrl">
@@ -42,13 +42,12 @@
   </div>
   <div>
 <pre><code>
-var dsHttpAdapter = new DSHttpAdapter();
+var adapter = new DSHttpAdapter();
 
-var datastore = new JSData.DS();
-datastore.defaults.defaultAdapter = 'dsHttpAdapter';
-datastore.adapters.dsHttpAdapter = dsHttpAdapter;
+var store = new JSData.DS();
+store.registerAdapter('http', adapter, { default: true });
 
-var User = datastore.defineResource('user');
+var User = store.defineResource('user');
 
 angular.module('http-example', [])
   .controller('httpCtrl', function ($scope, $timeout) {

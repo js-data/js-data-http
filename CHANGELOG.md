@@ -1,3 +1,8 @@
+##### 0.4.1 - 30 September 2014
+
+###### Backwards compatible API changes
+- Added `forceTrailingSlash` option to `DSHttpAdapter#defaults`
+
 ##### 0.4.0 - 25 September 2014
 
 ###### Breaking API changes

@@ -21,6 +21,8 @@ defaultsPrototype.queryTransform = function (resourceName, params) {
 
 defaultsPrototype.basePath = '';
 
+defaultsPrototype.forceTrailingSlash = '';
+
 defaultsPrototype.httpConfig = {};
 
 defaultsPrototype.log = console ? console.log : function () {
@@ -52,7 +54,10 @@ dsHttpAdapterPrototype.getAllPath = function (resourceConfig, options) {
 dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
   var start = new Date().getTime();
-  config = deepMixIn(config, this.defaults.httpConfig);
+  config = deepMixIn(config, _this.defaults.httpConfig);
+  if (_this.defaults.forceTrailingSlash && config.url[config.url.length] !== '/') {
+    config.url += '/';
+  }
   return http(config).then(function (data) {
     if (_this.defaults.log) {
       var args = Array.prototype.slice.call(arguments);

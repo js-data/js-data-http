@@ -1,11 +1,10 @@
 (function () {
-  var dsHttpAdapter = new DSHttpAdapter();
+  var adapter = new DSHttpAdapter();
 
-  var datastore = new JSData.DS();
-  datastore.defaults.defaultAdapter = 'dsHttpAdapter';
-  datastore.adapters.dsHttpAdapter = dsHttpAdapter;
+  var store = new JSData.DS();
+  store.registerAdapter('http', adapter, { default: true });
 
-  var User = datastore.defineResource('user');
+  var User = store.defineResource('user');
 
   angular.module('http-example', [])
     .controller('httpCtrl', function ($scope, $timeout) {
