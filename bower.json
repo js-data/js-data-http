@@ -29,10 +29,7 @@
     "karma.conf.js",
     "karma.start.js"
   ],
-  "peerDependencies": {
-    "js-data": "~0.4.x"
-  },
-  "devDependencies": {
+  "dependencies": {
     "js-data": "~0.4.x"
   }
 }

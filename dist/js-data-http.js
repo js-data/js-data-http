@@ -1290,10 +1290,21 @@ process.chdir = function (dir) {
 
 },{}],23:[function(require,module,exports){
 var JSData;
-if (!window && typeof module !== 'undefined' && module.exports) {
+
+try {
   JSData = require('js-data');
-} else {
-  JSData = window.JSData;
+} catch (e) {
+}
+
+if (!JSData) {
+  try {
+    JSData = window.JSData;
+  } catch (e) {
+  }
+}
+
+if (!JSData) {
+  throw new Error('js-data must be loaded!');
 }
 
 var makePath = JSData.DSUtils.makePath;

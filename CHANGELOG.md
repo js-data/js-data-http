@@ -3,6 +3,9 @@
 ###### Backwards compatible API changes
 - Added `forceTrailingSlash` option to `DSHttpAdapter#defaults`
 
+###### Other
+- Improved checking for the js-data dependency
+
 ##### 0.4.0 - 25 September 2014
 
 ###### Breaking API changes
