@@ -5,7 +5,7 @@
 http adapter for [js-data](http://www.js-data.io/js-data).
 
 ## API Documentation
-[DSHttpAdapter](https://github.com/js-data/js-data/wiki/DSHttpAdapter)
+[DSHttpAdapter](http://www.js-data.io/docs/dshttpadapter)
 
 ## Demo
 [js-data-http.firebaseapp.com/](https://js-data-http.firebaseapp.com/)
