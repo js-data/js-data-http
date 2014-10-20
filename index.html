@@ -38,21 +38,18 @@
 <h2>
 <a name="api-documentation" class="anchor" href="#api-documentation"><span class="octicon octicon-link"></span></a>API Documentation</h2>
 
-<p><a href="https://github.com/js-data/js-data/wiki/DSHttpAdapter">DSHttpAdapter</a></p>
-
-<h2>
-<a name="demo" class="anchor" href="#demo"><span class="octicon octicon-link"></span></a>Demo</h2>
-
-<p><a href="https://js-data-http.firebaseapp.com/">js-data-http.firebaseapp.com/</a></p>
+<p><a href="http://www.js-data.io/docs/dshttpadapter">DSHttpAdapter</a></p>
 
 <h2>
 <a name="project-status" class="anchor" href="#project-status"><span class="octicon octicon-link"></span></a>Project Status</h2>
 
 <table>
-<thead><tr>
+<thead>
+<tr>
 <th>Branch</th>
 <th>Master</th>
-</tr></thead>
+</tr>
+</thead>
 <tbody>
 <tr>
 <td>Bower</td>
@@ -79,7 +76,9 @@
 <td><a href="https://coveralls.io/r/js-data/js-data-http?branch=master"><img src="https://coveralls.io/repos/js-data/js-data-http/badge.png?branch=master" alt="Coverage Status"></a></td>
 </tr>
 </tbody>
-</table><h2>
+</table>
+
+<h2>
 <a name="quick-start" class="anchor" href="#quick-start"><span class="octicon octicon-link"></span></a>Quick Start</h2>
 
 <p><code>bower install --save js-data js-data-http</code> or <code>npm install --save js-data js-data-http</code>.</p>
@@ -89,9 +88,7 @@
 <div class="highlight highlight-js"><pre><span class="kd">var</span> <span class="nx">adapter</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DSHttpAdapter</span><span class="p">();</span>
 
 <span class="kd">var</span> <span class="nx">store</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">JSData</span><span class="p">.</span><span class="nx">DS</span><span class="p">();</span>
-
-<span class="nx">store</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">DSHttpAdapter</span> <span class="o">=</span> <span class="nx">adapter</span><span class="p">;</span>
-<span class="nx">store</span><span class="p">.</span><span class="nx">defaults</span><span class="p">.</span><span class="nx">defaultAdapter</span> <span class="o">=</span> <span class="s1">'DSHttpAdapter'</span><span class="p">;</span>
+<span class="nx">store</span><span class="p">.</span><span class="nx">registerAdapter</span><span class="p">(</span><span class="s1">'http'</span><span class="p">,</span> <span class="nx">adapter</span><span class="p">,</span> <span class="p">{</span> <span class="k">default</span><span class="o">:</span> <span class="kc">true</span> <span class="p">});</span>
 
 <span class="c1">// "store" will now use the http adapter for all async operations</span>
 </pre></div>
@@ -112,7 +109,9 @@
 <li>
 <a href="https://github.com/js-data/js-data-http">GitHub</a> - View the source code for js-data.</li>
 <li><a href="https://github.com/js-data/js-data-http/blob/master/CONTRIBUTING.md">Contributing Guide</a></li>
-</ul><h2>
+</ul>
+
+<h2>
 <a name="contributing" class="anchor" href="#contributing"><span class="octicon octicon-link"></span></a>Contributing</h2>
 
 <p>First, feel free to contact me with questions. <a href="https://groups.io/org/groupsio/jsdata">Mailing List</a>. <a href="https://github.com/js-data/js-data-http/issues">Issues</a>.</p>
@@ -127,27 +126,32 @@
 <li>(in another terminal) <code>grunt karma:dev</code> (runs the tests)</li>
 <li>Write your code, including relevant documentation and tests</li>
 <li>Submit a PR and we'll review</li>
-</ol><h2>
+</ol>
+
+<h2>
 <a name="license" class="anchor" href="#license"><span class="octicon octicon-link"></span></a>License</h2>
+
+<p>The MIT License (MIT)</p>
 
 <p>Copyright (c) 2014 Jason Dobry</p>
 
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in
-the Software without restriction, including without limitation the rights to
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies
-of the Software, and to permit persons to whom the Software is furnished to do
-so, subject to the following conditions:</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
 
 <p>The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.</p>
 
 <p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
-FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
-COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.</p>
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/js-data">js-data</a></p>
