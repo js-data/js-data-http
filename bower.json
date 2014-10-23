@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "http adapter for js-data.",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "homepage": "http://www.js-data.io/js-data-http",
   "repository": {
     "type": "git",
@@ -30,6 +30,6 @@
     "karma.start.js"
   ],
   "dependencies": {
-    "js-data": "~0.4.x"
+    "js-data": "~1.0.x"
   }
 }

@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 0.4.1 - Homepage <http://www.js-data.iojs-data-http/>
+* @version 0.4.2 - Homepage <http://www.js-data.iojs-data-http/>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1362,9 +1362,7 @@ dsHttpAdapterPrototype.HTTP = function (config) {
   }
   return http(config).then(function (data) {
     if (_this.defaults.log) {
-      var args = Array.prototype.slice.call(arguments);
-      args.unshift(data.config.method + ' request: ' + data.config.url + ' Time taken: ' + (new Date().getTime() - start) + 'ms');
-      _this.defaults.log.apply(_this.defaults.log, args);
+      _this.defaults.log(data.config.method.toUpperCase() + ' request: ' + data.config.url + ' Time taken: ' + (new Date().getTime() - start) + 'ms', data);
     }
     return data;
   });

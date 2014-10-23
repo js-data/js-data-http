@@ -2,7 +2,7 @@
 
 ## js-data-http
 
-http adapter for [js-data](http://www.js-data.io/js-data).
+http adapter for [js-data](http://www.js-data.io/).
 
 ## API Documentation
 [DSHttpAdapter](http://www.js-data.io/docs/dshttpadapter)

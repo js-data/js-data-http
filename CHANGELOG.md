@@ -1,3 +1,8 @@
+##### 0.4.2 - 22 October 2014
+
+###### Backwards compatible bug fixes
+- Fixed illegal invocation error
+
 ##### 0.4.1 - 30 September 2014
 
 ###### Backwards compatible API changes

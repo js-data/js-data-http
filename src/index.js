@@ -71,9 +71,7 @@ dsHttpAdapterPrototype.HTTP = function (config) {
   }
   return http(config).then(function (data) {
     if (_this.defaults.log) {
-      var args = Array.prototype.slice.call(arguments);
-      args.unshift(data.config.method + ' request: ' + data.config.url + ' Time taken: ' + (new Date().getTime() - start) + 'ms');
-      _this.defaults.log.apply(_this.defaults.log, args);
+      _this.defaults.log(data.config.method.toUpperCase() + ' request: ' + data.config.url + ' Time taken: ' + (new Date().getTime() - start) + 'ms', data);
     }
     return data;
   });
