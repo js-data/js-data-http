@@ -36,7 +36,9 @@ defaultsPrototype.forceTrailingSlash = '';
 
 defaultsPrototype.httpConfig = {};
 
-defaultsPrototype.log = console ? console.log : function () {
+defaultsPrototype.log = console ? function (a, b, c, d, e) {
+  console.log(a, b, c, d, e);
+} : function () {
 };
 
 defaultsPrototype.deserialize = function (resourceName, data) {

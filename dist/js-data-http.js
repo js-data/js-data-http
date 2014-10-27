@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 0.4.2 - Homepage <http://www.js-data.iojs-data-http/>
+* @version 0.4.3 - Homepage <http://www.js-data.iojs-data-http/>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -10,13 +10,13 @@
 !function(e){if("object"==typeof exports&&"undefined"!=typeof module)module.exports=e();else if("function"==typeof define&&define.amd)define([],e);else{var f;"undefined"!=typeof window?f=window:"undefined"!=typeof global?f=global:"undefined"!=typeof self&&(f=self),f.DSHttpAdapter=e()}}(function(){var define,module,exports;return (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 module.exports = require('./lib/axios');
 },{"./lib/axios":3}],2:[function(require,module,exports){
-var buildUrl = require('./../buildUrl');
-var cookies = require('./../cookies');
 var defaults = require('./../defaults');
-var parseHeaders = require('./../parseHeaders');
-var transformData = require('./../transformData');
-var urlIsSameOrigin = require('./../urlIsSameOrigin');
 var utils = require('./../utils');
+var buildUrl = require('./../helpers/buildUrl');
+var cookies = require('./../helpers/cookies');
+var parseHeaders = require('./../helpers/parseHeaders');
+var transformData = require('./../helpers/transformData');
+var urlIsSameOrigin = require('./../helpers/urlIsSameOrigin');
 
 module.exports = function xhrAdapter(resolve, reject, config) {
   // Transform request data
@@ -99,19 +99,23 @@ module.exports = function xhrAdapter(resolve, reject, config) {
     }
   }
 
+  if (utils.isArrayBuffer(data)) {
+    data = new DataView(data);
+  }
+
   // Send the request
   request.send(data);
 };
-},{"./../buildUrl":4,"./../cookies":5,"./../defaults":6,"./../parseHeaders":7,"./../transformData":9,"./../urlIsSameOrigin":10,"./../utils":11}],3:[function(require,module,exports){
+},{"./../defaults":4,"./../helpers/buildUrl":5,"./../helpers/cookies":6,"./../helpers/parseHeaders":7,"./../helpers/transformData":9,"./../helpers/urlIsSameOrigin":10,"./../utils":11}],3:[function(require,module,exports){
 (function (process){
 var Promise = require('es6-promise').Promise;
 var defaults = require('./defaults');
 var utils = require('./utils');
-var spread = require('./spread');
 
 var axios = module.exports = function axios(config) {
   config = utils.merge({
     method: 'get',
+    headers: {},
     transformRequest: defaults.transformRequest,
     transformResponse: defaults.transformResponse
   }, config);
@@ -134,8 +138,23 @@ var axios = module.exports = function axios(config) {
     }
   });
 
+  function deprecatedMethod(method, instead, docs) {
+    try {
+      console.warn(
+        'DEPRECATED method `' + method + '`.' +
+        (instead ? ' Use `' + instead + '` instead.' : '') +
+        ' This method will be removed in a future release.');
+
+      if (docs) {
+        console.warn('For more information about usage see ' + docs);
+      }
+    } catch (e) {}
+  }
+
   // Provide alias for success
   promise.success = function success(fn) {
+    deprecatedMethod('success', 'then', 'https://github.com/mzabriskie/axios/blob/master/README.md#response-api');
+
     promise.then(function(response) {
       fn(response.data, response.status, response.headers, response.config);
     });
@@ -144,6 +163,8 @@ var axios = module.exports = function axios(config) {
 
   // Provide alias for error
   promise.error = function error(fn) {
+    deprecatedMethod('error', 'catch', 'https://github.com/mzabriskie/axios/blob/master/README.md#response-api');
+
     promise.then(null, function(response) {
       fn(response.data, response.status, response.headers, response.config);
     });
@@ -160,7 +181,7 @@ axios.defaults = defaults;
 axios.all = function (promises) {
   return Promise.all(promises);
 };
-axios.spread = spread;
+axios.spread = require('./helpers/spread');
 
 // Provide aliases for supported request methods
 createShortMethods('delete', 'get', 'head');
@@ -189,10 +210,62 @@ function createShortMethodsWithData() {
   });
 }
 }).call(this,require('_process'))
-},{"./adapters/http":2,"./adapters/xhr":2,"./defaults":6,"./spread":8,"./utils":11,"_process":22,"es6-promise":12}],4:[function(require,module,exports){
+},{"./adapters/http":2,"./adapters/xhr":2,"./defaults":4,"./helpers/spread":8,"./utils":11,"_process":22,"es6-promise":12}],4:[function(require,module,exports){
 'use strict';
 
 var utils = require('./utils');
+
+var JSON_START = /^\s*(\[|\{[^\{])/;
+var JSON_END = /[\}\]]\s*$/;
+var PROTECTION_PREFIX = /^\)\]\}',?\n/;
+var DEFAULT_CONTENT_TYPE = {
+  'Content-Type': 'application/x-www-form-urlencoded'
+};
+
+module.exports = {
+  transformRequest: [function (data, headers) {
+    if (utils.isArrayBuffer(data)) {
+      return data;
+    }
+    if (utils.isArrayBufferView(data)) {
+      return data.buffer;
+    }
+    if (utils.isObject(data) && !utils.isFile(data) && !utils.isBlob(data)) {
+      // Set application/json if no Content-Type has been specified
+      if (!utils.isUndefined(headers) && utils.isUndefined(headers['Content-Type'])) {
+        headers['Content-Type'] = 'application/json;charset=utf-8';
+      }
+      return JSON.stringify(data);
+    }
+    return data;
+  }],
+
+  transformResponse: [function (data) {
+    if (typeof data === 'string') {
+      data = data.replace(PROTECTION_PREFIX, '');
+      if (JSON_START.test(data) && JSON_END.test(data)) {
+        data = JSON.parse(data);
+      }
+    }
+    return data;
+  }],
+
+  headers: {
+    common: {
+      'Accept': 'application/json, text/plain, */*'
+    },
+    patch: utils.merge(DEFAULT_CONTENT_TYPE),
+    post: utils.merge(DEFAULT_CONTENT_TYPE),
+    put: utils.merge(DEFAULT_CONTENT_TYPE)
+  },
+
+  xsrfCookieName: 'XSRF-TOKEN',
+  xsrfHeaderName: 'X-XSRF-TOKEN'
+};
+},{"./utils":11}],5:[function(require,module,exports){
+'use strict';
+
+var utils = require('./../utils');
 
 function encode(val) {
   return encodeURIComponent(val).
@@ -235,10 +308,10 @@ module.exports = function buildUrl(url, params) {
 
   return url;
 };
-},{"./utils":11}],5:[function(require,module,exports){
+},{"./../utils":11}],6:[function(require,module,exports){
 'use strict';
 
-var utils = require('./utils');
+var utils = require('./../utils');
 
 module.exports = {
   write: function write(name, value, expires, path, domain, secure) {
@@ -273,52 +346,10 @@ module.exports = {
     this.write(name, '', Date.now() - 86400000);
   }
 };
-},{"./utils":11}],6:[function(require,module,exports){
+},{"./../utils":11}],7:[function(require,module,exports){
 'use strict';
 
-var utils = require('./utils');
-
-var JSON_START = /^\s*(\[|\{[^\{])/;
-var JSON_END = /[\}\]]\s*$/;
-var PROTECTION_PREFIX = /^\)\]\}',?\n/;
-var CONTENT_TYPE_APPLICATION_JSON = {
-  'Content-Type': 'application/json;charset=utf-8'
-};
-
-module.exports = {
-  transformRequest: [function (data) {
-    return utils.isObject(data) &&
-          !utils.isFile(data) &&
-          !utils.isBlob(data) ?
-            JSON.stringify(data) : data;
-  }],
-
-  transformResponse: [function (data) {
-    if (typeof data === 'string') {
-      data = data.replace(PROTECTION_PREFIX, '');
-      if (JSON_START.test(data) && JSON_END.test(data)) {
-        data = JSON.parse(data);
-      }
-    }
-    return data;
-  }],
-
-  headers: {
-    common: {
-      'Accept': 'application/json, text/plain, */*'
-    },
-    patch: utils.merge(CONTENT_TYPE_APPLICATION_JSON),
-    post: utils.merge(CONTENT_TYPE_APPLICATION_JSON),
-    put: utils.merge(CONTENT_TYPE_APPLICATION_JSON)
-  },
-
-  xsrfCookieName: 'XSRF-TOKEN',
-  xsrfHeaderName: 'X-XSRF-TOKEN'
-};
-},{"./utils":11}],7:[function(require,module,exports){
-'use strict';
-
-var utils = require('./utils');
+var utils = require('./../utils');
 
 /**
  * Parse headers into an object
@@ -350,7 +381,7 @@ module.exports = function parseHeaders(headers) {
 
   return parsed;
 };
-},{"./utils":11}],8:[function(require,module,exports){
+},{"./../utils":11}],8:[function(require,module,exports){
 /**
  * Syntactic sugar for invoking a function and expanding an array for arguments.
  *
@@ -379,7 +410,7 @@ module.exports = function spread(callback) {
 },{}],9:[function(require,module,exports){
 'use strict';
 
-var utils = require('./utils');
+var utils = require('./../utils');
 
 /**
  * Transform the data for a request or a response
@@ -396,11 +427,11 @@ module.exports = function transformData(data, headers, fns) {
 
   return data;
 };
-},{"./utils":11}],10:[function(require,module,exports){
+},{"./../utils":11}],10:[function(require,module,exports){
 'use strict';
 
 var msie = /(msie|trident)/i.test(navigator.userAgent);
-var utils = require('./utils');
+var utils = require('./../utils');
 var urlParsingNode = document.createElement('a');
 var originUrl = urlResolve(window.location.href);
 
@@ -447,7 +478,7 @@ module.exports = function urlIsSameOrigin(requestUrl) {
   return (parsed.protocol === originUrl.protocol &&
         parsed.host === originUrl.host);
 };
-},{"./utils":11}],11:[function(require,module,exports){
+},{"./../utils":11}],11:[function(require,module,exports){
 // utils is a library of generic helper functions non-specific to axios
 
 var toString = Object.prototype.toString;
@@ -460,6 +491,30 @@ var toString = Object.prototype.toString;
  */
 function isArray(val) {
   return toString.call(val) === '[object Array]';
+}
+
+/**
+ * Determine if a value is an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an ArrayBuffer, otherwise false
+ */
+function isArrayBuffer(val) {
+  return toString.call(val) === '[object ArrayBuffer]';
+}
+
+/**
+ * Determine if a value is a view on an ArrayBuffer
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
+ */
+function isArrayBufferView(val) {
+  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
+    return ArrayBuffer.isView(val);
+  } else {
+    return (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+  }
 }
 
 /**
@@ -480,6 +535,16 @@ function isString(val) {
  */
 function isNumber(val) {
   return typeof val === 'number';
+}
+
+/**
+ * Determine if a value is undefined
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if the value is undefined, otherwise false
+ */
+function isUndefined(val) {
+  return typeof val === 'undefined';
 }
 
 /**
@@ -603,9 +668,12 @@ function merge(obj1/*, obj2, obj3, ...*/) {
 
 module.exports = {
   isArray: isArray,
+  isArrayBuffer: isArrayBuffer,
+  isArrayBufferView: isArrayBufferView,
   isString: isString,
   isNumber: isNumber,
   isObject: isObject,
+  isUndefined: isUndefined,
   isDate: isDate,
   isFile: isFile,
   isBlob: isBlob,
@@ -1231,6 +1299,8 @@ var process = module.exports = {};
 process.nextTick = (function () {
     var canSetImmediate = typeof window !== 'undefined'
     && window.setImmediate;
+    var canMutationObserver = typeof window !== 'undefined'
+    && window.MutationObserver;
     var canPost = typeof window !== 'undefined'
     && window.postMessage && window.addEventListener
     ;
@@ -1239,8 +1309,29 @@ process.nextTick = (function () {
         return function (f) { return window.setImmediate(f) };
     }
 
+    var queue = [];
+
+    if (canMutationObserver) {
+        var hiddenDiv = document.createElement("div");
+        var observer = new MutationObserver(function () {
+            var queueList = queue.slice();
+            queue.length = 0;
+            queueList.forEach(function (fn) {
+                fn();
+            });
+        });
+
+        observer.observe(hiddenDiv, { attributes: true });
+
+        return function nextTick(fn) {
+            if (!queue.length) {
+                hiddenDiv.setAttribute('yes', 'no');
+            }
+            queue.push(fn);
+        };
+    }
+
     if (canPost) {
-        var queue = [];
         window.addEventListener('message', function (ev) {
             var source = ev.source;
             if ((source === window || source === null) && ev.data === 'process-tick') {
@@ -1280,7 +1371,7 @@ process.emit = noop;
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
-}
+};
 
 // TODO(shtylman)
 process.cwd = function () { return '/' };
@@ -1327,7 +1418,9 @@ defaultsPrototype.forceTrailingSlash = '';
 
 defaultsPrototype.httpConfig = {};
 
-defaultsPrototype.log = console ? console.log : function () {
+defaultsPrototype.log = console ? function (a, b, c, d, e) {
+  console.log(a, b, c, d, e);
+} : function () {
 };
 
 defaultsPrototype.deserialize = function (resourceName, data) {
