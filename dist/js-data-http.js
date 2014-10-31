@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 0.4.3 - Homepage <http://www.js-data.iojs-data-http/>
+* @version 1.0.0-alpha.1 - Homepage <http://www.js-data.iojs-data-http/>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *

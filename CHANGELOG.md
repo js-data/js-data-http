@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.1 - 31 October 2014
+
+###### Backwards compatible bug fixes
+- #3 - _this.defaults.log() throws Illegal invocation
+
 ##### 0.4.2 - 22 October 2014
 
 ###### Backwards compatible bug fixes
