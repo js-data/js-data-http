@@ -62,4 +62,32 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
       _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(p1));
     }, 10);
   });
+
+  it('should log errors', function (done) {
+    var _this = this;
+    var loggedError;
+
+    dsHttpAdapter.defaults.error = function (err) {
+      loggedError = err;
+    };
+
+    dsHttpAdapter.find(Post, 1).then(function () {
+      done('Should not have succeeded!');
+    }, function () {
+      assert.isString(loggedError);
+      assert.isTrue(loggedError.indexOf('api/posts/1') !== -1);
+      done();
+    });
+
+    setTimeout(function () {
+      try {
+        assert.equal(1, _this.requests.length);
+        assert.equal(_this.requests[0].url, 'api/posts/1');
+        assert.equal(_this.requests[0].method, 'get');
+      } catch (err) {
+        done(err);
+      }
+      _this.requests[0].respond(404, { 'Content-Type': 'text/plain' }, 'Not Found');
+    }, 10);
+  });
 });

@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.2 - 01 November 2014
+
+###### Backwards compatible API changes
+- #4 - Log failures. See also #5 and #6
+
 ##### 1.0.0-alpha.1 - 31 October 2014
 
 ###### Backwards compatible bug fixes

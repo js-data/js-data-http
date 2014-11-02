@@ -36,8 +36,13 @@ defaultsPrototype.forceTrailingSlash = '';
 
 defaultsPrototype.httpConfig = {};
 
-defaultsPrototype.log = console ? function (a, b, c, d, e) {
-  console.log(a, b, c, d, e);
+defaultsPrototype.log = console ? function (a, b) {
+  console[typeof console.info === 'function' ? 'info' : 'log'](a, b);
+} : function () {
+};
+
+defaultsPrototype.error = console ? function (a, b) {
+  console[typeof console.error === 'function' ? 'error' : 'log'](a, b);
 } : function () {
 };
 
@@ -66,17 +71,28 @@ dsHttpAdapterPrototype.getAllPath = function (resourceConfig, options) {
 
 dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
-  var start = new Date().getTime();
+  var start = new Date();
   config = deepMixIn(config, _this.defaults.httpConfig);
   if (_this.defaults.forceTrailingSlash && config.url[config.url.length] !== '/') {
     config.url += '/';
   }
-  return http(config).then(function (data) {
-    if (_this.defaults.log) {
-      _this.defaults.log(data.config.method.toUpperCase() + ' request: ' + data.config.url + ' Time taken: ' + (new Date().getTime() - start) + 'ms', data);
+
+  function logResponse(data) {
+    var str = start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
+    if (data.status >= 200 && data.status < 300) {
+      if (_this.defaults.log) {
+        _this.defaults.log(str, data);
+      }
+      return data;
+    } else {
+      if (_this.defaults.error) {
+        _this.defaults.error('FAILED: ' + str, data);
+      }
+      throw data;
     }
-    return data;
-  });
+  }
+
+  return http(config).then(logResponse, logResponse);
 };
 
 dsHttpAdapterPrototype.GET = function (url, config) {

@@ -1,8 +1,8 @@
 {
   "name": "js-data-http",
   "description": "http adapter for js-data.",
-  "version": "1.0.0-alpha.1",
-  "homepage": "http://www.js-data.io/js-data-http",
+  "version": "1.0.0-alpha.2",
+  "homepage": "http://www.js-data.io/docs/dshttpadapter",
   "repository": {
     "type": "git",
     "url": "https://github.com/js-data/js-data-http.git"
@@ -46,6 +46,6 @@
   "dependencies": {
     "axios": "0.4.x",
     "mout": "0.10.0",
-    "js-data": "1.0.x"
+    "js-data": "~1.0.x"
   }
 }
