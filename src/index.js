@@ -26,7 +26,7 @@ function Defaults() {
 
 var defaultsPrototype = Defaults.prototype;
 
-defaultsPrototype.queryTransform = function (resourceName, params) {
+defaultsPrototype.queryTransform = function (resourceConfig, params) {
   return params;
 };
 
@@ -46,11 +46,11 @@ defaultsPrototype.error = console ? function (a, b) {
 } : function () {
 };
 
-defaultsPrototype.deserialize = function (resourceName, data) {
+defaultsPrototype.deserialize = function (resourceConfig, data) {
   return data ? ('data' in data ? data.data : data) : data;
 };
 
-defaultsPrototype.serialize = function (resourceName, data) {
+defaultsPrototype.serialize = function (resourceConfig, data) {
   return data;
 };
 
@@ -144,7 +144,7 @@ dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
     _this.getIdPath(resourceConfig, options, id),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 
@@ -153,14 +153,14 @@ dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
   options = options || {};
   options.params = options.params || {};
   if (params) {
-    params = _this.defaults.queryTransform(resourceConfig.name, params);
+    params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
   }
   return _this.GET(
     _this.getAllPath(resourceConfig, options),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 
@@ -169,10 +169,10 @@ dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
   options = options || {};
   return _this.POST(
     makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(attrs, options)),
-    options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
+    options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 
@@ -181,10 +181,10 @@ dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
   options = options || {};
   return _this.PUT(
     _this.getIdPath(resourceConfig, options, id),
-    options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
+    options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 
@@ -193,15 +193,15 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
   options = options || {};
   options.params = options.params || {};
   if (params) {
-    params = _this.defaults.queryTransform(resourceConfig.name, params);
+    params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
   }
   return this.PUT(
     _this.getAllPath(resourceConfig, options),
-    options.serialize ? options.serialize(resourceConfig.name, attrs) : _this.defaults.serialize(resourceConfig.name, attrs),
+    options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 
@@ -212,7 +212,7 @@ dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
     _this.getIdPath(resourceConfig, options, id),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 
@@ -221,14 +221,14 @@ dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
   options = options || {};
   options.params = options.params || {};
   if (params) {
-    params = _this.defaults.queryTransform(resourceConfig.name, params);
+    params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
   }
   return this.DEL(
     _this.getAllPath(resourceConfig, options),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig.name, data);
+      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
     });
 };
 

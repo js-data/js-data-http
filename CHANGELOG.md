@@ -1,3 +1,8 @@
+##### 1.0.0-alpha.3 - 19 November 2014
+
+###### Breaking API changes
+- `queryTransform`, `serialize` and `deserialize` now take the resource definition as the first argument instead of just the resource name
+
 ##### 1.0.0-alpha.2 - 01 November 2014
 
 ###### Backwards compatible API changes
