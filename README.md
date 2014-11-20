@@ -13,7 +13,7 @@ http adapter for [js-data](http://www.js-data.io/).
 | ------ | ------ |
 | Bower | [![Bower version](https://badge.fury.io/bo/js-data-http.png)](http://badge.fury.io/bo/js-data-http) |
 | NPM | [![NPM version](https://badge.fury.io/js/js-data-http.png)](http://badge.fury.io/js/js-data-http) |
-| Build Status | [![Build Status](https://travis-ci.org/js-data/js-data-http.png?branch=master)](https://travis-ci.org/js-data/js-data-http) |
+| Build Status | [![Circle CI](https://circleci.com/gh/js-data/js-data-http/tree/master.png?style=badge)](https://circleci.com/gh/js-data/js-data-http/tree/master) |
 | Code Climate | [![Code Climate](https://codeclimate.com/github/js-data/js-data-http.png)](https://codeclimate.com/github/js-data/js-data-http) |
 | Dependency Status | [![Dependency Status](https://gemnasium.com/js-data/js-data-http.png)](https://gemnasium.com/js-data/js-data-http) |
 | Coverage | [![Coverage Status](https://coveralls.io/repos/js-data/js-data-http/badge.png?branch=master)](https://coveralls.io/r/js-data/js-data-http?branch=master) |

@@ -36,14 +36,14 @@ module.exports = function (grunt) {
       main: {
         options: {
           banner: '/**\n' +
-            '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
-            '* @file js-data-http.min.js\n' +
-            '* @version <%= pkg.version %> - Homepage <http://wwwjs-data.io/js-data-http>\n' +
-            '* @copyright (c) 2014 Jason Dobry\n' +
-            '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
-            '*\n' +
-            '* @overview My Adapter.\n' +
-            '*/\n'
+          '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
+          '* @file js-data-http.min.js\n' +
+          '* @version <%= pkg.version %> - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
+          '* @copyright (c) 2014 Jason Dobry\n' +
+          '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
+          '*\n' +
+          '* @overview My Adapter.\n' +
+          '*/\n'
         },
         files: {
           'dist/js-data-http.min.js': ['dist/js-data-http.js']
@@ -75,7 +75,7 @@ module.exports = function (grunt) {
         preprocessors: {}
       },
       min: {
-        browsers: ['Firefox', 'PhantomJS'],
+        browsers: ['Chrome', 'Firefox', 'PhantomJS'],
         options: {
           files: [
             'bower_components/js-data/dist/js-data.min.js',
@@ -86,7 +86,7 @@ module.exports = function (grunt) {
         }
       },
       ci: {
-        browsers: ['Firefox', 'PhantomJS']
+        browsers: ['Chrome', 'Firefox', 'PhantomJS']
       }
     },
     coveralls: {
@@ -110,7 +110,7 @@ module.exports = function (grunt) {
     var banner = '/**\n' +
       '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
       '* @file js-data-http.js\n' +
-      '* @version ' + pkg.version + ' - Homepage <http://www.js-data.iojs-data-http/>\n' +
+      '* @version ' + pkg.version + ' - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
       '* @copyright (c) 2014 Jason Dobry \n' +
       '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
       '*\n' +
