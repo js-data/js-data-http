@@ -1,3 +1,11 @@
+##### 1.0.0-alpha.4 - 01 December 2014
+
+###### Backwards compatible API changes
+- Added DSHttpAdapter.getPath
+
+###### Backwards compatible bug fixes
+- #8 - Fixed handling of `forceTrailingSlash` option
+
 ##### 1.0.0-alpha.3 - 19 November 2014
 
 ###### Breaking API changes

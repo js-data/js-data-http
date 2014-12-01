@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 1.0.0-alpha.3 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 1.0.0-alpha.4 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1398,7 +1398,7 @@ if (!JSData) {
   throw new Error('js-data must be loaded!');
 }
 
-var makePath = JSData.DSUtils.makePath;
+var DSUtils = JSData.DSUtils;
 var deepMixIn = JSData.DSUtils.deepMixIn;
 var http = require('axios');
 
@@ -1443,19 +1443,24 @@ function DSHttpAdapter(options) {
 
 var dsHttpAdapterPrototype = DSHttpAdapter.prototype;
 
-dsHttpAdapterPrototype.getIdPath = function (resourceConfig, options, id) {
-  return makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(id, options), id);
-};
-
-dsHttpAdapterPrototype.getAllPath = function (resourceConfig, options) {
-  return makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(null, options));
+dsHttpAdapterPrototype.getPath = function (method, resourceConfig, id, options) {
+  var _this = this;
+  options = options || {};
+  var args = [
+    options.basePath || _this.defaults.basePath || resourceConfig.basePath,
+    resourceConfig.getEndpoint((DSUtils.isString(id) || DSUtils.isNumber(id) || method === 'create') ? id : null, options)
+  ];
+  if (method === 'find' || method === 'update' || method === 'destroy') {
+    args.push(id);
+  }
+  return DSUtils.makePath.apply(DSUtils, args);
 };
 
 dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
   var start = new Date();
   config = deepMixIn(config, _this.defaults.httpConfig);
-  if (_this.defaults.forceTrailingSlash && config.url[config.url.length] !== '/') {
+  if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
     config.url += '/';
   }
 
@@ -1523,7 +1528,7 @@ dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
   return _this.GET(
-    _this.getIdPath(resourceConfig, options, id),
+    _this.getPath('find', resourceConfig, id, options),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
@@ -1539,7 +1544,7 @@ dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
     deepMixIn(options.params, params);
   }
   return _this.GET(
-    _this.getAllPath(resourceConfig, options),
+    _this.getPath('findAll', resourceConfig, params, options),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
@@ -1550,7 +1555,7 @@ dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
   var _this = this;
   options = options || {};
   return _this.POST(
-    makePath(options.basePath || this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(attrs, options)),
+    _this.getPath('create', resourceConfig, attrs, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
     options
   ).then(function (data) {
@@ -1562,7 +1567,7 @@ dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
   var _this = this;
   options = options || {};
   return _this.PUT(
-    _this.getIdPath(resourceConfig, options, id),
+    _this.getPath('update', resourceConfig, id, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
     options
   ).then(function (data) {
@@ -1579,7 +1584,7 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
     deepMixIn(options.params, params);
   }
   return this.PUT(
-    _this.getAllPath(resourceConfig, options),
+    _this.getPath('updateAll', resourceConfig, attrs, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
     options
   ).then(function (data) {
@@ -1591,7 +1596,7 @@ dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
   return _this.DEL(
-    _this.getIdPath(resourceConfig, options, id),
+    _this.getPath('destroy', resourceConfig, id, options),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
@@ -1607,7 +1612,7 @@ dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
     deepMixIn(options.params, params);
   }
   return this.DEL(
-    _this.getAllPath(resourceConfig, options),
+    _this.getPath('destroyAll', resourceConfig, params, options),
     options
   ).then(function (data) {
       return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
