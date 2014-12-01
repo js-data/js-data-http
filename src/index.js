@@ -73,7 +73,7 @@ dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
   var start = new Date();
   config = deepMixIn(config, _this.defaults.httpConfig);
-  if (_this.defaults.forceTrailingSlash && config.url[config.url.length] !== '/') {
+  if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
     config.url += '/';
   }
 
