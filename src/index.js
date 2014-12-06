@@ -157,8 +157,8 @@ dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
 dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
   var _this = this;
   options = options || {};
+  options = DSUtils.copy(options);
   options.params = options.params || {};
-  options.params = DSUtils.copy(options.params);
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
@@ -198,8 +198,8 @@ dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
 dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, options) {
   var _this = this;
   options = options || {};
+  options = DSUtils.copy(options);
   options.params = options.params || {};
-  options.params = DSUtils.copy(options.params);
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
@@ -227,8 +227,8 @@ dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
 dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
   var _this = this;
   options = options || {};
+  options = DSUtils.copy(options);
   options.params = options.params || {};
-  options.params = DSUtils.copy(options.params);
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
