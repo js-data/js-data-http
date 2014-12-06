@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 1.0.0-alpha.4 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 1.0.0-alpha.5 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1459,6 +1459,7 @@ dsHttpAdapterPrototype.getPath = function (method, resourceConfig, id, options) 
 dsHttpAdapterPrototype.HTTP = function (config) {
   var _this = this;
   var start = new Date();
+  config = DSUtils.copy(config);
   config = deepMixIn(config, _this.defaults.httpConfig);
   if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
     config.url += '/';
@@ -1539,6 +1540,7 @@ dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
   var _this = this;
   options = options || {};
   options.params = options.params || {};
+  options.params = DSUtils.copy(options.params);
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
@@ -1579,6 +1581,7 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
   var _this = this;
   options = options || {};
   options.params = options.params || {};
+  options.params = DSUtils.copy(options.params);
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);
@@ -1607,6 +1610,7 @@ dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
   var _this = this;
   options = options || {};
   options.params = options.params || {};
+  options.params = DSUtils.copy(options.params);
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
     deepMixIn(options.params, params);

@@ -1,3 +1,7 @@
+##### 1.0.0-alpha.5 - 05 December 2014
+
+Updated dependencies. Now safely making copies of the `options` passed into methods
+
 ##### 1.0.0-alpha.4 - 01 December 2014
 
 ###### Backwards compatible API changes
