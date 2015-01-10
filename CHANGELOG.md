@@ -1,3 +1,7 @@
+##### 1.0.0-beta.1 - 10 January 2014
+
+Now in beta
+
 ##### 1.0.0-alpha.6 - 05 December 2014
 
 ###### Backwards compatible bug fixes

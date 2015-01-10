@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 1.0.0-alpha.6 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 1.0.0-beta.1 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
