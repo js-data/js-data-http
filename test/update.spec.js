@@ -18,7 +18,7 @@ describe('DSHttpAdapter.update(resourceConfig, id, attrs, options)', function ()
       setTimeout(function () {
         assert.equal(2, _this.requests.length);
         assert.equal(_this.requests[1].url, 'api2/posts/1');
-        assert.equal(_this.requests[1].method, 'put');
+        assert.equal(_this.requests[1].method, 'PUT');
         assert.equal(_this.requests[1].requestBody, JSON.stringify({ author: 'John', age: 30 }));
         _this.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(p1));
       }, 10);
@@ -30,7 +30,7 @@ describe('DSHttpAdapter.update(resourceConfig, id, attrs, options)', function ()
     setTimeout(function () {
       assert.equal(1, _this.requests.length);
       assert.equal(_this.requests[0].url, 'api/posts/1');
-      assert.equal(_this.requests[0].method, 'put');
+      assert.equal(_this.requests[0].method, 'PUT');
       assert.equal(_this.requests[0].requestBody, JSON.stringify({ author: 'John', age: 30 }));
       _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(p1));
     }, 10);

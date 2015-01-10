@@ -24,7 +24,7 @@ describe('DSHttpAdapter.updateAll(resourceConfig, attrs, params, options)', func
       setTimeout(function () {
         assert.equal(2, _this.requests.length);
         assert.equal(_this.requests[1].url, 'api2/posts?where=%7B%22author%22:%7B%22%3D%3D%22:%22John%22%7D%7D');
-        assert.equal(_this.requests[1].method, 'put');
+        assert.equal(_this.requests[1].method, 'PUT');
         _this.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify([p1]));
       }, 10);
     }).catch(function (err) {
@@ -35,7 +35,7 @@ describe('DSHttpAdapter.updateAll(resourceConfig, attrs, params, options)', func
     setTimeout(function () {
       assert.equal(1, _this.requests.length);
       assert.equal(_this.requests[0].url, 'api/posts');
-      assert.equal(_this.requests[0].method, 'put');
+      assert.equal(_this.requests[0].method, 'PUT');
       _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify([p1]));
     }, 10);
   });

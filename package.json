@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "http adapter for js-data.",
-  "version": "1.0.0-beta.1",
+  "version": "1.0.0-beta.2",
   "homepage": "http://www.js-data.io/docs/dshttpadapter",
   "repository": {
     "type": "git",

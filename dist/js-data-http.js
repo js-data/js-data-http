@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 1.0.0-beta.1 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 1.0.0-beta.2 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -33,9 +33,13 @@ module.exports = function xhrAdapter(resolve, reject, config) {
     config.headers || {}
   );
 
+  if (utils.isFormData(data)) {
+    delete headers['Content-Type']; // Let the browser set it
+  }
+
   // Create the request
   var request = new(XMLHttpRequest || ActiveXObject)('Microsoft.XMLHTTP');
-  request.open(config.method, buildUrl(config.url, config.params), true);
+  request.open(config.method.toUpperCase(), buildUrl(config.url, config.params), true);
 
   // Listen for ready state
   request.onreadystatechange = function () {
@@ -123,20 +127,22 @@ var axios = module.exports = function axios(config) {
   // Don't allow overriding defaults.withCredentials
   config.withCredentials = config.withCredentials || defaults.withCredentials;
 
-  var promise = new Promise(function (resolve, reject) {
-    try {
-      // For browsers use XHR adapter
-      if (typeof window !== 'undefined') {
-        require('./adapters/xhr')(resolve, reject, config);
+  var serverRequest = function (config) {
+    return new Promise(function (resolve, reject) {
+      try {
+        // For browsers use XHR adapter
+        if (typeof window !== 'undefined') {
+          require('./adapters/xhr')(resolve, reject, config);
+        }
+        // For node use HTTP adapter
+        else if (typeof process !== 'undefined') {
+          require('./adapters/http')(resolve, reject, config);
+        }
+      } catch (e) {
+        reject(e);
       }
-      // For node use HTTP adapter
-      else if (typeof process !== 'undefined') {
-        require('./adapters/http')(resolve, reject, config);
-      }
-    } catch (e) {
-      reject(e);
-    }
-  });
+    });
+  };
 
   function deprecatedMethod(method, instead, docs) {
     try {
@@ -149,6 +155,24 @@ var axios = module.exports = function axios(config) {
         console.warn('For more information about usage see ' + docs);
       }
     } catch (e) {}
+  }
+
+  var chain = [serverRequest, undefined];
+  var promise = Promise.resolve(config);
+
+  utils.forEach(axios.interceptors.request.handlers, function (interceptor) {
+    chain.unshift(interceptor.request, interceptor.requestError);
+  });
+
+  utils.forEach(axios.interceptors.response.handlers, function (interceptor) {
+    chain.push(interceptor.response, interceptor.responseError);
+  });
+
+  while (chain.length) {
+    var thenFn = chain.shift();
+    var rejectFn = chain.shift();
+
+    promise = promise.then(thenFn, rejectFn);
   }
 
   // Provide alias for success
@@ -183,6 +207,22 @@ axios.all = function (promises) {
 };
 axios.spread = require('./helpers/spread');
 
+// interceptors
+axios.interceptors = {
+  request: {
+    handlers: [],
+    use: function (thenFn, rejectFn) {
+      axios.interceptors.request.handlers.push({ request: thenFn, requestError: rejectFn });
+    }
+  },
+  response: {
+    handlers: [],
+    use: function (thenFn, rejectFn) {
+      axios.interceptors.response.handlers.push({ response: thenFn, responseError: rejectFn });
+    }
+  }
+};
+
 // Provide aliases for supported request methods
 createShortMethods('delete', 'get', 'head');
 createShortMethodsWithData('post', 'put', 'patch');
@@ -209,6 +249,7 @@ function createShortMethodsWithData() {
     };
   });
 }
+
 }).call(this,require('_process'))
 },{"./adapters/http":2,"./adapters/xhr":2,"./defaults":4,"./helpers/spread":8,"./utils":11,"_process":22,"es6-promise":12}],4:[function(require,module,exports){
 'use strict';
@@ -504,6 +545,16 @@ function isArrayBuffer(val) {
 }
 
 /**
+ * Determine if a value is a FormData
+ *
+ * @param {Object} val The value to test
+ * @returns {boolean} True if value is an FormData, otherwise false
+ */
+function isFormData(val) {
+  return toString.call(val) === '[object FormData]';
+}
+
+/**
  * Determine if a value is a view on an ArrayBuffer
  *
  * @param {Object} val The value to test
@@ -669,6 +720,7 @@ function merge(obj1/*, obj2, obj3, ...*/) {
 module.exports = {
   isArray: isArray,
   isArrayBuffer: isArrayBuffer,
+  isFormData: isFormData,
   isArrayBufferView: isArrayBufferView,
   isString: isString,
   isNumber: isNumber,

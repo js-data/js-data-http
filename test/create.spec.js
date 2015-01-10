@@ -31,7 +31,7 @@ describe('DSHttpAdapter.create(resourceConfig, attrs, options)', function () {
     setTimeout(function () {
       assert.equal(1, _this.requests.length);
       assert.equal(_this.requests[0].url, 'api/posts');
-      assert.equal(_this.requests[0].method, 'post');
+      assert.equal(_this.requests[0].method, 'POST');
       assert.equal(_this.requests[0].requestBody, DSUtils.toJson({ author: 'John', age: 30 }));
       _this.requests[0].respond(200, {'Content-Type': 'application/json'}, DSUtils.toJson(p1));
     }, 10);

@@ -18,7 +18,7 @@ describe('DSHttpAdapter.destroy(resourceConfig, id, options)', function () {
       setTimeout(function () {
         assert.equal(2, _this.requests.length);
         assert.equal(_this.requests[1].url, 'api2/posts/1');
-        assert.equal(_this.requests[1].method, 'delete');
+        assert.equal(_this.requests[1].method, 'DELETE');
         _this.requests[1].respond(200, {'Content-Type': 'text/plain'}, '1');
       }, 10);
 
@@ -30,7 +30,7 @@ describe('DSHttpAdapter.destroy(resourceConfig, id, options)', function () {
     setTimeout(function () {
       assert.equal(1, _this.requests.length);
       assert.equal(_this.requests[0].url, 'api/posts/1');
-      assert.equal(_this.requests[0].method, 'delete');
+      assert.equal(_this.requests[0].method, 'DELETE');
       _this.requests[0].respond(200, {'Content-Type': 'text/plain'}, '1');
     }, 10);
   });

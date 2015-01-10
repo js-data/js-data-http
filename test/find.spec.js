@@ -18,7 +18,7 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
       setTimeout(function () {
         assert.equal(2, _this.requests.length);
         assert.equal(_this.requests[1].url, 'api2/posts/1');
-        assert.equal(_this.requests[1].method, 'get');
+        assert.equal(_this.requests[1].method, 'GET');
         _this.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(p1));
       }, 10);
     }).catch(function (err) {
@@ -29,7 +29,7 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
     setTimeout(function () {
       assert.equal(1, _this.requests.length);
       assert.equal(_this.requests[0].url, 'api/posts/1');
-      assert.equal(_this.requests[0].method, 'get');
+      assert.equal(_this.requests[0].method, 'GET');
       _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(p1));
     }, 10);
   });
@@ -54,7 +54,7 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
     setTimeout(function () {
       assert.equal(1, _this.requests.length);
       assert.equal(_this.requests[0].url, 'api/posts/1?test=test');
-      assert.equal(_this.requests[0].method, 'get');
+      assert.equal(_this.requests[0].method, 'GET');
       assert.deepEqual({
         Authorization: 'test',
         Accept: 'application/json, text/plain, */*'
@@ -83,7 +83,7 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
       try {
         assert.equal(1, _this.requests.length);
         assert.equal(_this.requests[0].url, 'api/posts/1');
-        assert.equal(_this.requests[0].method, 'get');
+        assert.equal(_this.requests[0].method, 'GET');
       } catch (err) {
         done(err);
       }

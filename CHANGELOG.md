@@ -1,3 +1,7 @@
+##### 1.0.0-beta.2 - 10 January 2014
+
+Fixed some tests.
+
 ##### 1.0.0-beta.1 - 10 January 2014
 
 Now in beta
