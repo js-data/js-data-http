@@ -1,3 +1,7 @@
+##### 1.1.0 - 04 February 2015
+
+Now requiring js-data 1.1.0 to allow for safe stringification of cyclic objects
+
 ##### 1.0.0 - 03 February 2015
 
 Stable Version 1.0.0

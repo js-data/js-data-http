@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 1.0.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 1.1.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1920,6 +1920,9 @@ dsHttpAdapterPrototype.HTTP = function (config) {
   config = deepMixIn(config, _this.defaults.httpConfig);
   if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
     config.url += '/';
+  }
+  if (typeof config.data === 'object') {
+    config.data = DSUtils.removeCircular(config.data);
   }
 
   function logResponse(data) {

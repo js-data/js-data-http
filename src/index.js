@@ -82,6 +82,9 @@ dsHttpAdapterPrototype.HTTP = function (config) {
   if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
     config.url += '/';
   }
+  if (typeof config.data === 'object') {
+    config.data = DSUtils.removeCircular(config.data);
+  }
 
   function logResponse(data) {
     var str = start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
