@@ -1,3 +1,8 @@
+##### 1.2.0 - 24 February 2015
+
+###### Backwards compatible API changes
+- Added `suffix` option
+
 ##### 1.1.0 - 04 February 2015
 
 Now requiring js-data 1.1.0 to allow for safe stringification of cyclic objects

@@ -90,4 +90,53 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
       _this.requests[0].respond(404, { 'Content-Type': 'text/plain' }, 'Not Found');
     }, 10);
   });
+
+  it('should use suffixes', function (done) {
+    var _this = this;
+
+    var Thing = datastore.defineResource({
+      name: 'thing',
+      endpoint: 'things',
+      suffix: '.xml'
+    });
+
+    var otherAdapter = new DSHttpAdapter({
+      suffix: '.json'
+    });
+
+    dsHttpAdapter.find(Thing, 1).then(function () {
+
+      otherAdapter.find(Post, 1).then(function () {
+        done();
+      }).catch(function (err) {
+        console.error(err.stack);
+        done('should not have rejected');
+      });
+
+      setTimeout(function () {
+        try {
+          assert.equal(2, _this.requests.length);
+          assert.equal(_this.requests[1].url, 'api/posts/1.json');
+          assert.equal(_this.requests[1].method, 'GET');
+          _this.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({ id: 1 }));
+        } catch (e) {
+          done(e);
+        }
+      }, 10);
+    }).catch(function (err) {
+      console.error(err.stack);
+      done('should not have rejected');
+    });
+
+    setTimeout(function () {
+      try {
+        assert.equal(1, _this.requests.length);
+        assert.equal(_this.requests[0].url, 'things/1.xml');
+        assert.equal(_this.requests[0].method, 'GET');
+        _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({ id: 1 }));
+      } catch (e) {
+        done(e);
+      }
+    }, 10);
+  });
 });

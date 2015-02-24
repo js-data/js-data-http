@@ -1,7 +1,7 @@
 /**
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @file js-data-http.js
-* @version 1.1.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 1.2.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @copyright (c) 2014 Jason Dobry 
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1924,6 +1924,10 @@ dsHttpAdapterPrototype.HTTP = function (config) {
   if (typeof config.data === 'object') {
     config.data = DSUtils.removeCircular(config.data);
   }
+  var suffix = config.suffix || _this.defaults.suffix;
+  if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
+    config.url += suffix;
+  }
 
   function logResponse(data) {
     var str = start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
@@ -1988,6 +1992,7 @@ dsHttpAdapterPrototype.DEL = function (url, config) {
 dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
+  options.suffix = options.suffix || resourceConfig.suffix;
   return _this.GET(
     _this.getPath('find', resourceConfig, id, options),
     options
@@ -2000,6 +2005,7 @@ dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
   var _this = this;
   options = options || {};
   options = DSUtils.copy(options);
+  options.suffix = options.suffix || resourceConfig.suffix;
   options.params = options.params || {};
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
@@ -2016,6 +2022,7 @@ dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
 dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
   var _this = this;
   options = options || {};
+  options.suffix = options.suffix || resourceConfig.suffix;
   return _this.POST(
     _this.getPath('create', resourceConfig, attrs, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
@@ -2028,6 +2035,7 @@ dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
 dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
   var _this = this;
   options = options || {};
+  options.suffix = options.suffix || resourceConfig.suffix;
   return _this.PUT(
     _this.getPath('update', resourceConfig, id, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
@@ -2041,6 +2049,7 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
   var _this = this;
   options = options || {};
   options = DSUtils.copy(options);
+  options.suffix = options.suffix || resourceConfig.suffix;
   options.params = options.params || {};
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
@@ -2058,6 +2067,7 @@ dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, opti
 dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
+  options.suffix = options.suffix || resourceConfig.suffix;
   return _this.DEL(
     _this.getPath('destroy', resourceConfig, id, options),
     options
@@ -2070,6 +2080,7 @@ dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
   var _this = this;
   options = options || {};
   options = DSUtils.copy(options);
+  options.suffix = options.suffix || resourceConfig.suffix;
   options.params = options.params || {};
   if (params) {
     params = _this.defaults.queryTransform(resourceConfig, params);
