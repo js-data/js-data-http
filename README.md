@@ -12,7 +12,7 @@ http adapter for [js-data](http://www.js-data.io/).
 | Branch | Master |
 | ------ | ------ |
 | Bower | [![Bower version](https://badge.fury.io/bo/js-data-http.png)](http://badge.fury.io/bo/js-data-http) |
-| NPM | [![NPM version](https://badge.fury.io/js/js-data-http.png)](http://badge.fury.io/js/js-data-http) |
+| NPM | [![NPM](https://nodei.co/npm/js-data-http.png?downloads=true&stars=true)](https://nodei.co/npm/js-data-http/) |
 | Build Status | [![Circle CI](https://circleci.com/gh/js-data/js-data-http/tree/master.png?style=badge)](https://circleci.com/gh/js-data/js-data-http/tree/master) |
 | Code Climate | [![Code Climate](https://codeclimate.com/github/js-data/js-data-http.png)](https://codeclimate.com/github/js-data/js-data-http) |
 | Dependency Status | [![Dependency Status](https://gemnasium.com/js-data/js-data-http.png)](https://gemnasium.com/js-data/js-data-http) |

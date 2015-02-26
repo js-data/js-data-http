@@ -19,6 +19,7 @@ if (!JSData) {
 var DSUtils = JSData.DSUtils;
 var deepMixIn = JSData.DSUtils.deepMixIn;
 var http = require('axios');
+var P = DSUtils.Promise;
 
 function Defaults() {
 
@@ -158,7 +159,12 @@ dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
     _this.getPath('find', resourceConfig, id, options),
     options
   ).then(function (data) {
-      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+      var item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+      if (!item) {
+        return P.reject(new Error('Not Found!'));
+      } else {
+        return item;
+      }
     });
 };
 
