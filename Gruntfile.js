@@ -2,7 +2,7 @@
  * js-data-http
  * http://github.com/js-data/js-data-http
  *
- * Copyright (c) 2014 Jason Dobry <http://www.js-data.io/js-data-http>
+ * Copyright (c) 2014-2015 Jason Dobry <http://www.js-data.io/js-data-http>
  * Licensed under the MIT license. <https://github.com/js-data/js-data-http/blob/master/LICENSE>
  */
 module.exports = function (grunt) {
@@ -42,10 +42,10 @@ module.exports = function (grunt) {
           '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
           '* @file js-data-http.min.js\n' +
           '* @version <%= pkg.version %> - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
-          '* @copyright (c) 2014 Jason Dobry\n' +
+          '* @copyright (c) 2014-2015 Jason Dobry\n' +
           '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
           '*\n' +
-          '* @overview My Adapter.\n' +
+          '* @overview Http adapter for js-data.\n' +
           '*/\n'
         },
         files: {
@@ -53,16 +53,27 @@ module.exports = function (grunt) {
         }
       }
     },
-    browserify: {
-      options: {
-        browserifyOptions: {
-          standalone: 'DSHttpAdapter'
-        },
-        external: ['js-data']
-      },
+    webpack: {
       dist: {
-        files: {
-          'dist/js-data-http.js': ['src/index.js']
+        entry: './src/index.js',
+        output: {
+          filename: './dist/js-data-http.js',
+          libraryTarget: 'umd',
+          library: 'DSHttpAdapter'
+        },
+        externals: {
+          'js-data': {
+            amd: 'js-data',
+            commonjs: 'js-data',
+            commonjs2: 'js-data',
+            root: 'JSData'
+          },
+          'js-data-schema': {
+            amd: 'js-data-schema',
+            commonjs: 'js-data-schema',
+            commonjs2: 'js-data-schema',
+            root: 'Schemator'
+          }
         }
       }
     },
@@ -114,10 +125,10 @@ module.exports = function (grunt) {
       '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
       '* @file js-data-http.js\n' +
       '* @version ' + pkg.version + ' - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
-      '* @copyright (c) 2014 Jason Dobry \n' +
+      '* @copyright (c) 2014-2015 Jason Dobry \n' +
       '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
       '*\n' +
-      '* @overview My Adapter.\n' +
+      '* @overview Http adapter for js-data.\n' +
       '*/\n';
 
     file = banner + file;
@@ -129,7 +140,7 @@ module.exports = function (grunt) {
   grunt.registerTask('build', [
     'clean',
     'jshint',
-    'browserify',
+    'webpack',
     'banner',
     'uglify:main'
   ]);

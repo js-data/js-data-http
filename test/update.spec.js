@@ -8,7 +8,7 @@ describe('DSHttpAdapter.update(resourceConfig, id, attrs, options)', function ()
 
       dsHttpAdapter.update(Post, 1, { author: 'John', age: 30 }, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, p1, 'post 5 should have been updated');
-        assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');
+        assert.equal(queryTransform.callCount, 2, 'queryTransform should have been called twice');
         done();
       }).catch(function (err) {
         console.error(err.stack);

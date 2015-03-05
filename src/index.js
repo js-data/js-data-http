@@ -155,6 +155,8 @@ dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
   options.suffix = options.suffix || resourceConfig.suffix;
+  options.params = options.params || {};
+  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
   return _this.GET(
     _this.getPath('find', resourceConfig, id, options),
     options
@@ -190,6 +192,8 @@ dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
   var _this = this;
   options = options || {};
   options.suffix = options.suffix || resourceConfig.suffix;
+  options.params = options.params || {};
+  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
   return _this.POST(
     _this.getPath('create', resourceConfig, attrs, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
@@ -203,6 +207,8 @@ dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
   var _this = this;
   options = options || {};
   options.suffix = options.suffix || resourceConfig.suffix;
+  options.params = options.params || {};
+  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
   return _this.PUT(
     _this.getPath('update', resourceConfig, id, options),
     options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
@@ -235,6 +241,8 @@ dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
   var _this = this;
   options = options || {};
   options.suffix = options.suffix || resourceConfig.suffix;
+  options.params = options.params || {};
+  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
   return _this.DEL(
     _this.getPath('destroy', resourceConfig, id, options),
     options

@@ -8,23 +8,27 @@ describe('DSHttpAdapter.destroy(resourceConfig, id, options)', function () {
 
       dsHttpAdapter.destroy(Post, 1, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, '1', 'post should have been deleted');
-        assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');
+        assert.equal(queryTransform.callCount, 2, 'queryTransform should have been called twice');
         done();
       }).catch(function (err) {
         console.error(err.stack);
-        done('should not have rejected');
+        done(err);
       });
 
       setTimeout(function () {
-        assert.equal(2, _this.requests.length);
-        assert.equal(_this.requests[1].url, 'api2/posts/1');
-        assert.equal(_this.requests[1].method, 'DELETE');
-        _this.requests[1].respond(200, {'Content-Type': 'text/plain'}, '1');
+        try {
+          assert.equal(2, _this.requests.length);
+          assert.equal(_this.requests[1].url, 'api2/posts/1');
+          assert.equal(_this.requests[1].method, 'DELETE');
+          _this.requests[1].respond(200, {'Content-Type': 'text/plain'}, '1');
+        } catch (err) {
+          done(err);
+        }
       }, 10);
 
     }).catch(function (err) {
       console.error(err.stack);
-      done('should not have rejected');
+      done(err);
     });
 
     setTimeout(function () {

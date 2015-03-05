@@ -1,3 +1,11 @@
+##### 1.2.2 - 04 March 2015
+
+###### Backwards compatible bug fixes
+- #10 - DSHttpAdapter#find does not call queryTransform
+
+###### Other
+- Switched build to webpack. UMD should actually work now.
+
 ##### 1.2.1 - 25 February 2015
 
 ###### Backwards compatible bug fixes

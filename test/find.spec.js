@@ -8,7 +8,7 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
 
       dsHttpAdapter.find(Post, 1, { basePath: 'api2' }).then(function (data) {
         assert.deepEqual(data, p1, 'post should have been found');
-        assert.equal(queryTransform.callCount, 0, 'queryTransform should not have been called');
+        assert.equal(queryTransform.callCount, 2, 'queryTransform should have been called twice');
         done();
       }).catch(function (err) {
         console.error(err.stack);
