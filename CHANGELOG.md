@@ -1,4 +1,4 @@
-##### 1.2.3 - 04 March 2015
+##### 1.2.3 - 07 March 2015
 
 ###### Other
 - Converted code to ES6.
