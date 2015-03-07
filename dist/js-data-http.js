@@ -1,12 +1,12 @@
-/**
-* @author Jason Dobry <jason.dobry@gmail.com>
-* @file js-data-http.js
-* @version 1.2.2 - Homepage <http://www.js-data.io/docs/dshttpadapter>
-* @copyright (c) 2014-2015 Jason Dobry 
-* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
-*
-* @overview Http adapter for js-data.
-*/
+/*!
+ * js-data-http
+ * @version 1.2.3 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+ * @author Jason Dobry <jason.dobry@gmail.com>
+ * @copyright (c) 2014-2015 Jason Dobry 
+ * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
+ * 
+ * @overview Http adapter for js-data.
+ */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory((function webpackLoadOptionalExternalModule() { try { return require("js-data"); } catch(e) {} }()));
@@ -63,280 +63,287 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var JSData;
+	var _createClass = (function () { function defineProperties(target, props) { for (var key in props) { var prop = props[key]; prop.configurable = true; if (prop.value) prop.writable = true; } Object.defineProperties(target, props); } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } };
+
+	var JSData = undefined;
 
 	try {
 	  JSData = __webpack_require__(1);
-	} catch (e) {
-	}
+	} catch (e) {}
 
 	if (!JSData) {
 	  try {
 	    JSData = window.JSData;
-	  } catch (e) {
-	  }
+	  } catch (e) {}
 	}
 
 	if (!JSData) {
-	  throw new Error('js-data must be loaded!');
+	  throw new Error("js-data must be loaded!");
 	}
 
+	var http = __webpack_require__(2);
 	var DSUtils = JSData.DSUtils;
 	var deepMixIn = JSData.DSUtils.deepMixIn;
-	var http = __webpack_require__(2);
+	var removeCircular = JSData.DSUtils.removeCircular;
+	var copy = JSData.DSUtils.copy;
+	var makePath = JSData.DSUtils.makePath;
+	var isString = JSData.DSUtils.isString;
+	var isNumber = JSData.DSUtils.isNumber;
 	var P = DSUtils.Promise;
 
-	function Defaults() {
+	var Defaults = (function () {
+	  function Defaults() {
+	    _classCallCheck(this, Defaults);
+	  }
 
-	}
+	  _createClass(Defaults, {
+	    queryTransform: {
+	      value: function queryTransform(resourceConfig, params) {
+	        return params;
+	      }
+	    },
+	    deserialize: {
+	      value: function deserialize(resourceConfig, data) {
+	        return data ? "data" in data ? data.data : data : data;
+	      }
+	    },
+	    serialize: {
+	      value: function serialize(resourceConfig, data) {
+	        return data;
+	      }
+	    },
+	    log: {
+	      value: function log() {}
+	    },
+	    error: {
+	      value: function error() {}
+	    }
+	  });
+
+	  return Defaults;
+	})();
 
 	var defaultsPrototype = Defaults.prototype;
 
-	defaultsPrototype.queryTransform = function (resourceConfig, params) {
-	  return params;
-	};
+	defaultsPrototype.basePath = "";
 
-	defaultsPrototype.basePath = '';
-
-	defaultsPrototype.forceTrailingSlash = '';
+	defaultsPrototype.forceTrailingSlash = "";
 
 	defaultsPrototype.httpConfig = {};
 
-	defaultsPrototype.log = console ? function (a, b) {
-	  console[typeof console.info === 'function' ? 'info' : 'log'](a, b);
-	} : function () {
-	};
+	var DSHttpAdapter = (function () {
+	  function DSHttpAdapter(options) {
+	    _classCallCheck(this, DSHttpAdapter);
 
-	defaultsPrototype.error = console ? function (a, b) {
-	  console[typeof console.error === 'function' ? 'error' : 'log'](a, b);
-	} : function () {
-	};
-
-	defaultsPrototype.deserialize = function (resourceConfig, data) {
-	  return data ? ('data' in data ? data.data : data) : data;
-	};
-
-	defaultsPrototype.serialize = function (resourceConfig, data) {
-	  return data;
-	};
-
-	function DSHttpAdapter(options) {
-	  this.defaults = new Defaults();
-	  deepMixIn(this.defaults, options);
-	}
-
-	var dsHttpAdapterPrototype = DSHttpAdapter.prototype;
-
-	dsHttpAdapterPrototype.getPath = function (method, resourceConfig, id, options) {
-	  var _this = this;
-	  options = options || {};
-	  var args = [
-	    options.basePath || _this.defaults.basePath || resourceConfig.basePath,
-	    resourceConfig.getEndpoint((DSUtils.isString(id) || DSUtils.isNumber(id) || method === 'create') ? id : null, options)
-	  ];
-	  if (method === 'find' || method === 'update' || method === 'destroy') {
-	    args.push(id);
-	  }
-	  return DSUtils.makePath.apply(DSUtils, args);
-	};
-
-	dsHttpAdapterPrototype.HTTP = function (config) {
-	  var _this = this;
-	  var start = new Date();
-	  config = DSUtils.copy(config);
-	  config = deepMixIn(config, _this.defaults.httpConfig);
-	  if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
-	    config.url += '/';
-	  }
-	  if (typeof config.data === 'object') {
-	    config.data = DSUtils.removeCircular(config.data);
-	  }
-	  var suffix = config.suffix || _this.defaults.suffix;
-	  if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
-	    config.url += suffix;
-	  }
-
-	  function logResponse(data) {
-	    var str = start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
-	    if (data.status >= 200 && data.status < 300) {
-	      if (_this.defaults.log) {
-	        _this.defaults.log(str, data);
-	      }
-	      return data;
-	    } else {
-	      if (_this.defaults.error) {
-	        _this.defaults.error('FAILED: ' + str, data);
-	      }
-	      throw data;
+	    this.defaults = new Defaults();
+	    if (console) {
+	      this.defaults.log = function (a, b) {
+	        return console[typeof console.info === "function" ? "info" : "log"](a, b);
+	      };
 	    }
+	    if (console) {
+	      this.defaults.error = function (a, b) {
+	        return console[typeof console.error === "function" ? "error" : "log"](a, b);
+	      };
+	    }
+	    deepMixIn(this.defaults, options);
 	  }
 
-	  return http(config).then(logResponse, logResponse);
-	};
-
-	dsHttpAdapterPrototype.GET = function (url, config) {
-	  config = config || {};
-	  if (!('method' in config)) {
-	    config.method = 'get';
-	  }
-	  return this.HTTP(deepMixIn(config, {
-	    url: url
-	  }));
-	};
-
-	dsHttpAdapterPrototype.POST = function (url, attrs, config) {
-	  config = config || {};
-	  if (!('method' in config)) {
-	    config.method = 'post';
-	  }
-	  return this.HTTP(deepMixIn(config, {
-	    url: url,
-	    data: attrs
-	  }));
-	};
-
-	dsHttpAdapterPrototype.PUT = function (url, attrs, config) {
-	  config = config || {};
-	  if (!('method' in config)) {
-	    config.method = 'put';
-	  }
-	  return this.HTTP(deepMixIn(config, {
-	    url: url,
-	    data: attrs || {}
-	  }));
-	};
-
-	dsHttpAdapterPrototype.DEL = function (url, config) {
-	  config = config || {};
-	  if (!('method' in config)) {
-	    config.method = 'delete';
-	  }
-	  return this.HTTP(deepMixIn(config, {
-	    url: url
-	  }));
-	};
-
-	dsHttpAdapterPrototype.find = function (resourceConfig, id, options) {
-	  var _this = this;
-	  options = options || {};
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	  return _this.GET(
-	    _this.getPath('find', resourceConfig, id, options),
-	    options
-	  ).then(function (data) {
-	      var item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	      if (!item) {
-	        return P.reject(new Error('Not Found!'));
-	      } else {
-	        return item;
+	  _createClass(DSHttpAdapter, {
+	    getPath: {
+	      value: function getPath(method, resourceConfig, id, options) {
+	        var _this = this;
+	        options = options || {};
+	        var args = [options.basePath || _this.defaults.basePath || resourceConfig.basePath, resourceConfig.getEndpoint(isString(id) || isNumber(id) || method === "create" ? id : null, options)];
+	        if (method === "find" || method === "update" || method === "destroy") {
+	          args.push(id);
+	        }
+	        return makePath.apply(DSUtils, args);
 	      }
-	    });
-	};
+	    },
+	    HTTP: {
+	      value: function HTTP(config) {
+	        var _this = this;
+	        var start = new Date();
+	        config = copy(config);
+	        config = deepMixIn(config, _this.defaults.httpConfig);
+	        if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== "/") {
+	          config.url += "/";
+	        }
+	        if (typeof config.data === "object") {
+	          config.data = removeCircular(config.data);
+	        }
+	        var suffix = config.suffix || _this.defaults.suffix;
+	        if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
+	          config.url += suffix;
+	        }
 
-	dsHttpAdapterPrototype.findAll = function (resourceConfig, params, options) {
-	  var _this = this;
-	  options = options || {};
-	  options = DSUtils.copy(options);
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  if (params) {
-	    params = _this.defaults.queryTransform(resourceConfig, params);
-	    deepMixIn(options.params, params);
-	  }
-	  return _this.GET(
-	    _this.getPath('findAll', resourceConfig, params, options),
-	    options
-	  ).then(function (data) {
-	      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	    });
-	};
+	        function logResponse(data) {
+	          var str = "" + start.toUTCString() + " - " + data.config.method.toUpperCase() + " " + data.config.url + " - " + data.status + " " + (new Date().getTime() - start.getTime()) + "ms";
+	          if (data.status >= 200 && data.status < 300) {
+	            if (_this.defaults.log) {
+	              _this.defaults.log(str, data);
+	            }
+	            return data;
+	          } else {
+	            if (_this.defaults.error) {
+	              _this.defaults.error("'FAILED: " + str, data);
+	            }
+	            throw data;
+	          }
+	        }
 
-	dsHttpAdapterPrototype.create = function (resourceConfig, attrs, options) {
-	  var _this = this;
-	  options = options || {};
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	  return _this.POST(
-	    _this.getPath('create', resourceConfig, attrs, options),
-	    options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
-	    options
-	  ).then(function (data) {
-	      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	    });
-	};
+	        return http(config).then(logResponse, logResponse);
+	      }
+	    },
+	    GET: {
+	      value: function GET(url, config) {
+	        config = config || {};
+	        if (!("method" in config)) {
+	          config.method = "get";
+	        }
+	        return this.HTTP(deepMixIn(config, {
+	          url: url
+	        }));
+	      }
+	    },
+	    POST: {
+	      value: function POST(url, attrs, config) {
+	        config = config || {};
+	        if (!("method" in config)) {
+	          config.method = "post";
+	        }
+	        return this.HTTP(deepMixIn(config, {
+	          url: url,
+	          data: attrs
+	        }));
+	      }
+	    },
+	    PUT: {
+	      value: function PUT(url, attrs, config) {
+	        config = config || {};
+	        if (!("method" in config)) {
+	          config.method = "put";
+	        }
+	        return this.HTTP(deepMixIn(config, {
+	          url: url,
+	          data: attrs || {}
+	        }));
+	      }
+	    },
+	    DEL: {
+	      value: function DEL(url, config) {
+	        config = config || {};
+	        if (!("method" in config)) {
+	          config.method = "delete";
+	        }
+	        return this.HTTP(deepMixIn(config, {
+	          url: url
+	        }));
+	      }
+	    },
+	    find: {
+	      value: function find(resourceConfig, id, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        options.params = _this.defaults.queryTransform(resourceConfig, options.params);
+	        return _this.GET(_this.getPath("find", resourceConfig, id, options), options).then(function (data) {
+	          var item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	          return !item ? P.reject(new Error("Not Found!")) : item;
+	        });
+	      }
+	    },
+	    findAll: {
+	      value: function findAll(resourceConfig, params, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        if (params) {
+	          params = _this.defaults.queryTransform(resourceConfig, params);
+	          deepMixIn(options.params, params);
+	        }
+	        return _this.GET(_this.getPath("findAll", resourceConfig, params, options), options).then(function (data) {
+	          return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	        });
+	      }
+	    },
+	    create: {
+	      value: function create(resourceConfig, attrs, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        options.params = _this.defaults.queryTransform(resourceConfig, options.params);
+	        return _this.POST(_this.getPath("create", resourceConfig, attrs, options), options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs), options).then(function (data) {
+	          return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	        });
+	      }
+	    },
+	    update: {
+	      value: function update(resourceConfig, id, attrs, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        options.params = _this.defaults.queryTransform(resourceConfig, options.params);
+	        return _this.PUT(_this.getPath("update", resourceConfig, id, options), options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs), options).then(function (data) {
+	          return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	        });
+	      }
+	    },
+	    updateAll: {
+	      value: function updateAll(resourceConfig, attrs, params, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        if (params) {
+	          params = _this.defaults.queryTransform(resourceConfig, params);
+	          deepMixIn(options.params, params);
+	        }
+	        return this.PUT(_this.getPath("updateAll", resourceConfig, attrs, options), options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs), options).then(function (data) {
+	          return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	        });
+	      }
+	    },
+	    destroy: {
+	      value: function destroy(resourceConfig, id, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        options.params = _this.defaults.queryTransform(resourceConfig, options.params);
+	        return _this.DEL(_this.getPath("destroy", resourceConfig, id, options), options).then(function (data) {
+	          return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	        });
+	      }
+	    },
+	    destroyAll: {
+	      value: function destroyAll(resourceConfig, params, options) {
+	        var _this = this;
+	        options = options ? copy(options) : {};
+	        options.suffix = options.suffix || resourceConfig.suffix;
+	        options.params = options.params || {};
+	        if (params) {
+	          params = _this.defaults.queryTransform(resourceConfig, params);
+	          deepMixIn(options.params, params);
+	        }
+	        return this.DEL(_this.getPath("destroyAll", resourceConfig, params, options), options).then(function (data) {
+	          return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	        });
+	      }
+	    }
+	  });
 
-	dsHttpAdapterPrototype.update = function (resourceConfig, id, attrs, options) {
-	  var _this = this;
-	  options = options || {};
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	  return _this.PUT(
-	    _this.getPath('update', resourceConfig, id, options),
-	    options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
-	    options
-	  ).then(function (data) {
-	      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	    });
-	};
-
-	dsHttpAdapterPrototype.updateAll = function (resourceConfig, attrs, params, options) {
-	  var _this = this;
-	  options = options || {};
-	  options = DSUtils.copy(options);
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  if (params) {
-	    params = _this.defaults.queryTransform(resourceConfig, params);
-	    deepMixIn(options.params, params);
-	  }
-	  return this.PUT(
-	    _this.getPath('updateAll', resourceConfig, attrs, options),
-	    options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
-	    options
-	  ).then(function (data) {
-	      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	    });
-	};
-
-	dsHttpAdapterPrototype.destroy = function (resourceConfig, id, options) {
-	  var _this = this;
-	  options = options || {};
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	  return _this.DEL(
-	    _this.getPath('destroy', resourceConfig, id, options),
-	    options
-	  ).then(function (data) {
-	      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	    });
-	};
-
-	dsHttpAdapterPrototype.destroyAll = function (resourceConfig, params, options) {
-	  var _this = this;
-	  options = options || {};
-	  options = DSUtils.copy(options);
-	  options.suffix = options.suffix || resourceConfig.suffix;
-	  options.params = options.params || {};
-	  if (params) {
-	    params = _this.defaults.queryTransform(resourceConfig, params);
-	    deepMixIn(options.params, params);
-	  }
-	  return this.DEL(
-	    _this.getPath('destroyAll', resourceConfig, params, options),
-	    options
-	  ).then(function (data) {
-	      return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	    });
-	};
+	  return DSHttpAdapter;
+	})();
 
 	module.exports = DSHttpAdapter;
-
-
 
 /***/ },
 /* 1 */

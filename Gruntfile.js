@@ -13,7 +13,15 @@ module.exports = function (grunt) {
   });
   require('time-grunt')(grunt);
 
+  var webpack = require('webpack');
   var pkg = grunt.file.readJSON('package.json');
+  var banner = 'js-data-http\n' +
+    '@version ' + pkg.version + ' - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
+    '@author Jason Dobry <jason.dobry@gmail.com>\n' +
+    '@copyright (c) 2014-2015 Jason Dobry \n' +
+    '@license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
+    '\n' +
+    '@overview Http adapter for js-data.';
 
   // Project configuration.
   grunt.initConfig({
@@ -21,10 +29,6 @@ module.exports = function (grunt) {
     clean: {
       coverage: ['coverage/'],
       dist: ['dist/']
-    },
-    jshint: {
-      all: ['Gruntfile.js', 'src/**/*.js', 'test/*.js'],
-      jshintrc: '.jshintrc'
     },
     watch: {
       dist: {
@@ -38,10 +42,10 @@ module.exports = function (grunt) {
           report: 'min',
           sourceMap: true,
           sourceMapName: 'dist/js-data-http.min.map',
-          banner: '/**\n' +
-          '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
-          '* @file js-data-http.min.js\n' +
+          banner: '/*!\n' +
+          '* js-data-http\n' +
           '* @version <%= pkg.version %> - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
+          '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
           '* @copyright (c) 2014-2015 Jason Dobry\n' +
           '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
           '*\n' +
@@ -74,7 +78,22 @@ module.exports = function (grunt) {
             commonjs2: 'js-data-schema',
             root: 'Schemator'
           }
-        }
+        },
+        module: {
+          loaders: [
+            { test: /(src)(.+)\.js$/, exclude: /node_modules/, loader: 'babel-loader?blacklist=useStrict' }
+          ],
+          preLoaders: [
+            {
+              test: /(src)(.+)\.js$|(test)(.+)\.js$/, // include .js files
+              exclude: /node_modules/, // exclude any and all files in the node_modules folder
+              loader: "jshint-loader?failOnHint=true"
+            }
+          ]
+        },
+        plugins: [
+          new webpack.BannerPlugin(banner)
+        ]
       }
     },
     karma: {
@@ -118,30 +137,10 @@ module.exports = function (grunt) {
     grunt.file.write(filePath, file);
   });
 
-  grunt.registerTask('banner', function () {
-    var file = grunt.file.read('dist/js-data-http.js');
-
-    var banner = '/**\n' +
-      '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
-      '* @file js-data-http.js\n' +
-      '* @version ' + pkg.version + ' - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
-      '* @copyright (c) 2014-2015 Jason Dobry \n' +
-      '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
-      '*\n' +
-      '* @overview Http adapter for js-data.\n' +
-      '*/\n';
-
-    file = banner + file;
-
-    grunt.file.write('dist/js-data-http.js', file);
-  });
-
   grunt.registerTask('test', ['build', 'karma:ci', 'karma:min']);
   grunt.registerTask('build', [
     'clean',
-    'jshint',
     'webpack',
-    'banner',
     'uglify:main'
   ]);
   grunt.registerTask('go', ['build', 'watch:dist']);

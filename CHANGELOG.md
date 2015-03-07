@@ -1,3 +1,8 @@
+##### 1.2.3 - 04 March 2015
+
+###### Other
+- Converted code to ES6.
+
 ##### 1.2.2 - 04 March 2015
 
 ###### Backwards compatible bug fixes
