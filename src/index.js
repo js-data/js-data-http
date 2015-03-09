@@ -121,7 +121,7 @@ class DSHttpAdapter {
       config.method = 'get';
     }
     return this.HTTP(deepMixIn(config, {
-      url: url
+      url
     }));
   }
 
@@ -131,7 +131,7 @@ class DSHttpAdapter {
       config.method = 'post';
     }
     return this.HTTP(deepMixIn(config, {
-      url: url,
+      url,
       data: attrs
     }));
   }
@@ -142,7 +142,7 @@ class DSHttpAdapter {
       config.method = 'put';
     }
     return this.HTTP(deepMixIn(config, {
-      url: url,
+      url,
       data: attrs || {}
     }));
   }
@@ -153,7 +153,7 @@ class DSHttpAdapter {
       config.method = 'delete';
     }
     return this.HTTP(deepMixIn(config, {
-      url: url
+      url
     }));
   }
 
