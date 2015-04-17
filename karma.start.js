@@ -66,16 +66,24 @@ beforeEach(function () {
   p4 = { author: 'Adam', age: 33, id: 8 };
   p5 = { author: 'Adam', age: 33, id: 9 };
 
-  this.xhr = sinon.useFakeXMLHttpRequest();
-  // Create an array to store requests
-  var requests = this.requests = [];
-  // Keep references to created requests
-  this.xhr.onCreate = function (xhr) {
-    requests.push(xhr);
-  };
+  try {
+    this.xhr = sinon.useFakeXMLHttpRequest();
+    // Create an array to store requests
+    var requests = this.requests = [];
+    // Keep references to created requests
+    this.xhr.onCreate = function (xhr) {
+      requests.push(xhr);
+    };
+  } catch (err) {
+    console.error(err);
+  }
 });
 
 afterEach(function () {
   // Restore the global timer functions to their native implementations
-  this.xhr.restore();
+  try {
+    this.xhr.restore();
+  } catch (err) {
+    console.error(err);
+  }
 });
