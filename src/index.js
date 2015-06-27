@@ -1,4 +1,4 @@
-import JSData from 'js-data';
+let JSData = require('js-data');
 let axios = null;
 
 try {
@@ -52,12 +52,54 @@ class DSHttpAdapter {
     this.http = options.http || axios;
   }
 
+  getEndpoint(resourceConfig, id, options) {
+    options = options || {};
+    options.params = options.params || {};
+
+    let item;
+    let parentKey = resourceConfig.parentKey;
+    let endpoint = options.hasOwnProperty('endpoint') ? options.endpoint : resourceConfig.endpoint;
+    let parentField = resourceConfig.parentField;
+    let parentDef = resourceConfig.getResource(resourceConfig.parent);
+    let parentId = options.params[parentKey];
+
+    if (parentId === false || !parentKey || !parentDef) {
+      if (parentId === false) {
+        delete options.params[parentKey];
+      }
+      return endpoint;
+    } else {
+      delete options.params[parentKey];
+
+      if (DSUtils._sn(id)) {
+        item = resourceConfig.get(id);
+      } else if (DSUtils._o(id)) {
+        item = id;
+      }
+
+      if (item) {
+        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+      }
+
+      if (parentId) {
+        delete options.endpoint;
+        let _options = {};
+        DSUtils.forOwn(options, (value, key) => {
+          _options[key] = value;
+        });
+        return DSUtils.makePath(this.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint);
+      } else {
+        return endpoint;
+      }
+    }
+  }
+
   getPath(method, resourceConfig, id, options) {
     let _this = this;
     options = options || {};
     let args = [
       options.basePath || _this.defaults.basePath || resourceConfig.basePath,
-      resourceConfig.getEndpoint((isString(id) || isNumber(id) || method === 'create') ? id : null, options)
+      this.getEndpoint(resourceConfig, (isString(id) || isNumber(id) || method === 'create') ? id : null, options)
     ];
     if (method === 'find' || method === 'update' || method === 'destroy') {
       args.push(id);
@@ -246,5 +288,5 @@ class DSHttpAdapter {
   }
 }
 
-export default DSHttpAdapter;
+module.exports = DSHttpAdapter;
 

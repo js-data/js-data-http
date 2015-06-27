@@ -29,6 +29,6 @@
     "karma.start.js"
   ],
   "dependencies": {
-    "js-data": "2.0.0-beta.1"
+    "js-data": "2.0.0-rc.1"
   }
 }
