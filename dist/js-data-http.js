@@ -63,9 +63,9 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
-	var _classCallCheck = function (instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } };
-
 	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ('value' in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+
+	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError('Cannot call a class as a function'); } }
 
 	var JSData = __webpack_require__(1);
 	var axios = null;
@@ -143,7 +143,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  _createClass(DSHttpAdapter, [{
 	    key: 'getEndpoint',
 	    value: function getEndpoint(resourceConfig, id, options) {
-	      var _this = this;
+	      var _this2 = this;
 
 	      options = options || {};
 	      options.params = options.params || {};
@@ -181,13 +181,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _options[key] = value;
 	            });
 	            return {
-	              v: DSUtils.makePath(_this.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint)
+	              v: DSUtils.makePath(_this2.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint)
 	            };
 	          })();
 
-	          if (typeof _ret === 'object') {
-	            return _ret.v;
-	          }
+	          if (typeof _ret === 'object') return _ret.v;
 	        } else {
 	          return endpoint;
 	        }
@@ -224,7 +222,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      function logResponse(data) {
-	        var str = '' + start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
+	        var str = start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
 	        if (data.status >= 200 && data.status < 300) {
 	          if (_this.defaults.log) {
 	            _this.defaults.log(str, data);
