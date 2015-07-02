@@ -12,7 +12,7 @@ __Latest Release:__ [![Latest Release](https://img.shields.io/github/release/js-
 
 __Status:__
 
-[![Dependency Status](https://img.shields.io/gemnasium/js-data/js-data-http.svg?style=flat-square)](https://gemnasium.com/js-data/js-data-http) [![Coverage Status](https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat-square)](https://coveralls.io/r/js-data/js-data-http?branch=master) [![Codacity](https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-http/dashboard) 
+[![Dependency Status](https://img.shields.io/gemnasium/js-data/js-data-http.svg?style=flat-square)](https://gemnasium.com/js-data/js-data-http) [![Coverage Status](https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat-square)](https://coveralls.io/r/js-data/js-data-http?branch=master) [![Codacity](https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-http/dashboard)
 
 __Supported Platforms:__
 
@@ -36,6 +36,8 @@ store.registerAdapter('http', adapter, { default: true });
 [CHANGELOG.md](https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md)
 
 ### Community
+- [Gitter Channel](https://gitter.im/js-data/js-data) - Better than IRC!
+- [Announcements](http://www.js-data.io/blog)
 - [Mailing List](https://groups.io/org/groupsio/jsdata) - Ask your questions!
 - [Issues](https://github.com/js-data/js-data-http/issues) - Found a bug? Feature request? Submit an issue!
 - [GitHub](https://github.com/js-data/js-data-http) - View the source code for js-data.
