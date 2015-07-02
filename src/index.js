@@ -1,30 +1,13 @@
-let JSData;
+let JSData = require('js-data');
+let axios = null;
 
 try {
-  JSData = require('js-data');
+  axios = require('axios');
 } catch (e) {
 }
 
-if (!JSData) {
-  try {
-    JSData = window.JSData;
-  } catch (e) {
-  }
-}
-
-if (!JSData) {
-  throw new Error('js-data must be loaded!');
-}
-
-let http = require('axios');
-let DSUtils = JSData.DSUtils;
-let deepMixIn = JSData.DSUtils.deepMixIn;
-let removeCircular = JSData.DSUtils.removeCircular;
-let copy = JSData.DSUtils.copy;
-let makePath = JSData.DSUtils.makePath;
-let isString = JSData.DSUtils.isString;
-let isNumber = JSData.DSUtils.isNumber;
-let P = DSUtils.Promise;
+let { DSUtils } = JSData;
+let { deepMixIn, removeCircular, copy, makePath, isString, isNumber } = DSUtils;
 
 class Defaults {
   queryTransform(resourceConfig, params) {
@@ -66,6 +49,49 @@ class DSHttpAdapter {
       this.defaults.error = (a, b) => console[typeof console.error === 'function' ? 'error' : 'log'](a, b);
     }
     deepMixIn(this.defaults, options);
+    this.http = options.http || axios;
+  }
+
+  getEndpoint(resourceConfig, id, options) {
+    options = options || {};
+    options.params = options.params || {};
+
+    let item;
+    let parentKey = resourceConfig.parentKey;
+    let endpoint = options.hasOwnProperty('endpoint') ? options.endpoint : resourceConfig.endpoint;
+    let parentField = resourceConfig.parentField;
+    let parentDef = resourceConfig.getResource(resourceConfig.parent);
+    let parentId = options.params[parentKey];
+
+    if (parentId === false || !parentKey || !parentDef) {
+      if (parentId === false) {
+        delete options.params[parentKey];
+      }
+      return endpoint;
+    } else {
+      delete options.params[parentKey];
+
+      if (DSUtils._sn(id)) {
+        item = resourceConfig.get(id);
+      } else if (DSUtils._o(id)) {
+        item = id;
+      }
+
+      if (item) {
+        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+      }
+
+      if (parentId) {
+        delete options.endpoint;
+        let _options = {};
+        DSUtils.forOwn(options, (value, key) => {
+          _options[key] = value;
+        });
+        return DSUtils.makePath(this.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint);
+      } else {
+        return endpoint;
+      }
+    }
   }
 
   getPath(method, resourceConfig, id, options) {
@@ -73,7 +99,7 @@ class DSHttpAdapter {
     options = options || {};
     let args = [
       options.basePath || _this.defaults.basePath || resourceConfig.basePath,
-      resourceConfig.getEndpoint((isString(id) || isNumber(id) || method === 'create') ? id : null, options)
+      this.getEndpoint(resourceConfig, (isString(id) || isNumber(id) || method === 'create') ? id : null, options)
     ];
     if (method === 'find' || method === 'update' || method === 'destroy') {
       args.push(id);
@@ -92,6 +118,7 @@ class DSHttpAdapter {
     if (typeof config.data === 'object') {
       config.data = removeCircular(config.data);
     }
+    config.method = config.method.toUpperCase();
     let suffix = config.suffix || _this.defaults.suffix;
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
       config.url += suffix;
@@ -108,11 +135,15 @@ class DSHttpAdapter {
         if (_this.defaults.error) {
           _this.defaults.error(`'FAILED: ${str}`, data);
         }
-        throw data;
+        return DSUtils.Promise.reject(data);
       }
     }
 
-    return http(config).then(logResponse, logResponse);
+    if (!this.http) {
+      throw new Error('You have not configured this adapter with an http library!');
+    }
+
+    return this.http(config).then(logResponse, logResponse);
   }
 
   GET(url, config) {
@@ -168,7 +199,7 @@ class DSHttpAdapter {
       options
     ).then(data => {
         let item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-        return !item ? P.reject(new Error('Not Found!')) : item;
+        return !item ? DSUtils.Promise.reject(new Error('Not Found!')) : item;
       });
   }
 
@@ -257,5 +288,5 @@ class DSHttpAdapter {
   }
 }
 
-export default DSHttpAdapter;
+module.exports = DSHttpAdapter;
 

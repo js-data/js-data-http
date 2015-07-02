@@ -29,6 +29,6 @@
     "karma.start.js"
   ],
   "dependencies": {
-    "js-data": ">=1.1.0"
+    "js-data": ">=2.0.0"
   }
 }

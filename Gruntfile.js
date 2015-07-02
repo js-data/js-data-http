@@ -71,12 +71,6 @@ module.exports = function (grunt) {
             commonjs: 'js-data',
             commonjs2: 'js-data',
             root: 'JSData'
-          },
-          'js-data-schema': {
-            amd: 'js-data-schema',
-            commonjs: 'js-data-schema',
-            commonjs2: 'js-data-schema',
-            root: 'Schemator'
           }
         },
         module: {
@@ -111,7 +105,8 @@ module.exports = function (grunt) {
         browsers: ['Chrome', 'Firefox', 'PhantomJS'],
         options: {
           files: [
-            'bower_components/js-data/dist/js-data.min.js',
+            'node_modules/es6-promise/dist/es6-promise.js',
+            'node_modules/js-data/dist/js-data.js',
             'dist/js-data-http.min.js',
             'karma.start.js',
             'test/**/*.js'

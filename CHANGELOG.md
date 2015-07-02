@@ -1,3 +1,15 @@
+##### 2.0.0 - 02 July 2015
+
+Stable Version 2.0.0
+
+##### 2.0.0-rc.1 - 30 June 2015
+
+Added `getEndpoint()`, which was removed from JSData
+
+##### 2.0.0-beta.1 - 17 April 2015
+
+Prepare for 2.0
+
 ##### 1.2.3 - 07 March 2015
 
 ###### Other
