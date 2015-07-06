@@ -1,3 +1,8 @@
+##### 3.0.0-beta.1 - 06 July 2015
+
+###### Breaking API changes
+- `axios` is now a peerDependency, and is not bundled with js-data-http.js You now have to configure the adapter to use an http library.
+
 ##### 2.0.0 - 02 July 2015
 
 Stable Version 2.0.0

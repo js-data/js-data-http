@@ -29,6 +29,7 @@
     "karma.start.js"
   ],
   "dependencies": {
+    "axios": "0.5.x",
     "js-data": ">=2.0.0"
   }
 }

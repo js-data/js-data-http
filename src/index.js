@@ -1,13 +1,47 @@
 let JSData = require('js-data');
-let axios = null;
-
-try {
-  axios = require('axios');
-} catch (e) {
-}
-
 let { DSUtils } = JSData;
 let { deepMixIn, removeCircular, copy, makePath, isString, isNumber } = DSUtils;
+
+function encode(val) {
+  return encodeURIComponent(val).
+    replace(/%40/gi, '@').
+    replace(/%3A/gi, ':').
+    replace(/%24/g, '$').
+    replace(/%2C/gi, ',').
+    replace(/%20/g, '+');
+}
+
+function buildUrl(url, params) {
+  if (!params) {
+    return url;
+  }
+
+  var parts = [];
+
+  DSUtils.forOwn(params, function (val, key) {
+    if (val === null || typeof val === 'undefined') {
+      return;
+    }
+    if (!DSUtils.isArray(val)) {
+      val = [val];
+    }
+
+    DSUtils.forEach(val, function (v) {
+      if (window.toString.call(v) === '[object Date]') {
+        v = v.toISOString();
+      } else if (DSUtils.isObject(v)) {
+        v = DSUtils.toJson(v);
+      }
+      parts.push(encode(key) + '=' + encode(v));
+    });
+  });
+
+  if (parts.length > 0) {
+    url += (url.indexOf('?') === -1 ? '?' : '&') + parts.join('&');
+  }
+
+  return url;
+}
 
 class Defaults {
   queryTransform(resourceConfig, params) {
@@ -33,15 +67,22 @@ class Defaults {
 
 let defaultsPrototype = Defaults.prototype;
 
+defaultsPrototype.httpLibName = 'axios';
+
 defaultsPrototype.basePath = '';
 
 defaultsPrototype.forceTrailingSlash = '';
 
 defaultsPrototype.httpConfig = {};
 
+defaultsPrototype.useFetch = false;
+
 class DSHttpAdapter {
   constructor(options) {
+    options = options || {};
     this.defaults = new Defaults();
+    this.http = options.http;
+    delete options.http;
     if (console) {
       this.defaults.log = (a, b) => console[typeof console.info === 'function' ? 'info' : 'log'](a, b);
     }
@@ -49,7 +90,39 @@ class DSHttpAdapter {
       this.defaults.error = (a, b) => console[typeof console.error === 'function' ? 'error' : 'log'](a, b);
     }
     deepMixIn(this.defaults, options);
-    this.http = options.http || axios;
+
+    if (this.defaults.useFetch && window.fetch) {
+      this.defaults.deserialize = (resourceConfig, response) => {
+        return response.json();
+      };
+      this.http = config => {
+
+        var requestConfig = {
+          method: config.method,
+          // turn the plain headers object into the Fetch Headers object
+          headers: new window.Headers(config.headers)
+        };
+
+        if (config.data) {
+          requestConfig.body = DSUtils.toJson(config.data);
+        }
+
+        return window.fetch(new window.Request(buildUrl(config.url, config.params), requestConfig))
+          .then(function (response) {
+            response.config = {
+              method: config.method,
+              url: config.url
+            };
+            return response;
+          });
+      };
+    }
+
+    if (!this.http) {
+      try {
+        this.http = window[this.defaults.httpLibName];
+      } catch (e) {}
+    }
   }
 
   getEndpoint(resourceConfig, id, options) {
@@ -125,7 +198,7 @@ class DSHttpAdapter {
     }
 
     function logResponse(data) {
-      let str = `${start.toUTCString()} - ${data.config.method.toUpperCase()} ${data.config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`;
+      let str = `${start.toUTCString()} - ${config.method.toUpperCase()} ${config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`;
       if (data.status >= 200 && data.status < 300) {
         if (_this.defaults.log) {
           _this.defaults.log(str, data);

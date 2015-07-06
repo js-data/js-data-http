@@ -105,11 +105,12 @@ module.exports = function (grunt) {
         browsers: ['Chrome', 'Firefox', 'PhantomJS'],
         options: {
           files: [
+            'bower_components/axios/dist/axios.js',
             'node_modules/es6-promise/dist/es6-promise.js',
             'node_modules/js-data/dist/js-data.js',
             'dist/js-data-http.min.js',
             'karma.start.js',
-            'test/**/*.js'
+            'test/browser/**/*.js'
           ]
         }
       },
@@ -120,6 +121,14 @@ module.exports = function (grunt) {
     coveralls: {
       options: {
         coverage_dir: 'coverage'
+      }
+    },
+    mochaTest: {
+      all: {
+        options: {
+          reporter: 'spec'
+        },
+        src: ['mocha.start.js', 'test/node/**/*.js']
       }
     }
   });
@@ -132,7 +141,7 @@ module.exports = function (grunt) {
     grunt.file.write(filePath, file);
   });
 
-  grunt.registerTask('test', ['build', 'karma:ci', 'karma:min']);
+  grunt.registerTask('test', ['build', 'karma:ci', 'karma:min', 'mochaTest']);
   grunt.registerTask('build', [
     'clean',
     'webpack',
