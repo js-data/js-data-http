@@ -135,6 +135,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    options = options || {};
 	    this.defaults = new Defaults();
+	    this.http = options.http;
+	    delete options.http;
 	    if (console) {
 	      this.defaults.log = function (a, b) {
 	        return console[typeof console.info === 'function' ? 'info' : 'log'](a, b);
@@ -146,7 +148,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	      };
 	    }
 	    deepMixIn(this.defaults, options);
-	    this.http = options.http || axios;
+
+	    if (this.defaults.useFetch && window.fetch) {
+	      this.defaults.deserialize = function (resourceConfig, response) {
+	        return response.json();
+	      };
+	      this.http = function (config) {
+
+	        var requestConfig = {
+	          method: config.method,
+	          // turn the plain headers object into the Fetch Headers object
+	          headers: new window.Headers(config.headers)
+	        };
+
+	        if (config.data) {
+	          requestConfig.body = DSUtils.toJson(config.data);
+	        }
+
+	        return window.fetch(new window.Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
+	          response.config = {
+	            method: config.method,
+	            url: config.url
+	          };
+	          return response;
+	        });
+	      };
+	    }
+
+	    if (!this.http) {
+	      try {
+	        this.http = window[this.defaults.httpLibName];
+	      } catch (e) {}
+	    }
 	  }
 	
 	  _createClass(DSHttpAdapter, [{

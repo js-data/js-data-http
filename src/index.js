@@ -36,6 +36,8 @@ defaultsPrototype.httpConfig = {}
 
 defaultsPrototype.verbsUseBasePath = false
 
+defaultsPrototype.useFetch = false;
+
 class DSHttpAdapter {
   constructor (options) {
     options = options || {}
