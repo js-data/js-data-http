@@ -99,14 +99,18 @@ class DSHttpAdapter {
   getPath(method, resourceConfig, id, options) {
     let _this = this;
     options = options || {};
-    let args = [
-      options.basePath || _this.defaults.basePath || resourceConfig.basePath,
-      this.getEndpoint(resourceConfig, (isString(id) || isNumber(id) || method === 'create') ? id : null, options)
-    ];
-    if (method === 'find' || method === 'update' || method === 'destroy') {
-      args.push(id);
+    if (isString(options.urlPath)) {
+      return makePath.apply(DSUtils, [options.basePath || _this.defaults.basePath || resourceConfig.basePath, options.urlPath.split('/')]);
+    } else {
+      let args = [
+        options.basePath || _this.defaults.basePath || resourceConfig.basePath,
+        this.getEndpoint(resourceConfig, (isString(id) || isNumber(id) || method === 'create') ? id : null, options)
+      ];
+      if (method === 'find' || method === 'update' || method === 'destroy') {
+        args.push(id);
+      }
+      return makePath.apply(DSUtils, args);
     }
-    return makePath.apply(DSUtils, args);
   }
 
   HTTP(config) {
