@@ -39,6 +39,8 @@ defaultsPrototype.forceTrailingSlash = '';
 
 defaultsPrototype.httpConfig = {};
 
+defaultsPrototype.verbsUseBasePath = false;
+
 class DSHttpAdapter {
   constructor(options) {
     this.defaults = new Defaults();
@@ -112,7 +114,13 @@ class DSHttpAdapter {
     let start = new Date();
     config = copy(config);
     config = deepMixIn(config, _this.defaults.httpConfig);
-    if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
+    if (!('verbsUseBasePath' in config)) {
+      config.verbsUseBasePath = _this.defaults.verbsUseBasePath;
+    }
+    if (!config.urlOverride && config.verbsUseBasePath) {
+      config.url = makePath(config.basePath || _this.defaults.basePath, config.url);
+    }
+    if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/' && !config.urlOverride) {
       config.url += '/';
     }
     if (typeof config.data === 'object') {
@@ -120,7 +128,7 @@ class DSHttpAdapter {
     }
     config.method = config.method.toUpperCase();
     let suffix = config.suffix || _this.defaults.suffix;
-    if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
+    if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix && !config.urlOverride) {
       config.url += suffix;
     }
 
@@ -129,10 +137,10 @@ class DSHttpAdapter {
       // examine the data object
       if (data instanceof Error) {
         // log the Error object
-        _this.defaults.error(`'FAILED: ${data.message || 'Unknown Error'}'`, data);
+        _this.defaults.error(`FAILED: ${data.message || 'Unknown Error'}`, data);
         return DSUtils.Promise.reject(data);
-      } else if (data instanceof Object) {
-        let str = `${start.toUTCString()} - ${data.config.method.toUpperCase()} ${data.config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`;
+      } else if (typeof data === 'object') {
+        let str = `${start.toUTCString()} - ${config.method} ${config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`;
 
         if (data.status >= 200 && data.status < 300) {
           if (_this.defaults.log) {
@@ -141,13 +149,13 @@ class DSHttpAdapter {
           return data;
         } else {
           if (_this.defaults.error) {
-            _this.defaults.error(`'FAILED: ${str}'`, data);
+            _this.defaults.error(`FAILED: ${str}`, data);
           }
           return DSUtils.Promise.reject(data);
         }
       } else {
         // unknown type for 'data' that is not an Object or Error
-        _this.defaults.error(`'FAILED'`, data);
+        _this.defaults.error(`FAILED`, data);
         return DSUtils.Promise.reject(data);
       }
     }
@@ -161,44 +169,36 @@ class DSHttpAdapter {
 
   GET(url, config) {
     config = config || {};
-    if (!('method' in config)) {
-      config.method = 'get';
-    }
-    return this.HTTP(deepMixIn(config, {
-      url
-    }));
+    config.method = config.method || 'get';
+    config.urlOverride = !!config.url;
+    config.url = config.url || url;
+    return this.HTTP(config);
   }
 
   POST(url, attrs, config) {
     config = config || {};
-    if (!('method' in config)) {
-      config.method = 'post';
-    }
-    return this.HTTP(deepMixIn(config, {
-      url,
-      data: attrs
-    }));
+    config.method = config.method || 'post';
+    config.urlOverride = !!config.url;
+    config.url = config.url || url;
+    config.data = config.data || attrs;
+    return this.HTTP(config);
   }
 
   PUT(url, attrs, config) {
     config = config || {};
-    if (!('method' in config)) {
-      config.method = 'put';
-    }
-    return this.HTTP(deepMixIn(config, {
-      url,
-      data: attrs || {}
-    }));
+    config.method = config.method || 'put';
+    config.urlOverride = !!config.url;
+    config.url = config.url || url;
+    config.data = config.data || attrs;
+    return this.HTTP(config);
   }
 
   DEL(url, config) {
     config = config || {};
-    if (!('method' in config)) {
-      config.method = 'delete';
-    }
-    return this.HTTP(deepMixIn(config, {
-      url
-    }));
+    config.method = config.method || 'delete';
+    config.urlOverride = !!config.url;
+    config.url = config.url || url;
+    return this.HTTP(config);
   }
 
   find(resourceConfig, id, options) {

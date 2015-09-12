@@ -1,3 +1,13 @@
+##### 2.1.0 - xx September 2015
+
+###### Backwards compatible API changes
+- #20 - DSHttpAdapter.POST does not pick DSHttpAdapter.defaults.basePath
+- #26 - Add support for full url override
+
+###### Backwards compatible bug fixes
+- #21 - Cannot read property 'method' of undefined
+- #22 - Fixing issue where logging responses cannot handle Error objects. PR by @RobertHerhold
+
 ##### 2.0.0 - 02 July 2015
 
 Stable Version 2.0.0

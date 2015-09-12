@@ -12,7 +12,7 @@ __Latest Release:__ [![Latest Release](https://img.shields.io/github/release/js-
 
 __Status:__
 
-[![Dependency Status](https://img.shields.io/gemnasium/js-data/js-data-http.svg?style=flat-square)](https://gemnasium.com/js-data/js-data-http) [![Coverage Status](https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat-square)](https://coveralls.io/r/js-data/js-data-http?branch=master) [![Codacity](https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-http/dashboard)
+[![Coverage Status](https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat-square)](https://coveralls.io/r/js-data/js-data-http?branch=master) [![Codacity](https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-http/dashboard)
 
 __Supported Platforms:__
 
@@ -45,16 +45,28 @@ store.registerAdapter('http', adapter, { default: true });
 
 ### Contributing
 
-First, feel free to contact me with questions. [Mailing List](https://groups.io/org/groupsio/jsdata). [Issues](https://github.com/js-data/js-data-http/issues).
+First, support is handled via the [Gitter Channel](https://gitter.im/js-data/js-data) and the [Mailing List](https://groups.io/org/groupsio/jsdata). Ask your questions there.
 
-1. Contribute to the issue that is the reason you'll be developing in the first place
+When submitting issues on GitHub, please include as much detail as possible to make debugging quick and easy.
+
+- good - Your versions of js-data, js-data-http, etc., relevant console logs/error, code examples that revealed the issue
+- better - A [plnkr](http://plnkr.co/), [fiddle](http://jsfiddle.net/), or [bin](http://jsbin.com/?html,output) that demonstrates the issue
+- best - A Pull Request that fixes the issue, including test coverage for the issue and the fix
+
+[Github Issues](https://github.com/js-data/js-data-http/issues).
+
+#### Submitting Pull Requests
+
+1. Contribute to the issue/discussion that is the reason you'll be developing in the first place
 1. Fork js-data-http
-1. `git clone https://github.com/<you>/js-data-http.git`
+1. `git clone git@github.com:<you>/js-data-http.git`
 1. `cd js-data-http; npm install; bower install;`
-1. `grunt go` (builds and starts a watch)
-1. (in another terminal) `grunt karma:dev` (runs the tests)
 1. Write your code, including relevant documentation and tests
-1. Submit a PR and we'll review
+1. Run `grunt test` (build and test)
+1. Your code will be linted and checked for formatting, the tests will be run
+1. The `dist/` folder & files will be generated, do NOT commit `dist/*`! They will be committed when a release is cut.
+1. Submit your PR and we'll review!
+1. Thanks!
 
 ### License
 
