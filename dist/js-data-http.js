@@ -1,6 +1,6 @@
 /*!
  * js-data-http
- * @version 2.0.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+ * @version 2.1.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
  * @author Jason Dobry <jason.dobry@gmail.com>
  * @copyright (c) 2014-2015 Jason Dobry 
  * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -121,6 +121,8 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	defaultsPrototype.httpConfig = {};
 
+	defaultsPrototype.verbsUseBasePath = false;
+
 	var DSHttpAdapter = (function () {
 	  function DSHttpAdapter(options) {
 	    _classCallCheck(this, DSHttpAdapter);
@@ -196,11 +198,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function getPath(method, resourceConfig, id, options) {
 	      var _this = this;
 	      options = options || {};
-	      var args = [options.basePath || _this.defaults.basePath || resourceConfig.basePath, this.getEndpoint(resourceConfig, isString(id) || isNumber(id) || method === 'create' ? id : null, options)];
-	      if (method === 'find' || method === 'update' || method === 'destroy') {
-	        args.push(id);
+	      if (isString(options.urlPath)) {
+	        return makePath.apply(DSUtils, [options.basePath || _this.defaults.basePath || resourceConfig.basePath, options.urlPath]);
+	      } else {
+	        var args = [options.basePath || _this.defaults.basePath || resourceConfig.basePath, this.getEndpoint(resourceConfig, isString(id) || isNumber(id) || method === 'create' ? id : null, options)];
+	        if (method === 'find' || method === 'update' || method === 'destroy') {
+	          args.push(id);
+	        }
+	        return makePath.apply(DSUtils, args);
 	      }
-	      return makePath.apply(DSUtils, args);
 	    }
 	  }, {
 	    key: 'HTTP',
@@ -209,7 +215,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var start = new Date();
 	      config = copy(config);
 	      config = deepMixIn(config, _this.defaults.httpConfig);
-	      if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
+	      if (!('verbsUseBasePath' in config)) {
+	        config.verbsUseBasePath = _this.defaults.verbsUseBasePath;
+	      }
+	      if (!config.urlOverride && config.verbsUseBasePath) {
+	        config.url = makePath(config.basePath || _this.defaults.basePath, config.url);
+	      }
+	      if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/' && !config.urlOverride) {
 	        config.url += '/';
 	      }
 	      if (typeof config.data === 'object') {
@@ -217,21 +229,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      config.method = config.method.toUpperCase();
 	      var suffix = config.suffix || _this.defaults.suffix;
-	      if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
+	      if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix && !config.urlOverride) {
 	        config.url += suffix;
 	      }
 
+	      // logs the HTTP response
 	      function logResponse(data) {
-	        var str = start.toUTCString() + ' - ' + data.config.method.toUpperCase() + ' ' + data.config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
-	        if (data.status >= 200 && data.status < 300) {
-	          if (_this.defaults.log) {
-	            _this.defaults.log(str, data);
+	        // examine the data object
+	        if (data instanceof Error) {
+	          // log the Error object
+	          _this.defaults.error('FAILED: ' + (data.message || 'Unknown Error'), data);
+	          return DSUtils.Promise.reject(data);
+	        } else if (typeof data === 'object') {
+	          var str = start.toUTCString() + ' - ' + config.method + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
+
+	          if (data.status >= 200 && data.status < 300) {
+	            if (_this.defaults.log) {
+	              _this.defaults.log(str, data);
+	            }
+	            return data;
+	          } else {
+	            if (_this.defaults.error) {
+	              _this.defaults.error('FAILED: ' + str, data);
+	            }
+	            return DSUtils.Promise.reject(data);
 	          }
-	          return data;
 	        } else {
-	          if (_this.defaults.error) {
-	            _this.defaults.error('\'FAILED: ' + str, data);
-	          }
+	          // unknown type for 'data' that is not an Object or Error
+	          _this.defaults.error('FAILED', data);
 	          return DSUtils.Promise.reject(data);
 	        }
 	      }
@@ -246,47 +271,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	    key: 'GET',
 	    value: function GET(url, config) {
 	      config = config || {};
-	      if (!('method' in config)) {
-	        config.method = 'get';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url
-	      }));
+	      config.method = config.method || 'get';
+	      config.urlOverride = !!config.url;
+	      config.url = config.url || url;
+	      return this.HTTP(config);
 	    }
 	  }, {
 	    key: 'POST',
 	    value: function POST(url, attrs, config) {
 	      config = config || {};
-	      if (!('method' in config)) {
-	        config.method = 'post';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url,
-	        data: attrs
-	      }));
+	      config.method = config.method || 'post';
+	      config.urlOverride = !!config.url;
+	      config.url = config.url || url;
+	      config.data = config.data || attrs;
+	      return this.HTTP(config);
 	    }
 	  }, {
 	    key: 'PUT',
 	    value: function PUT(url, attrs, config) {
 	      config = config || {};
-	      if (!('method' in config)) {
-	        config.method = 'put';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url,
-	        data: attrs || {}
-	      }));
+	      config.method = config.method || 'put';
+	      config.urlOverride = !!config.url;
+	      config.url = config.url || url;
+	      config.data = config.data || attrs;
+	      return this.HTTP(config);
 	    }
 	  }, {
 	    key: 'DEL',
 	    value: function DEL(url, config) {
 	      config = config || {};
-	      if (!('method' in config)) {
-	        config.method = 'delete';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url
-	      }));
+	      config.method = config.method || 'delete';
+	      config.urlOverride = !!config.url;
+	      config.url = config.url || url;
+	      return this.HTTP(config);
 	    }
 	  }, {
 	    key: 'find',
@@ -391,7 +408,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 1 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
@@ -411,13 +428,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var utils = __webpack_require__(5);
 	var deprecatedMethod = __webpack_require__(6);
 	var dispatchRequest = __webpack_require__(7);
-	var InterceptorManager = __webpack_require__(8);
+	var InterceptorManager = __webpack_require__(15);
 
 	// Polyfill ES6 Promise if needed
 	(function () {
 	  // webpack is being used to set es6-promise to the native Promise
 	  // for the standalone build. It's necessary to make sure polyfill exists.
-	  var P = __webpack_require__(11);
+	  var P = __webpack_require__(16);
 	  if (P && typeof P.polyfill === 'function') {
 	    P.polyfill();
 	  }
@@ -480,7 +497,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	axios.all = function (promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(9);
+	axios.spread = __webpack_require__(21);
 
 	// Expose interceptors
 	axios.interceptors = {
@@ -578,7 +595,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 5 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -801,7 +818,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 /***/ },
 /* 6 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 
@@ -845,11 +862,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    try {
 	      // For browsers use XHR adapter
 	      if (typeof window !== 'undefined') {
-	        __webpack_require__(10)(resolve, reject, config);
+	        __webpack_require__(9)(resolve, reject, config);
 	      }
 	      // For node use HTTP adapter
 	      else if (typeof process !== 'undefined') {
-	        __webpack_require__(10)(resolve, reject, config);
+	        __webpack_require__(9)(resolve, reject, config);
 	      }
 	    } catch (e) {
 	      reject(e);
@@ -858,64 +875,103 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
 
 /***/ },
 /* 8 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
-	'use strict';
+	// shim for using process in browser
 
-	var utils = __webpack_require__(5);
+	var process = module.exports = {};
+	var queue = [];
+	var draining = false;
+	var currentQueue;
+	var queueIndex = -1;
 
-	function InterceptorManager() {
-	  this.handlers = [];
+	function cleanUpNextTick() {
+	    draining = false;
+	    if (currentQueue.length) {
+	        queue = currentQueue.concat(queue);
+	    } else {
+	        queueIndex = -1;
+	    }
+	    if (queue.length) {
+	        drainQueue();
+	    }
 	}
 
-	/**
-	 * Add a new interceptor to the stack
-	 *
-	 * @param {Function} fulfilled The function to handle `then` for a `Promise`
-	 * @param {Function} rejected The function to handle `reject` for a `Promise`
-	 *
-	 * @return {Number} An ID used to remove interceptor later
-	 */
-	InterceptorManager.prototype.use = function (fulfilled, rejected) {
-	  this.handlers.push({
-	    fulfilled: fulfilled,
-	    rejected: rejected
-	  });
-	  return this.handlers.length - 1;
-	};
-
-	/**
-	 * Remove an interceptor from the stack
-	 *
-	 * @param {Number} id The ID that was returned by `use`
-	 */
-	InterceptorManager.prototype.eject = function (id) {
-	  if (this.handlers[id]) {
-	    this.handlers[id] = null;
-	  }
-	};
-
-	/**
-	 * Iterate over all the registered interceptors
-	 *
-	 * This method is particularly useful for skipping over any
-	 * interceptors that may have become `null` calling `remove`.
-	 *
-	 * @param {Function} fn The function to call for each interceptor
-	 */
-	InterceptorManager.prototype.forEach = function (fn) {
-	  utils.forEach(this.handlers, function (h) {
-	    if (h !== null) {
-	      fn(h);
+	function drainQueue() {
+	    if (draining) {
+	        return;
 	    }
-	  });
+	    var timeout = setTimeout(cleanUpNextTick);
+	    draining = true;
+
+	    var len = queue.length;
+	    while(len) {
+	        currentQueue = queue;
+	        queue = [];
+	        while (++queueIndex < len) {
+	            if (currentQueue) {
+	                currentQueue[queueIndex].run();
+	            }
+	        }
+	        queueIndex = -1;
+	        len = queue.length;
+	    }
+	    currentQueue = null;
+	    draining = false;
+	    clearTimeout(timeout);
+	}
+
+	process.nextTick = function (fun) {
+	    var args = new Array(arguments.length - 1);
+	    if (arguments.length > 1) {
+	        for (var i = 1; i < arguments.length; i++) {
+	            args[i - 1] = arguments[i];
+	        }
+	    }
+	    queue.push(new Item(fun, args));
+	    if (queue.length === 1 && !draining) {
+	        setTimeout(drainQueue, 0);
+	    }
 	};
 
-	module.exports = InterceptorManager;
+	// v8 likes predictible objects
+	function Item(fun, array) {
+	    this.fun = fun;
+	    this.array = array;
+	}
+	Item.prototype.run = function () {
+	    this.fun.apply(null, this.array);
+	};
+	process.title = 'browser';
+	process.browser = true;
+	process.env = {};
+	process.argv = [];
+	process.version = ''; // empty string to avoid regexp issues
+	process.versions = {};
+
+	function noop() {}
+
+	process.on = noop;
+	process.addListener = noop;
+	process.once = noop;
+	process.off = noop;
+	process.removeListener = noop;
+	process.removeAllListeners = noop;
+	process.emit = noop;
+
+	process.binding = function (name) {
+	    throw new Error('process.binding is not supported');
+	};
+
+	process.cwd = function () { return '/' };
+	process.chdir = function (dir) {
+	    throw new Error('process.chdir is not supported');
+	};
+	process.umask = function() { return 0; };
 
 
 /***/ },
@@ -924,48 +980,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 
-	/**
-	 * Syntactic sugar for invoking a function and expanding an array for arguments.
-	 *
-	 * Common use case would be to use `Function.prototype.apply`.
-	 *
-	 *  ```js
-	 *  function f(x, y, z) {}
-	 *  var args = [1, 2, 3];
-	 *  f.apply(null, args);
-	 *  ```
-	 *
-	 * With `spread` this example can be re-written.
-	 *
-	 *  ```js
-	 *  spread(function(x, y, z) {})([1, 2, 3]);
-	 *  ```
-	 *
-	 * @param {Function} callback
-	 * @returns {Function}
-	 */
-	module.exports = function spread(callback) {
-	  return function (arr) {
-	    callback.apply(null, arr);
-	  };
-	};
-
-
-/***/ },
-/* 10 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
 	/*global ActiveXObject:true*/
 
 	var defaults = __webpack_require__(4);
 	var utils = __webpack_require__(5);
-	var buildUrl = __webpack_require__(13);
-	var cookies = __webpack_require__(14);
-	var parseHeaders = __webpack_require__(15);
-	var transformData = __webpack_require__(16);
-	var urlIsSameOrigin = __webpack_require__(17);
+	var buildUrl = __webpack_require__(10);
+	var cookies = __webpack_require__(11);
+	var parseHeaders = __webpack_require__(12);
+	var transformData = __webpack_require__(13);
+	var urlIsSameOrigin = __webpack_require__(14);
 
 	module.exports = function xhrAdapter(resolve, reject, config) {
 	  // Transform request data
@@ -1064,7 +1087,289 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
+/* 10 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var utils = __webpack_require__(5);
+
+	function encode(val) {
+	  return encodeURIComponent(val).
+	    replace(/%40/gi, '@').
+	    replace(/%3A/gi, ':').
+	    replace(/%24/g, '$').
+	    replace(/%2C/gi, ',').
+	    replace(/%20/g, '+');
+	}
+
+	/**
+	 * Build a URL by appending params to the end
+	 *
+	 * @param {string} url The base of the url (e.g., http://www.google.com)
+	 * @param {object} [params] The params to be appended
+	 * @returns {string} The formatted url
+	 */
+	module.exports = function buildUrl(url, params) {
+	  if (!params) {
+	    return url;
+	  }
+
+	  var parts = [];
+
+	  utils.forEach(params, function (val, key) {
+	    if (val === null || typeof val === 'undefined') {
+	      return;
+	    }
+	    if (!utils.isArray(val)) {
+	      val = [val];
+	    }
+
+	    utils.forEach(val, function (v) {
+	      if (utils.isDate(v)) {
+	        v = v.toISOString();
+	      }
+	      else if (utils.isObject(v)) {
+	        v = JSON.stringify(v);
+	      }
+	      parts.push(encode(key) + '=' + encode(v));
+	    });
+	  });
+
+	  if (parts.length > 0) {
+	    url += (url.indexOf('?') === -1 ? '?' : '&') + parts.join('&');
+	  }
+
+	  return url;
+	};
+
+
+/***/ },
 /* 11 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var utils = __webpack_require__(5);
+
+	module.exports = {
+	  write: function write(name, value, expires, path, domain, secure) {
+	    var cookie = [];
+	    cookie.push(name + '=' + encodeURIComponent(value));
+
+	    if (utils.isNumber(expires)) {
+	      cookie.push('expires=' + new Date(expires).toGMTString());
+	    }
+
+	    if (utils.isString(path)) {
+	      cookie.push('path=' + path);
+	    }
+
+	    if (utils.isString(domain)) {
+	      cookie.push('domain=' + domain);
+	    }
+
+	    if (secure === true) {
+	      cookie.push('secure');
+	    }
+
+	    document.cookie = cookie.join('; ');
+	  },
+
+	  read: function read(name) {
+	    var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+	    return (match ? decodeURIComponent(match[3]) : null);
+	  },
+
+	  remove: function remove(name) {
+	    this.write(name, '', Date.now() - 86400000);
+	  }
+	};
+
+
+/***/ },
+/* 12 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var utils = __webpack_require__(5);
+
+	/**
+	 * Parse headers into an object
+	 *
+	 * ```
+	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
+	 * Content-Type: application/json
+	 * Connection: keep-alive
+	 * Transfer-Encoding: chunked
+	 * ```
+	 *
+	 * @param {String} headers Headers needing to be parsed
+	 * @returns {Object} Headers parsed into an object
+	 */
+	module.exports = function parseHeaders(headers) {
+	  var parsed = {}, key, val, i;
+
+	  if (!headers) { return parsed; }
+
+	  utils.forEach(headers.split('\n'), function(line) {
+	    i = line.indexOf(':');
+	    key = utils.trim(line.substr(0, i)).toLowerCase();
+	    val = utils.trim(line.substr(i + 1));
+
+	    if (key) {
+	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
+	    }
+	  });
+
+	  return parsed;
+	};
+
+
+/***/ },
+/* 13 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var utils = __webpack_require__(5);
+
+	/**
+	 * Transform the data for a request or a response
+	 *
+	 * @param {Object|String} data The data to be transformed
+	 * @param {Array} headers The headers for the request or response
+	 * @param {Array|Function} fns A single function or Array of functions
+	 * @returns {*} The resulting transformed data
+	 */
+	module.exports = function transformData(data, headers, fns) {
+	  utils.forEach(fns, function (fn) {
+	    data = fn(data, headers);
+	  });
+
+	  return data;
+	};
+
+
+/***/ },
+/* 14 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var utils = __webpack_require__(5);
+	var msie = /(msie|trident)/i.test(navigator.userAgent);
+	var urlParsingNode = document.createElement('a');
+	var originUrl;
+
+	/**
+	 * Parse a URL to discover it's components
+	 *
+	 * @param {String} url The URL to be parsed
+	 * @returns {Object}
+	 */
+	function urlResolve(url) {
+	  var href = url;
+
+	  if (msie) {
+	    // IE needs attribute set twice to normalize properties
+	    urlParsingNode.setAttribute('href', href);
+	    href = urlParsingNode.href;
+	  }
+
+	  urlParsingNode.setAttribute('href', href);
+
+	  // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+	  return {
+	    href: urlParsingNode.href,
+	    protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+	    host: urlParsingNode.host,
+	    search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+	    hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+	    hostname: urlParsingNode.hostname,
+	    port: urlParsingNode.port,
+	    pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+	              urlParsingNode.pathname :
+	              '/' + urlParsingNode.pathname
+	  };
+	}
+
+	originUrl = urlResolve(window.location.href);
+
+	/**
+	 * Determine if a URL shares the same origin as the current location
+	 *
+	 * @param {String} requestUrl The URL to test
+	 * @returns {boolean} True if URL shares the same origin, otherwise false
+	 */
+	module.exports = function urlIsSameOrigin(requestUrl) {
+	  var parsed = (utils.isString(requestUrl)) ? urlResolve(requestUrl) : requestUrl;
+	  return (parsed.protocol === originUrl.protocol &&
+	        parsed.host === originUrl.host);
+	};
+
+
+/***/ },
+/* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+
+	var utils = __webpack_require__(5);
+
+	function InterceptorManager() {
+	  this.handlers = [];
+	}
+
+	/**
+	 * Add a new interceptor to the stack
+	 *
+	 * @param {Function} fulfilled The function to handle `then` for a `Promise`
+	 * @param {Function} rejected The function to handle `reject` for a `Promise`
+	 *
+	 * @return {Number} An ID used to remove interceptor later
+	 */
+	InterceptorManager.prototype.use = function (fulfilled, rejected) {
+	  this.handlers.push({
+	    fulfilled: fulfilled,
+	    rejected: rejected
+	  });
+	  return this.handlers.length - 1;
+	};
+
+	/**
+	 * Remove an interceptor from the stack
+	 *
+	 * @param {Number} id The ID that was returned by `use`
+	 */
+	InterceptorManager.prototype.eject = function (id) {
+	  if (this.handlers[id]) {
+	    this.handlers[id] = null;
+	  }
+	};
+
+	/**
+	 * Iterate over all the registered interceptors
+	 *
+	 * This method is particularly useful for skipping over any
+	 * interceptors that may have become `null` calling `remove`.
+	 *
+	 * @param {Function} fn The function to call for each interceptor
+	 */
+	InterceptorManager.prototype.forEach = function (fn) {
+	  utils.forEach(this.handlers, function (h) {
+	    if (h !== null) {
+	      fn(h);
+	    }
+	  });
+	};
+
+	module.exports = InterceptorManager;
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	var require;var __WEBPACK_AMD_DEFINE_RESULT__;/* WEBPACK VAR INJECTION */(function(process, setImmediate, global, module) {/*!
@@ -1072,7 +1377,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @copyright Copyright (c) 2014 Yehuda Katz, Tom Dale, Stefan Penner and contributors (Conversion to ES6 API by Jake Archibald)
 	 * @license   Licensed under MIT license
 	 *            See https://raw.githubusercontent.com/jakearchibald/es6-promise/master/LICENSE
-	 * @version   2.1.0
+	 * @version   2.3.0
 	 */
 
 	(function() {
@@ -1102,7 +1407,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var lib$es6$promise$asap$$len = 0;
 	    var lib$es6$promise$asap$$toString = {}.toString;
 	    var lib$es6$promise$asap$$vertxNext;
-	    function lib$es6$promise$asap$$asap(callback, arg) {
+	    var lib$es6$promise$asap$$customSchedulerFn;
+
+	    var lib$es6$promise$asap$$asap = function asap(callback, arg) {
 	      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len] = callback;
 	      lib$es6$promise$asap$$queue[lib$es6$promise$asap$$len + 1] = arg;
 	      lib$es6$promise$asap$$len += 2;
@@ -1110,11 +1417,21 @@ return /******/ (function(modules) { // webpackBootstrap
 	        // If len is 2, that means that we need to schedule an async flush.
 	        // If additional callbacks are queued before the queue is flushed, they
 	        // will be processed by this flush that we are scheduling.
-	        lib$es6$promise$asap$$scheduleFlush();
+	        if (lib$es6$promise$asap$$customSchedulerFn) {
+	          lib$es6$promise$asap$$customSchedulerFn(lib$es6$promise$asap$$flush);
+	        } else {
+	          lib$es6$promise$asap$$scheduleFlush();
+	        }
 	      }
 	    }
 
-	    var lib$es6$promise$asap$$default = lib$es6$promise$asap$$asap;
+	    function lib$es6$promise$asap$$setScheduler(scheduleFn) {
+	      lib$es6$promise$asap$$customSchedulerFn = scheduleFn;
+	    }
+
+	    function lib$es6$promise$asap$$setAsap(asapFn) {
+	      lib$es6$promise$asap$$asap = asapFn;
+	    }
 
 	    var lib$es6$promise$asap$$browserWindow = (typeof window !== 'undefined') ? window : undefined;
 	    var lib$es6$promise$asap$$browserGlobal = lib$es6$promise$asap$$browserWindow || {};
@@ -1191,7 +1508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function lib$es6$promise$asap$$attemptVertex() {
 	      try {
 	        var r = require;
-	        var vertx = __webpack_require__(!(function webpackMissingModule() { var e = new Error("Cannot find module \"vertx\""); e.code = 'MODULE_NOT_FOUND'; throw e; }()));
+	        var vertx = __webpack_require__(19);
 	        lib$es6$promise$asap$$vertxNext = vertx.runOnLoop || vertx.runOnContext;
 	        return lib$es6$promise$asap$$useVertxTimer();
 	      } catch(e) {
@@ -1247,7 +1564,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 
 	    function lib$es6$promise$$internal$$handleForeignThenable(promise, thenable, then) {
-	       lib$es6$promise$asap$$default(function(promise) {
+	       lib$es6$promise$asap$$asap(function(promise) {
 	        var sealed = false;
 	        var error = lib$es6$promise$$internal$$tryThen(then, thenable, function(value) {
 	          if (sealed) { return; }
@@ -1274,7 +1591,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function lib$es6$promise$$internal$$handleOwnThenable(promise, thenable) {
 	      if (thenable._state === lib$es6$promise$$internal$$FULFILLED) {
 	        lib$es6$promise$$internal$$fulfill(promise, thenable._result);
-	      } else if (promise._state === lib$es6$promise$$internal$$REJECTED) {
+	      } else if (thenable._state === lib$es6$promise$$internal$$REJECTED) {
 	        lib$es6$promise$$internal$$reject(promise, thenable._result);
 	      } else {
 	        lib$es6$promise$$internal$$subscribe(thenable, undefined, function(value) {
@@ -1328,7 +1645,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      promise._state = lib$es6$promise$$internal$$FULFILLED;
 
 	      if (promise._subscribers.length !== 0) {
-	        lib$es6$promise$asap$$default(lib$es6$promise$$internal$$publish, promise);
+	        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, promise);
 	      }
 	    }
 
@@ -1337,7 +1654,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      promise._state = lib$es6$promise$$internal$$REJECTED;
 	      promise._result = reason;
 
-	      lib$es6$promise$asap$$default(lib$es6$promise$$internal$$publishRejection, promise);
+	      lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publishRejection, promise);
 	    }
 
 	    function lib$es6$promise$$internal$$subscribe(parent, child, onFulfillment, onRejection) {
@@ -1351,7 +1668,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      subscribers[length + lib$es6$promise$$internal$$REJECTED]  = onRejection;
 
 	      if (length === 0 && parent._state) {
-	        lib$es6$promise$asap$$default(lib$es6$promise$$internal$$publish, parent);
+	        lib$es6$promise$asap$$asap(lib$es6$promise$$internal$$publish, parent);
 	      }
 	    }
 
@@ -1608,7 +1925,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    /**
 	      Promise objects represent the eventual result of an asynchronous operation. The
 	      primary way of interacting with a promise is through its `then` method, which
-	      registers callbacks to receive either a promise’s eventual value or the reason
+	      registers callbacks to receive either a promise's eventual value or the reason
 	      why the promise cannot be fulfilled.
 
 	      Terminology
@@ -1731,6 +2048,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    lib$es6$promise$promise$$Promise.race = lib$es6$promise$promise$race$$default;
 	    lib$es6$promise$promise$$Promise.resolve = lib$es6$promise$promise$resolve$$default;
 	    lib$es6$promise$promise$$Promise.reject = lib$es6$promise$promise$reject$$default;
+	    lib$es6$promise$promise$$Promise._setScheduler = lib$es6$promise$asap$$setScheduler;
+	    lib$es6$promise$promise$$Promise._setAsap = lib$es6$promise$asap$$setAsap;
+	    lib$es6$promise$promise$$Promise._asap = lib$es6$promise$asap$$asap;
 
 	    lib$es6$promise$promise$$Promise.prototype = {
 	      constructor: lib$es6$promise$promise$$Promise,
@@ -1941,7 +2261,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	        if (state) {
 	          var callback = arguments[state - 1];
-	          lib$es6$promise$asap$$default(function(){
+	          lib$es6$promise$asap$$asap(function(){
 	            lib$es6$promise$$internal$$invokeCallback(state, child, callback, result);
 	          });
 	        } else {
@@ -2013,7 +2333,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 
 	    /* global define:true module:true window: true */
-	    if ("function" === 'function' && __webpack_require__(19)['amd']) {
+	    if ("function" === 'function' && __webpack_require__(20)['amd']) {
 	      !(__WEBPACK_AMD_DEFINE_RESULT__ = function() { return lib$es6$promise$umd$$ES6Promise; }.call(exports, __webpack_require__, exports, module), __WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__));
 	    } else if (typeof module !== 'undefined' && module['exports']) {
 	      module['exports'] = lib$es6$promise$umd$$ES6Promise;
@@ -2025,301 +2345,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	}).call(this);
 
 
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(12), __webpack_require__(18).setImmediate, (function() { return this; }()), __webpack_require__(20)(module)))
-
-/***/ },
-/* 12 */
-/***/ function(module, exports, __webpack_require__) {
-
-	// shim for using process in browser
-
-	var process = module.exports = {};
-	var queue = [];
-	var draining = false;
-
-	function drainQueue() {
-	    if (draining) {
-	        return;
-	    }
-	    draining = true;
-	    var currentQueue;
-	    var len = queue.length;
-	    while(len) {
-	        currentQueue = queue;
-	        queue = [];
-	        var i = -1;
-	        while (++i < len) {
-	            currentQueue[i]();
-	        }
-	        len = queue.length;
-	    }
-	    draining = false;
-	}
-	process.nextTick = function (fun) {
-	    queue.push(fun);
-	    if (!draining) {
-	        setTimeout(drainQueue, 0);
-	    }
-	};
-
-	process.title = 'browser';
-	process.browser = true;
-	process.env = {};
-	process.argv = [];
-	process.version = ''; // empty string to avoid regexp issues
-	process.versions = {};
-
-	function noop() {}
-
-	process.on = noop;
-	process.addListener = noop;
-	process.once = noop;
-	process.off = noop;
-	process.removeListener = noop;
-	process.removeAllListeners = noop;
-	process.emit = noop;
-
-	process.binding = function (name) {
-	    throw new Error('process.binding is not supported');
-	};
-
-	// TODO(shtylman)
-	process.cwd = function () { return '/' };
-	process.chdir = function (dir) {
-	    throw new Error('process.chdir is not supported');
-	};
-	process.umask = function() { return 0; };
-
-
-/***/ },
-/* 13 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var utils = __webpack_require__(5);
-
-	function encode(val) {
-	  return encodeURIComponent(val).
-	    replace(/%40/gi, '@').
-	    replace(/%3A/gi, ':').
-	    replace(/%24/g, '$').
-	    replace(/%2C/gi, ',').
-	    replace(/%20/g, '+');
-	}
-
-	/**
-	 * Build a URL by appending params to the end
-	 *
-	 * @param {string} url The base of the url (e.g., http://www.google.com)
-	 * @param {object} [params] The params to be appended
-	 * @returns {string} The formatted url
-	 */
-	module.exports = function buildUrl(url, params) {
-	  if (!params) {
-	    return url;
-	  }
-
-	  var parts = [];
-
-	  utils.forEach(params, function (val, key) {
-	    if (val === null || typeof val === 'undefined') {
-	      return;
-	    }
-	    if (!utils.isArray(val)) {
-	      val = [val];
-	    }
-
-	    utils.forEach(val, function (v) {
-	      if (utils.isDate(v)) {
-	        v = v.toISOString();
-	      }
-	      else if (utils.isObject(v)) {
-	        v = JSON.stringify(v);
-	      }
-	      parts.push(encode(key) + '=' + encode(v));
-	    });
-	  });
-
-	  if (parts.length > 0) {
-	    url += (url.indexOf('?') === -1 ? '?' : '&') + parts.join('&');
-	  }
-
-	  return url;
-	};
-
-
-/***/ },
-/* 14 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var utils = __webpack_require__(5);
-
-	module.exports = {
-	  write: function write(name, value, expires, path, domain, secure) {
-	    var cookie = [];
-	    cookie.push(name + '=' + encodeURIComponent(value));
-
-	    if (utils.isNumber(expires)) {
-	      cookie.push('expires=' + new Date(expires).toGMTString());
-	    }
-
-	    if (utils.isString(path)) {
-	      cookie.push('path=' + path);
-	    }
-
-	    if (utils.isString(domain)) {
-	      cookie.push('domain=' + domain);
-	    }
-
-	    if (secure === true) {
-	      cookie.push('secure');
-	    }
-
-	    document.cookie = cookie.join('; ');
-	  },
-
-	  read: function read(name) {
-	    var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-	    return (match ? decodeURIComponent(match[3]) : null);
-	  },
-
-	  remove: function remove(name) {
-	    this.write(name, '', Date.now() - 86400000);
-	  }
-	};
-
-
-/***/ },
-/* 15 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var utils = __webpack_require__(5);
-
-	/**
-	 * Parse headers into an object
-	 *
-	 * ```
-	 * Date: Wed, 27 Aug 2014 08:58:49 GMT
-	 * Content-Type: application/json
-	 * Connection: keep-alive
-	 * Transfer-Encoding: chunked
-	 * ```
-	 *
-	 * @param {String} headers Headers needing to be parsed
-	 * @returns {Object} Headers parsed into an object
-	 */
-	module.exports = function parseHeaders(headers) {
-	  var parsed = {}, key, val, i;
-
-	  if (!headers) { return parsed; }
-
-	  utils.forEach(headers.split('\n'), function(line) {
-	    i = line.indexOf(':');
-	    key = utils.trim(line.substr(0, i)).toLowerCase();
-	    val = utils.trim(line.substr(i + 1));
-
-	    if (key) {
-	      parsed[key] = parsed[key] ? parsed[key] + ', ' + val : val;
-	    }
-	  });
-
-	  return parsed;
-	};
-
-
-/***/ },
-/* 16 */
-/***/ function(module, exports, __webpack_require__) {
-
-	'use strict';
-
-	var utils = __webpack_require__(5);
-
-	/**
-	 * Transform the data for a request or a response
-	 *
-	 * @param {Object|String} data The data to be transformed
-	 * @param {Array} headers The headers for the request or response
-	 * @param {Array|Function} fns A single function or Array of functions
-	 * @returns {*} The resulting transformed data
-	 */
-	module.exports = function transformData(data, headers, fns) {
-	  utils.forEach(fns, function (fn) {
-	    data = fn(data, headers);
-	  });
-
-	  return data;
-	};
-
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(17).setImmediate, (function() { return this; }()), __webpack_require__(18)(module)))
 
 /***/ },
 /* 17 */
 /***/ function(module, exports, __webpack_require__) {
 
-	'use strict';
-
-	var utils = __webpack_require__(5);
-	var msie = /(msie|trident)/i.test(navigator.userAgent);
-	var urlParsingNode = document.createElement('a');
-	var originUrl;
-
-	/**
-	 * Parse a URL to discover it's components
-	 *
-	 * @param {String} url The URL to be parsed
-	 * @returns {Object}
-	 */
-	function urlResolve(url) {
-	  var href = url;
-
-	  if (msie) {
-	    // IE needs attribute set twice to normalize properties
-	    urlParsingNode.setAttribute('href', href);
-	    href = urlParsingNode.href;
-	  }
-
-	  urlParsingNode.setAttribute('href', href);
-
-	  // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-	  return {
-	    href: urlParsingNode.href,
-	    protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-	    host: urlParsingNode.host,
-	    search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-	    hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-	    hostname: urlParsingNode.hostname,
-	    port: urlParsingNode.port,
-	    pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-	              urlParsingNode.pathname :
-	              '/' + urlParsingNode.pathname
-	  };
-	}
-
-	originUrl = urlResolve(window.location.href);
-
-	/**
-	 * Determine if a URL shares the same origin as the current location
-	 *
-	 * @param {String} requestUrl The URL to test
-	 * @returns {boolean} True if URL shares the same origin, otherwise false
-	 */
-	module.exports = function urlIsSameOrigin(requestUrl) {
-	  var parsed = (utils.isString(requestUrl)) ? urlResolve(requestUrl) : requestUrl;
-	  return (parsed.protocol === originUrl.protocol &&
-	        parsed.host === originUrl.host);
-	};
-
-
-/***/ },
-/* 18 */
-/***/ function(module, exports, __webpack_require__) {
-
-	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(12).nextTick;
+	/* WEBPACK VAR INJECTION */(function(setImmediate, clearImmediate) {var nextTick = __webpack_require__(8).nextTick;
 	var apply = Function.prototype.apply;
 	var slice = Array.prototype.slice;
 	var immediateIds = {};
@@ -2395,18 +2427,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.clearImmediate = typeof clearImmediate === "function" ? clearImmediate : function(id) {
 	  delete immediateIds[id];
 	};
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(18).setImmediate, __webpack_require__(18).clearImmediate))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(17).setImmediate, __webpack_require__(17).clearImmediate))
 
 /***/ },
-/* 19 */
-/***/ function(module, exports, __webpack_require__) {
-
-	module.exports = function() { throw new Error("define cannot be used indirect"); };
-
-
-/***/ },
-/* 20 */
-/***/ function(module, exports, __webpack_require__) {
+/* 18 */
+/***/ function(module, exports) {
 
 	module.exports = function(module) {
 		if(!module.webpackPolyfill) {
@@ -2418,6 +2443,52 @@ return /******/ (function(modules) { // webpackBootstrap
 		}
 		return module;
 	}
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	/* (ignored) */
+
+/***/ },
+/* 20 */
+/***/ function(module, exports) {
+
+	module.exports = function() { throw new Error("define cannot be used indirect"); };
+
+
+/***/ },
+/* 21 */
+/***/ function(module, exports) {
+
+	'use strict';
+
+	/**
+	 * Syntactic sugar for invoking a function and expanding an array for arguments.
+	 *
+	 * Common use case would be to use `Function.prototype.apply`.
+	 *
+	 *  ```js
+	 *  function f(x, y, z) {}
+	 *  var args = [1, 2, 3];
+	 *  f.apply(null, args);
+	 *  ```
+	 *
+	 * With `spread` this example can be re-written.
+	 *
+	 *  ```js
+	 *  spread(function(x, y, z) {})([1, 2, 3]);
+	 *  ```
+	 *
+	 * @param {Function} callback
+	 * @returns {Function}
+	 */
+	module.exports = function spread(callback) {
+	  return function (arr) {
+	    callback.apply(null, arr);
+	  };
+	};
 
 
 /***/ }

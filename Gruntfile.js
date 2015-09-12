@@ -115,6 +115,9 @@ module.exports = function (grunt) {
       },
       ci: {
         browsers: ['Chrome', 'Firefox', 'PhantomJS']
+      },
+      c9: {
+        browsers: ['PhantomJS']
       }
     },
     coveralls: {
@@ -122,6 +125,22 @@ module.exports = function (grunt) {
         coverage_dir: 'coverage'
       }
     }
+  });
+
+  grunt.registerTask('standard', function () {
+    var child_process = require('child_process');
+    var done = this.async();
+    grunt.log.writeln('Linting for correcting formatting...');
+    child_process.exec('node node_modules/standard/bin/cmd.js --parser babel-eslint src/*.js src/**/*.js src/**/**/*.js', function (err, stdout) {
+      console.log(stdout);
+      if (err) {
+        grunt.log.writeln('Failed due to ' + (stdout.split('\n').length - 2) + ' lint errors!');
+        done(err);
+      } else {
+        grunt.log.writeln('Done linting.');
+        done();
+      }
+    });
   });
 
   grunt.registerTask('version', function (filePath) {
@@ -135,6 +154,7 @@ module.exports = function (grunt) {
   grunt.registerTask('test', ['build', 'karma:ci', 'karma:min']);
   grunt.registerTask('build', [
     'clean',
+    'standard',
     'webpack',
     'uglify:main'
   ]);

@@ -27,6 +27,22 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
     });
   });
 
+  it('should allow overriding urlPath', function () {
+    var _this = this;
+
+    setTimeout(function () {
+      assert.equal(1, _this.requests.length);
+      assert.equal(_this.requests[0].url, 'api/foo/bar/beep/boop/1');
+      assert.equal(_this.requests[0].method, 'GET');
+      _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify(p1));
+    }, 30);
+
+    return Post.find(1, { urlPath: '/foo/bar/beep/boop/1' }).then(function (data) {
+      assert.equal(data.id, p1.id, 'post should have been found');
+      assert.equal(queryTransform.callCount, 1, 'queryTransform should have been called twice');
+    });
+  });
+
   it('should use default configs', function () {
     var _this = this;
 

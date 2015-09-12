@@ -2,6 +2,7 @@
 
 ###### Backwards compatible API changes
 - #20 - DSHttpAdapter.POST does not pick DSHttpAdapter.defaults.basePath
+- #25 - Allow urlPath override for httpAdapter PR by @internalfx
 - #26 - Add support for full url override
 
 ###### Backwards compatible bug fixes
