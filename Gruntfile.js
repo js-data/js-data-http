@@ -152,6 +152,7 @@ module.exports = function (grunt) {
   });
 
   grunt.registerTask('test', ['build', 'karma:ci', 'karma:min']);
+  grunt.registerTask('test_c9', ['build', 'karma:c9']);
   grunt.registerTask('build', [
     'clean',
     'standard',

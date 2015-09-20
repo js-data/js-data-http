@@ -38,6 +38,7 @@ defaultsPrototype.verbsUseBasePath = false
 
 class DSHttpAdapter {
   constructor (options) {
+    options = options || {}
     this.defaults = new Defaults()
     if (console) {
       this.defaults.log = (a, b) => console[typeof console.info === 'function' ? 'info' : 'log'](a, b)
@@ -132,7 +133,8 @@ class DSHttpAdapter {
     }
 
     // logs the HTTP response
-    function logResponse (data) {
+    function logResponse (data, isRejection) {
+      data = data || {}
       // examine the data object
       if (data instanceof Error) {
         // log the Error object
@@ -141,7 +143,7 @@ class DSHttpAdapter {
       } else if (typeof data === 'object') {
         let str = `${start.toUTCString()} - ${config.method} ${config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`
 
-        if (data.status >= 200 && data.status < 300) {
+        if (data.status >= 200 && data.status < 300 && !isRejection) {
           if (_this.defaults.log) {
             _this.defaults.log(str, data)
           }
@@ -163,7 +165,9 @@ class DSHttpAdapter {
       throw new Error('You have not configured this adapter with an http library!')
     }
 
-    return this.http(config).then(logResponse, logResponse)
+    return this.http(config).then(logResponse, function (data) {
+      return logResponse(data, true)
+    })
   }
 
   GET (url, config) {

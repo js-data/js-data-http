@@ -1,6 +1,6 @@
 /*!
  * js-data-http
- * @version 2.1.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+ * @version 2.1.1 - Homepage <http://www.js-data.io/docs/dshttpadapter>
  * @author Jason Dobry <jason.dobry@gmail.com>
  * @copyright (c) 2014-2015 Jason Dobry 
  * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -127,6 +127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function DSHttpAdapter(options) {
 	    _classCallCheck(this, DSHttpAdapter);
 
+	    options = options || {};
 	    this.defaults = new Defaults();
 	    if (console) {
 	      this.defaults.log = function (a, b) {
@@ -234,7 +235,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 
 	      // logs the HTTP response
-	      function logResponse(data) {
+	      function logResponse(data, isRejection) {
+	        data = data || {};
 	        // examine the data object
 	        if (data instanceof Error) {
 	          // log the Error object
@@ -243,7 +245,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        } else if (typeof data === 'object') {
 	          var str = start.toUTCString() + ' - ' + config.method + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
 
-	          if (data.status >= 200 && data.status < 300) {
+	          if (data.status >= 200 && data.status < 300 && !isRejection) {
 	            if (_this.defaults.log) {
 	              _this.defaults.log(str, data);
 	            }
@@ -265,7 +267,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        throw new Error('You have not configured this adapter with an http library!');
 	      }
 
-	      return this.http(config).then(logResponse, logResponse);
+	      return this.http(config).then(logResponse, function (data) {
+	        return logResponse(data, true);
+	      });
 	    }
 	  }, {
 	    key: 'GET',

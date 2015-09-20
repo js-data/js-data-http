@@ -86,8 +86,9 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
     return dsHttpAdapter.find(Post, 1).then(function () {
       throw new Error('Should not have succeeded!');
     }, function () {
+      console.log(loggedError);
       assert.isString(loggedError);
-      assert.isTrue(loggedError.indexOf('api/posts/1') !== -1);
+      assert.isTrue(loggedError.indexOf('api/posts/1') !== -1, loggedError);
     });
   });
 

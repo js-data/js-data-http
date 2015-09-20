@@ -1,4 +1,10 @@
-##### 2.1.0 - xx September 2015
+##### 2.1.1 - 20 September 2015
+
+###### Backwards compatible bug fixes
+- #18 - Cannot read property 'http' of undefined
+- #27 - logResponse doesn't reject when this.http() rejects with something that is not an Error
+
+##### 2.1.0 - 11 September 2015
 
 ###### Backwards compatible API changes
 - #20 - DSHttpAdapter.POST does not pick DSHttpAdapter.defaults.basePath
