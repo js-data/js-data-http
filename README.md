@@ -1,25 +1,14 @@
 <img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64" />
 
-## js-data-http [![bower version](https://img.shields.io/bower/v/js-data-http.svg?style=flat-square)](https://www.npmjs.org/package/js-data-http) [![npm version](https://img.shields.io/npm/v/js-data-http.svg?style=flat-square)](https://www.npmjs.org/package/js-data-http) [![Circle CI](https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat-square)](https://circleci.com/gh/js-data/js-data-http/tree/master) [![npm downloads](https://img.shields.io/npm/dm/js-data-http.svg?style=flat-square)](https://www.npmjs.org/package/js-data-http) [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/js-data/js-data-http/blob/master/LICENSE)
+## js-data-http [![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![Circle CI][circle_b]][circle_l] [![npm downloads][dn_b]][dn_l] [![Coverage Status][cov_b]][cov_l] [![Codacy][cod_b]][cod_l]
 
-
-http adapter for [js-data](http://www.js-data.io/).
+HTTP adapter for [js-data](http://www.js-data.io/).
 
 ### API Documentation
 [DSHttpAdapter](http://www.js-data.io/docs/dshttpadapter)
 
-__Latest Release:__ [![Latest Release](https://img.shields.io/github/release/js-data/js-data-http.svg?style=flat-square)](https://github.com/js-data/js-data-http/releases)
-
-__Status:__
-
-[![Coverage Status](https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat-square)](https://coveralls.io/r/js-data/js-data-http?branch=master) [![Codacity](https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-http/dashboard)
-
-__Supported Platforms:__
-
-[![node version](https://img.shields.io/badge/Node-0.10%2B-green.svg?style=flat-square)](https://github.com/js-data/js-data) [![browsers](https://img.shields.io/badge/Browser-Chrome%2CFirefox%2CSafari%2COpera%2CIE%209%2B%2CiOS%20Safari%207.1%2B%2CAndroid%20Browser%202.3%2B-green.svg?style=flat-square)](https://github.com/js-data/js-data)
-
 ### Quick Start
-`bower install --save js-data js-data-http` or `npm install --save js-data js-data-http`.
+`npm install --save js-data js-data-http` or `bower install --save js-data js-data-http`.
 
 Load `js-data-http.js` after `js-data.js`.
 
@@ -36,7 +25,7 @@ store.registerAdapter('http', adapter, { default: true });
 [CHANGELOG.md](https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md)
 
 ### Community
-- [Gitter Channel](https://gitter.im/js-data/js-data) - Better than IRC!
+- [Slack Channel][sl_l] - Better than IRC!
 - [Announcements](http://www.js-data.io/blog)
 - [Mailing List](https://groups.io/org/groupsio/jsdata) - Ask your questions!
 - [Issues](https://github.com/js-data/js-data-http/issues) - Found a bug? Feature request? Submit an issue!
@@ -45,7 +34,7 @@ store.registerAdapter('http', adapter, { default: true });
 
 ### Contributing
 
-First, support is handled via the [Gitter Channel](https://gitter.im/js-data/js-data) and the [Mailing List](https://groups.io/org/groupsio/jsdata). Ask your questions there.
+First, support is handled via the [Slack Channel][sl_l] and the [Mailing List](https://groups.io/org/groupsio/jsdata). Ask your questions there.
 
 When submitting issues on GitHub, please include as much detail as possible to make debugging quick and easy.
 
@@ -60,9 +49,9 @@ When submitting issues on GitHub, please include as much detail as possible to m
 1. Contribute to the issue/discussion that is the reason you'll be developing in the first place
 1. Fork js-data-http
 1. `git clone git@github.com:<you>/js-data-http.git`
-1. `cd js-data-http; npm install; bower install;`
+1. `cd js-data-http; npm install;`
 1. Write your code, including relevant documentation and tests
-1. Run `grunt test` (build and test)
+1. Run `npm test` (build and test)
 1. Your code will be linted and checked for formatting, the tests will be run
 1. The `dist/` folder & files will be generated, do NOT commit `dist/*`! They will be committed when a release is cut.
 1. Submit your PR and we'll review!
@@ -92,3 +81,15 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
+[sl_b]: http://slack.js-data.io/badge.svg
+[sl_l]: http://slack.js-data.io
+[npm_b]: https://img.shields.io/npm/v/js-data-http.svg?style=flat
+[npm_l]: https://www.npmjs.org/package/js-data-http
+[circle_b]: https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat
+[circle_l]: https://circleci.com/gh/js-data/js-data-http/tree/master
+[dn_b]: https://img.shields.io/npm/dm/js-data-http.svg?style=flat
+[dn_l]: https://www.npmjs.org/package/js-data-http
+[cov_b]: https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat
+[cov_l]: https://coveralls.io/github/js-data/js-data-http?branch=master
+[cod_b]: https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg
+[cod_l]: https://www.codacy.com/app/jasondobry/js-data-http/dashboard

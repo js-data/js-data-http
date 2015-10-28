@@ -1,4 +1,21 @@
-// an example karma.conf.js
+var customLaunchers = {
+	bs_ie9_windows7: {
+		base: 'BrowserStack',
+		browser: 'ie',
+		browser_version: '9.0',
+		os: 'Windows',
+		os_version: '7'
+	}
+};
+
+var browsers = ['PhantomJS'];
+if (
+	process.env.BROWSERSTACK_USERNAME &&
+	process.env.BROWSERSTACK_ACCESS_KEY
+) {
+	browsers = browsers.concat(Object.keys(customLaunchers));
+}
+
 module.exports = function (config) {
 	config.set({
 		// base path, that will be used to resolve files and exclude
@@ -13,10 +30,11 @@ module.exports = function (config) {
 			'karma-phantomjs-launcher',
 			'karma-firefox-launcher',
 			'karma-coverage',
-			'karma-spec-reporter'
+			'karma-browserstack-launcher'
 		],
 		autoWatch: false,
-		browsers: ['Chrome'],
+		autoWatchBatchDelay: 4000,
+		browsers: browsers,
 
 		// list of files / patterns to load in the browser
 		files: [
@@ -27,7 +45,7 @@ module.exports = function (config) {
 			'test/**/*.js'
 		],
 
-		reporters: ['spec', 'coverage'],
+		reporters: ['dots', 'coverage'],
 
 		preprocessors: {
 			'dist/js-data-http.js': ['coverage']
@@ -38,6 +56,15 @@ module.exports = function (config) {
 			type: 'lcov',
 			dir: 'coverage/'
 		},
+
+		browserStack: {
+			username: process.env.BROWSERSTACK_USERNAME,
+			accessKey: process.env.BROWSERSTACK_ACCESS_KEY
+		},
+
+		customLaunchers: customLaunchers,
+
+		browserNoActivityTimeout: 30000,
 
 		// web server port
 		port: 9876,

@@ -1,3 +1,9 @@
+##### 2.1.2 - 28 October 2015
+
+###### Other
+- Dropped Grunt
+- Now reporting code coverage properly
+
 ##### 2.1.1 - 20 September 2015
 
 ###### Backwards compatible bug fixes

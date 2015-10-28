@@ -1,12 +1,12 @@
 /*!
- * js-data-http
- * @version 2.1.1 - Homepage <http://www.js-data.io/docs/dshttpadapter>
- * @author Jason Dobry <jason.dobry@gmail.com>
- * @copyright (c) 2014-2015 Jason Dobry 
- * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
- * 
- * @overview Http adapter for js-data.
- */
+* js-data-http
+* @version 2.1.2 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @author Jason Dobry <jason.dobry@gmail.com>
+* @copyright (c) 2014-2015 Jason Dobry
+* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
+*
+* @overview HTTP adapter for js-data.
+*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-data"));
@@ -407,6 +407,15 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	  return DSHttpAdapter;
 	})();
+
+	DSHttpAdapter.version = {
+	  full: '2.1.2',
+	  major: parseInt('2', 10),
+	  minor: parseInt('1', 10),
+	  patch: parseInt('2', 10),
+	  alpha:  true ? 'false' : false,
+	  beta:  true ? 'false' : false
+	};
 
 	module.exports = DSHttpAdapter;
 
