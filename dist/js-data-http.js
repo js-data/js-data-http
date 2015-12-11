@@ -84,8 +84,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	var isObject = _jsData.utils.isObject;
 	var isSorN = _jsData.utils.isSorN;
 	var isString = _jsData.utils.isString;
-	var removeCircular = _jsData.utils.removeCircular;
-	var resolve = _jsData.utils.resolve;
+	var
+	// removeCircular,
+	resolve = _jsData.utils.resolve;
 	var reject = _jsData.utils.reject;
 	var toJson = _jsData.utils.toJson;
 	
@@ -308,9 +309,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
 	        config.url += '/';
 	      }
-	      if (_typeof(config.data) === 'object') {
-	        config.data = removeCircular(config.data);
-	      }
+	      // if (typeof config.data === 'object') {
+	      //   config.data = removeCircular(config.data)
+	      // }
 	      config.method = config.method.toUpperCase();
 	      var suffix = config.suffix || _this.defaults.suffix;
 	      if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
