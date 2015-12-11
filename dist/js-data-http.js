@@ -268,9 +268,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/' && !config.urlOverride) {
 	        config.url += '/';
 	      }
-	      if (_typeof(config.data) === 'object') {
-	        config.data = removeCircular(config.data);
-	      }
+	      // if (typeof config.data === 'object') {
+	      //   config.data = removeCircular(config.data)
+	      // }
 	      config.method = config.method.toUpperCase();
 	      var suffix = config.suffix || _this.defaults.suffix;
 	      if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix && !config.urlOverride) {

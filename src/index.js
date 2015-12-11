@@ -142,9 +142,9 @@ class DSHttpAdapter {
     if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/' && !config.urlOverride) {
       config.url += '/'
     }
-    if (typeof config.data === 'object') {
-      config.data = removeCircular(config.data)
-    }
+    // if (typeof config.data === 'object') {
+    //   config.data = removeCircular(config.data)
+    // }
     config.method = config.method.toUpperCase()
     let suffix = config.suffix || _this.defaults.suffix
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix && !config.urlOverride) {
