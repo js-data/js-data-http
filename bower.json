@@ -23,6 +23,7 @@
     "coverage/",
     "Gruntfile.js",
     "node_modules/",
+    "node/",
     "test/",
     "package.json",
     "karma.conf.js",

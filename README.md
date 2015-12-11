@@ -26,15 +26,41 @@ To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 ## Quick Start
 `npm install --save js-data js-data-http` or `bower install --save js-data js-data-http`.
 
-Load `js-data-http.js` after `js-data.js`.
+`npm install --save axios js-data js-data-http-node`
+
+__ES6__
 
 ```js
-var adapter = new DSHttpAdapter();
+import {Model} from 'js-data'
+import DSHttpAdapter from 'js-data-http-node'
 
-var store = new JSData.DS();
-store.registerAdapter('http', adapter, { default: true });
+const adapter = new DSHttpAdapter()
 
-// "store" will now use the http adapter for all async operations
+class Base extends Model {}
+Base.registerAdapter('http', adapter, { default: true })
+
+class School extends Model {}
+class Student extends Model {}
+
+// "School" and "Student" will now use the http adapter by default
+```
+
+__ES5__
+
+```js
+var JSData = require('js-data')
+var Model = JSData.Model
+var DSHttpAdapter = require('js-data-http-node')
+
+var adapter = new DSHttpAdapter()
+
+var Base = Model.extend({}, { name: 'Base' })
+Base.registerAdapter('http', adapter, { default: true })
+
+var School = Base.extend({}, { name: 'School' })
+var Student = Base.extend({}, { name: 'Student' })
+
+// "School" and "Student" will now use the http adapter by default
 ```
 
 ## Guides and Tutorials

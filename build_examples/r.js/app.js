@@ -1,14 +1,15 @@
 define('app', [
   'js-data',
-  'axios',
   'js-data-http'
-], function (JSData, axios, DSHttpAdapter) {
-  document.getElementById('main').innerHTML = JSData.version.full;
+], function (JSData, DSHttpAdapter) {
+  document.getElementById('main').innerHTML = DSHttpAdapter.version.full
 
-  var adapter = new DSHttpAdapter({
-    http: axios
-  });
-  var store = new JSData.DS();
-  store.registerAdapter('http', adapter, { default: true });
-  return store.defineResource('user');
-});
+  var adapter = new DSHttpAdapter()
+  var Base = JSData.Model.extend({}, { name: 'Base' })
+  Base.registerAdapter('http', adapter, { default: true })
+  var User = Base.extend({}, { name: 'User' })
+
+  User.find(1).catch(function (err) {
+    console.log(err)
+  })
+})
