@@ -7,6 +7,7 @@ bower_components/
 
 coverage/
 
+dist/js-data-http-tests*
 build_examples/r.js/bundle.js
 build_examples/browserify/bundle.js
 build_examples/webpack/bundle.js

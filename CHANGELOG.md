@@ -1,7 +1,15 @@
-##### 3.0.0-beta.1 - 06 July 2015
+##### 3.0.0-alpha.1 - xx December 2015
+
+###### Backwards compatible API changes
+- Added option to support use of `window.fetch`
+- Added option to supply custom http implementation
 
 ###### Breaking API changes
-- `axios` is now a peerDependency, and is not bundled with js-data-http.js You now have to configure the adapter to use an http library.
+- Actions are now part of js-data-http, rather than js-data
+- Now requires js-data 3.x or greater
+
+###### Other
+- Published the js-data-http-node package, a build of js-data-http that works in Node.js
 
 ##### 2.0.0 - 02 July 2015
 

@@ -1,0 +1,9 @@
+test/
+node/
+src/
+mocha.start.js
+karma.start.js
+karma.conf.js
+.bowerrc
+scripts/
+webpack.config.js

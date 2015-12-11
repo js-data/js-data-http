@@ -1,42 +1,93 @@
 <img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64" />
 
-## js-data-http [![bower version](https://img.shields.io/bower/v/js-data-http.svg?style=flat-square)](https://www.npmjs.org/package/js-data-http) [![npm version](https://img.shields.io/npm/v/js-data-http.svg?style=flat-square)](https://www.npmjs.org/package/js-data-http) [![Circle CI](https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat-square)](https://circleci.com/gh/js-data/js-data-http/tree/master) [![npm downloads](https://img.shields.io/npm/dm/js-data-http.svg?style=flat-square)](https://www.npmjs.org/package/js-data-http) [![License](https://img.shields.io/badge/license-MIT-blue.svg?style=flat-square)](https://github.com/js-data/js-data-http/blob/master/LICENSE)
+## js-data-http [![Slack Status][sl_b]][sl_l] [![npm version][npm_b]][npm_l] [![Circle CI][circle_b]][circle_l] [![npm downloads][dn_b]][dn_l] [![Coverage Status][cov_b]][cov_l] [![Codacy][cod_b]][cod_l]
 
+HTTP adapter for [js-data](http://www.js-data.io/).
 
-http adapter for [js-data](http://www.js-data.io/).
+The `js-data-http` npm package is for use in the Browser, and the `js-data-http-node`
+package is for use in Node.js.
 
 ### API Documentation
 [DSHttpAdapter](http://www.js-data.io/docs/dshttpadapter)
 
-__Latest Release:__ [![Latest Release](https://img.shields.io/github/release/js-data/js-data-http.svg?style=flat-square)](https://github.com/js-data/js-data-http/releases)
-
-__Status:__
-
-[![Dependency Status](https://img.shields.io/gemnasium/js-data/js-data-http.svg?style=flat-square)](https://gemnasium.com/js-data/js-data-http) [![Coverage Status](https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat-square)](https://coveralls.io/r/js-data/js-data-http?branch=master) [![Codacity](https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg?style=flat-square)](https://www.codacy.com/public/jasondobry/js-data-http/dashboard)
-
-__Supported Platforms:__
-
-[![node version](https://img.shields.io/badge/Node-0.10%2B-green.svg?style=flat-square)](https://github.com/js-data/js-data) [![browsers](https://img.shields.io/badge/Browser-Chrome%2CFirefox%2CSafari%2COpera%2CIE%209%2B%2CiOS%20Safari%207.1%2B%2CAndroid%20Browser%202.3%2B-green.svg?style=flat-square)](https://github.com/js-data/js-data)
-
 ### Quick Start
+
+#### Browser
+
 `bower install --save js-data js-data-http` or `npm install --save js-data js-data-http`.
 
-Load `js-data-http.js` after `js-data.js`.
+__ES6__
 
 ```js
-var adapter = new DSHttpAdapter();
+const adapter = new DSHttpAdapter()
 
-var store = new JSData.DS();
-store.registerAdapter('http', adapter, { default: true });
+class Base extends JSData.Model {}
+Base.registerAdapter('http', adapter, { default: true })
 
-// "store" will now use the http adapter for all async operations
+class School extends Model {}
+class Student extends Model {}
+
+// "School" and "Student" will now use the http adapter by default
+```
+
+__ES5__
+
+```js
+var adapter = new DSHttpAdapter()
+
+var Base = JSData.Model.extend({}, { name: 'Base' })
+Base.registerAdapter('http', adapter, { default: true })
+
+var School = Base.extend({}, { name: 'School' })
+var Student = Base.extend({}, { name: 'Student' })
+
+// "School" and "Student" will now use the http adapter by default
+```
+
+#### Node.js
+
+`npm install --save axios js-data js-data-http-node`
+
+__ES6__
+
+```js
+import {Model} from 'js-data'
+import DSHttpAdapter from 'js-data-http-node'
+
+const adapter = new DSHttpAdapter()
+
+class Base extends Model {}
+Base.registerAdapter('http', adapter, { default: true })
+
+class School extends Model {}
+class Student extends Model {}
+
+// "School" and "Student" will now use the http adapter by default
+```
+
+__ES5__
+
+```js
+var JSData = require('js-data')
+var Model = JSData.Model
+var DSHttpAdapter = require('js-data-http-node')
+
+var adapter = new DSHttpAdapter()
+
+var Base = Model.extend({}, { name: 'Base' })
+Base.registerAdapter('http', adapter, { default: true })
+
+var School = Base.extend({}, { name: 'School' })
+var Student = Base.extend({}, { name: 'Student' })
+
+// "School" and "Student" will now use the http adapter by default
 ```
 
 ### Changelog
 [CHANGELOG.md](https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md)
 
 ### Community
-- [Gitter Channel](https://gitter.im/js-data/js-data) - Better than IRC!
+- [Slack Channel][sl_l] - Better than IRC!
 - [Announcements](http://www.js-data.io/blog)
 - [Mailing List](https://groups.io/org/groupsio/jsdata) - Ask your questions!
 - [Issues](https://github.com/js-data/js-data-http/issues) - Found a bug? Feature request? Submit an issue!
@@ -45,16 +96,35 @@ store.registerAdapter('http', adapter, { default: true });
 
 ### Contributing
 
-First, feel free to contact me with questions. [Mailing List](https://groups.io/org/groupsio/jsdata). [Issues](https://github.com/js-data/js-data-http/issues).
+First, support is handled via the [Slack Channel][sl_l] and the
+[Mailing List][ml]. Ask your questions there.
 
-1. Contribute to the issue that is the reason you'll be developing in the first place
+When submitting issues on GitHub, please include as much detail as possible to
+make debugging quick and easy.
+
+- good - Your versions of js-data, js-data-http, etc., relevant console logs/error,
+code examples that revealed the issue
+- better - A [plnkr](http://plnkr.co/), [fiddle](http://jsfiddle.net/), or
+[bin](http://jsbin.com/?html,output) that demonstrates the issue
+- best - A Pull Request that fixes the issue, including test coverage for the
+issue and the fix
+
+[Github Issues](https://github.com/js-data/js-data/issues).
+
+#### Pull Requests
+
+1. Contribute to the issue/discussion that is the reason you'll be developing in
+the first place
 1. Fork js-data-http
-1. `git clone https://github.com/<you>/js-data-http.git`
+1. `git clone git@github.com:<you>/js-data-http.git`
 1. `cd js-data-http; npm install; bower install;`
-1. `grunt go` (builds and starts a watch)
-1. (in another terminal) `grunt karma:dev` (runs the tests)
 1. Write your code, including relevant documentation and tests
-1. Submit a PR and we'll review
+1. Run `npm test` (build and test)
+1. Your code will be linted and checked for formatting, the tests will be run
+1. The `dist/` folder & files will be generated, do NOT commit `dist/*`! They
+will be committed when a release is cut.
+1. Submit your PR and we'll review!
+1. Thanks!
 
 ### License
 
@@ -79,4 +149,17 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+[sl_b]: http://slack.js-data.io/badge.svg
+[sl_l]: http://slack.js-data.io
+[npm_b]: https://img.shields.io/npm/v/js-data-http.svg?style=flat
+[npm_l]: https://www.npmjs.org/package/js-data-http
+[circle_b]: https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat
+[circle_l]: https://circleci.com/gh/js-data/js-data-http/tree/master
+[dn_b]: https://img.shields.io/npm/dm/js-data-http.svg?style=flat
+[dn_l]: https://www.npmjs.org/package/js-data-http
+[cov_b]: https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat
+[cov_l]: https://coveralls.io/github/js-data/js-data-http?branch=master
+[cod_b]: https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg
+[cod_l]: https://www.codacy.com/app/jasondobry/js-data-http/dashboard
 

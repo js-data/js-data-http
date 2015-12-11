@@ -1,8 +1,8 @@
 require.config({
   paths: {
-    'js-data-http': '../../dist/js-data-http',
-    'js-data': '../../bower_components/js-data/dist/js-data',
-    'axios': '../../bower_components/axios/dist/axios'
+    // customize these ass needed
+    'js-data-http': '../../node/dist/js-data-http-node',
+    'js-data': '../../node_modules/js-data/dist/js-data',
   }
 });
 
