@@ -11,10 +11,20 @@ module.exports = {
     libraryTarget: 'umd',
     library: 'DSHttpAdapter'
   },
-  externals: [
-    'chai',
-    'js-data'
-  ],
+  externals: {
+    'chai': {
+      amd: 'chai',
+      commonjs: 'chai',
+      commonjs2: 'chai',
+      root: 'chai'
+    },
+    'js-data': {
+      amd: 'js-data',
+      commonjs: 'js-data',
+      commonjs2: 'js-data',
+      root: 'JSData'
+    }
+  },
   module: {
     loaders: [
       {

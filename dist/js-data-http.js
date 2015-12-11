@@ -15,7 +15,7 @@
 	else if(typeof exports === 'object')
 		exports["DSHttpAdapter"] = factory(require("js-data"));
 	else
-		root["DSHttpAdapter"] = factory(root["js-data"]);
+		root["DSHttpAdapter"] = factory(root["JSData"]);
 })(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
