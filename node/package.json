@@ -1,0 +1,24 @@
+{
+  "name": "js-data-http-node",
+  "description": "Node.js HTTP adapter for js-data.",
+  "version": "3.0.0-alpha.1",
+  "homepage": "http://www.js-data.io/docs/dshttpadapter",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/js-data/js-data-http.git"
+  },
+  "author": "Jason Dobry <jason.dobry@gmail.com> (http://www.pseudobry.com)",
+  "license": "MIT",
+  "main": "./dist/js-data-http-node.js",
+  "keywords": [
+    "ajax",
+    "axios",
+    "rest",
+    "adapter",
+    "http",
+    "node.js"
+  ],
+  "dependencies": {
+    "axios": "0.7.0"
+  }
+}

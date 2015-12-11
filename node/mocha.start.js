@@ -5,8 +5,8 @@ var assert = require('chai').assert;
 var sinon = require('sinon')
 var mocha = require('mocha')
 var JSData = require('js-data')
-var DSHttpAdapter = require('./dist/js-data-http')
-var DSHttpAdapterTests = require('./dist/js-data-http-tests')
+var DSHttpAdapter = require('./dist/js-data-http-node')
+var DSHttpAdapterTests = require('./dist/js-data-http-node-tests')
 
 var store
 
