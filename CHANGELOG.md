@@ -1,12 +1,12 @@
-##### 3.0.0-alpha.1 - xx December 2015
-
-###### Backwards compatible API changes
-- Added option to support use of `window.fetch`
-- Added option to supply custom http implementation
+##### 3.0.0-alpha.1 - 12 December 2015
 
 ###### Breaking API changes
 - Actions are now part of js-data-http, rather than js-data
 - Now requires js-data 3.x or greater
+
+###### Backwards compatible API changes
+- Added option to support use of `window.fetch`
+- Added option to supply custom http implementation
 
 ###### Other
 - Published the js-data-http-node package, a build of js-data-http that works in Node.js
