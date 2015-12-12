@@ -18,6 +18,10 @@
 
 ##### 2.1.2 - 28 October 2015
 
+###### Backwards compatible API changes
+- Added option to support use of `window.fetch`
+- Added option to supply custom http implementation
+
 ###### Other
 - Dropped Grunt
 - Now reporting code coverage properly
