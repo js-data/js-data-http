@@ -8,18 +8,33 @@ try {
 let { DSUtils } = JSData
 let { deepMixIn, removeCircular, copy, makePath, isString, isNumber } = DSUtils
 
-class Defaults {
-  queryTransform (resourceConfig, params) {
-    return params
-  }
+/**
+ * DSHttpAdapter class.
+ * @class DSHttpAdapter
+ *
+ * @param {Object} [opts] Configuration options.
+ * @param {string} [opts.basePath='']
+ * @param {boolean} [opts.debug=false]
+ * @param {boolean} [opts.forceTrailingSlash=false]
+ * @param {Object} [opts.http=axios]
+ * @param {Object} [opts.httpConfig={}]
+ * @param {string} [opts.suffix='']
+ * @param {boolean} [opts.useFetch=false]
+ */
+function DSHttpAdapter (opts) {
+  const self = this
 
-  deserialize (resourceConfig, data) {
-    return data ? ('data' in data ? data.data : data) : data
-  }
+  // Default values for arguments
+  opts || (opts = {})
 
-  serialize (resourceConfig, data) {
-    return data
-  }
+  // Default and user-defined settings
+  self.basePath = opts.basePath === undefined ? '' : opts.basePath
+  self.debug = opts.debug === undefined ? false : opts.debug
+  self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash
+  self.http = opts.http === undefined ? axios : opts.http
+  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig
+  self.suffix = opts.suffix === undefined ? '' : opts.suffix
+  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch
 
   log () {}
 
@@ -28,11 +43,24 @@ class Defaults {
 
 let defaultsPrototype = Defaults.prototype
 
-defaultsPrototype.basePath = ''
+  beforeDEL () {},
 
-defaultsPrototype.forceTrailingSlash = ''
+  DEL (url, config, opts) {
+    const self = this
+    config || (config = {})
+    config.url = url || config.url
+    config.method = config.method || 'delete'
+    return resolve(self.beforeDEL(url, config, opts)).then(function (_config) {
+      config = _config || config
+      return self.HTTP(config, opts)
+    }).then(function (response) {
+      return resolve(self.afterDEL(url, config, opts, response)).then(function (_response) {
+        return _response || response
+      })
+    })
+  },
 
-defaultsPrototype.httpConfig = {}
+  afterDEL () {},
 
 defaultsPrototype.verbsUseBasePath = false
 
@@ -43,10 +71,15 @@ class DSHttpAdapter {
     options = options || {}
     this.defaults = new Defaults()
     if (console) {
-      this.defaults.log = (a, b) => console[typeof console.info === 'function' ? 'info' : 'log'](a, b)
+      console[typeof console.error === 'function' ? 'error' : 'log'](...args)
     }
-    if (console) {
-      this.defaults.error = (a, b) => console[typeof console.error === 'function' ? 'error' : 'log'](a, b)
+  },
+
+  fetch (config, opts) {
+    const requestConfig = {
+      method: config.method,
+      // turn the plain headers object into the Fetch Headers object
+      headers: new Headers(config.headers)
     }
     deepMixIn(this.defaults, options)
     this.http = options.http || axios
@@ -134,9 +167,6 @@ class DSHttpAdapter {
     if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/' && !config.urlOverride) {
       config.url += '/'
     }
-    // if (typeof config.data === 'object') {
-    //   config.data = removeCircular(config.data)
-    // }
     config.method = config.method.toUpperCase()
     let suffix = config.suffix || _this.defaults.suffix
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix && !config.urlOverride) {
@@ -172,7 +202,7 @@ class DSHttpAdapter {
       }
     }
 
-    if (!this.http) {
+    if (!self.http) {
       throw new Error('You have not configured this adapter with an http library!')
     }
 

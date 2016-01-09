@@ -1,19 +1,19 @@
 /*!
-* js-data-http-node
+* js-data-fetch
 * @version 3.0.0-alpha.2 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @copyright (c) 2014-2016 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
-* @overview Node.js HTTP adapter for js-data.
+* @overview Fetch HTTP (XHR) adapter for js-data in the browser.
 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
-		module.exports = factory(require("js-data"), require("axios"));
+		module.exports = factory(require("js-data"), require("undefined"));
 	else if(typeof define === 'function' && define.amd)
-		define(["js-data", "axios"], factory);
+		define(["js-data", "undefined"], factory);
 	else {
-		var a = typeof exports === 'object' ? factory(require("js-data"), require("axios")) : factory(root["js-data"], root["axios"]);
+		var a = typeof exports === 'object' ? factory(require("js-data"), require("undefined")) : factory(root["js-data"], root["undefined"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
 })(this, function(__WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
@@ -658,7 +658,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
+	module.exports = undefined;
 
 /***/ }
 /******/ ])

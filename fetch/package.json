@@ -1,7 +1,7 @@
 {
-  "name": "js-data-http-node",
-  "description": "Node.js HTTP adapter for js-data.",
-  "version": "3.0.0-alpha.2",
+  "name": "js-data-fetch",
+  "description": "HTTP adapter for js-data that uses fetch.",
+  "version": "3.0.0-alpha.1",
   "homepage": "http://www.js-data.io/docs/dshttpadapter",
   "repository": {
     "type": "git",
@@ -9,16 +9,13 @@
   },
   "author": "Jason Dobry <jason.dobry@gmail.com> (http://www.pseudobry.com)",
   "license": "MIT",
-  "main": "./dist/js-data-http-node.js",
+  "main": "./dist/js-data-fetch.js",
   "keywords": [
     "ajax",
     "axios",
     "rest",
     "adapter",
     "http",
-    "node.js"
-  ],
-  "peerDependencies": {
-    "axios": "0.7.x"
-  }
+    "fetch"
+  ]
 }
