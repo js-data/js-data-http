@@ -1,8 +1,8 @@
 /*!
 * js-data-http
-* @version 3.0.0-alpha.1 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 3.0.0-alpha.2 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @author Jason Dobry <jason.dobry@gmail.com>
-* @copyright (c) 2014-2015 Jason Dobry
+* @copyright (c) 2014-2016 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
 * @overview HTTP (XHR) adapter for js-data in the browser.
@@ -65,14 +65,11 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _createClass = (function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; })();
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _jsData = __webpack_require__(2);
 	
-	function _typeof(obj) { return obj && typeof Symbol !== "undefined" && obj.constructor === Symbol ? "symbol" : typeof obj; }
-	
-	function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-	
+	/* global fetch:true Headers:true Request:true */
 	var axios = __webpack_require__(3);
 	var _ = _jsData.utils._;
 	var copy = _jsData.utils.copy;
@@ -80,13 +77,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	var fillIn = _jsData.utils.fillIn;
 	var forOwn = _jsData.utils.forOwn;
 	var isArray = _jsData.utils.isArray;
+	var isFunction = _jsData.utils.isFunction;
 	var isNumber = _jsData.utils.isNumber;
 	var isObject = _jsData.utils.isObject;
 	var isSorN = _jsData.utils.isSorN;
 	var isString = _jsData.utils.isString;
-	var
-	// removeCircular,
-	resolve = _jsData.utils.resolve;
+	var resolve = _jsData.utils.resolve;
 	var reject = _jsData.utils.reject;
 	var toJson = _jsData.utils.toJson;
 	
@@ -97,11 +93,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	} catch (e) {}
 	
 	function isValidString(value) {
-	  return value != null && value !== ''; // jshint ignore:line
+	  return value != null && value !== '';
 	}
-	function join(items) {
-	  var separator = arguments.length <= 1 || arguments[1] === undefined ? '' : arguments[1];
-	
+	function join(items, separator) {
+	  separator || (separator = '');
 	  return items.filter(isValidString).join(separator);
 	}
 	function makePath() {
@@ -149,340 +144,433 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return url;
 	}
 	
-	var Defaults = (function () {
-	  function Defaults() {
-	    _classCallCheck(this, Defaults);
-	  }
+	/**
+	 * DSHttpAdapter class.
+	 * @class DSHttpAdapter
+	 *
+	 * @param {Object} [opts] Configuration options.
+	 * @param {string} [opts.basePath='']
+	 * @param {boolean} [opts.debug=false]
+	 * @param {boolean} [opts.forceTrailingSlash=false]
+	 * @param {Object} [opts.http=axios]
+	 * @param {Object} [opts.httpConfig={}]
+	 * @param {string} [opts.suffix='']
+	 * @param {boolean} [opts.useFetch=false]
+	 */
+	function DSHttpAdapter(opts) {
+	  var self = this;
 	
-	  _createClass(Defaults, [{
-	    key: 'queryTransform',
-	    value: function queryTransform(resourceConfig, params) {
-	      return params;
+	  // Default values for arguments
+	  opts || (opts = {});
+	
+	  // Default and user-defined settings
+	  self.basePath = opts.basePath === undefined ? '' : opts.basePath;
+	  self.debug = opts.debug === undefined ? false : opts.debug;
+	  self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash;
+	  self.http = opts.http === undefined ? axios : opts.http;
+	  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig;
+	  self.suffix = opts.suffix === undefined ? '' : opts.suffix;
+	  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch;
+	
+	  // Use "window.fetch" if available and the user asks for it
+	  if (hasFetch && (self.useFetch || self.http === undefined)) {}
+	}
+	
+	fillIn(DSHttpAdapter, {
+	  beforeCreate: function beforeCreate() {},
+	  create: function create(Model, props, opts) {
+	    var self = this;
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.op = 'create';
+	    self.dbg(opts.op, Model, props, opts);
+	    return resolve(self.beforeCreate(Model, props, opts)).then(function () {
+	      return self.POST(self.getPath('create', Model, props, opts), self.serialize(Model, props, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterCreate(Model, data, opts)).then(function (_data) {
+	        return _data || data;
+	      });
+	    });
+	  },
+	  afterCreate: function afterCreate() {},
+	  dbg: function dbg() {
+	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	      args[_key2] = arguments[_key2];
 	    }
-	  }, {
-	    key: 'deserialize',
-	    value: function deserialize(resourceConfig, data) {
-	      return data ? 'data' in data ? data.data : data : data;
+	
+	    this.log.apply(this, ['debug'].concat(args));
+	  },
+	  beforeDEL: function beforeDEL() {},
+	  DEL: function DEL(url, config, opts) {
+	    var self = this;
+	    config || (config = {});
+	    config.url = url || config.url;
+	    config.method = config.method || 'delete';
+	    return resolve(self.beforeDEL(url, config, opts)).then(function (_config) {
+	      config = _config || config;
+	      return self.HTTP(config, opts);
+	    }).then(function (response) {
+	      return resolve(self.afterDEL(url, config, opts, response)).then(function (_response) {
+	        return _response || response;
+	      });
+	    });
+	  },
+	  afterDEL: function afterDEL() {},
+	  deserialize: function deserialize(Model, data, opts) {
+	    opts || (opts = {});
+	    if (isFunction(opts.deserialize)) {
+	      return opts.deserialize(Model, data, opts);
 	    }
-	  }, {
-	    key: 'serialize',
-	    value: function serialize(resourceConfig, data) {
+	    if (opts.raw) {
 	      return data;
 	    }
-	  }, {
-	    key: 'log',
-	    value: function log() {}
-	  }, {
-	    key: 'error',
-	    value: function error() {}
-	  }]);
-	
-	  return Defaults;
-	})();
-	
-	var defaultsPrototype = Defaults.prototype;
-	
-	defaultsPrototype.basePath = '';
-	
-	defaultsPrototype.forceTrailingSlash = '';
-	
-	defaultsPrototype.httpConfig = {};
-	
-	defaultsPrototype.useFetch = false;
-	
-	var DSHttpAdapter = (function () {
-	  function DSHttpAdapter(options) {
-	    _classCallCheck(this, DSHttpAdapter);
-	
-	    options = options || {};
-	    this.defaults = new Defaults();
-	    this.http = options.http || axios;
-	    delete options.http;
+	    return data ? 'data' in data ? data.data : data : data;
+	  },
+	  beforeDestroy: function beforeDestroy() {},
+	  destroy: function destroy(Model, id, opts) {
+	    var self = this;
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.op = 'destroy';
+	    self.dbg(opts.op, Model, id, opts);
+	    return resolve(self.beforeDestroy(Model, id, opts)).then(function () {
+	      return self.DEL(self.getPath('destroy', Model, id, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterDestroy(Model, id, data, opts)).then(function (_data) {
+	        return _data || data;
+	      });
+	    });
+	  },
+	  beforeDestroyAll: function beforeDestroyAll() {},
+	  destroyAll: function destroyAll(Model, query, opts) {
+	    var self = this;
+	    query || (query = {});
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.op = 'destroy';
+	    self.dbg(opts.op, Model, query, opts);
+	    deepMixIn(opts.params, query);
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    return resolve(self.beforeDestroyAll(Model, query, opts)).then(function () {
+	      return self.DEL(self.getPath('destroyAll', Model, query, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterDestroyAll(Model, query, data, opts)).then(function (_data) {
+	        return _data || data;
+	      });
+	    });
+	  },
+	  error: function error() {
 	    if (console) {
-	      this.defaults.log = function (a, b) {
-	        return console[typeof console.info === 'function' ? 'info' : 'log'](a, b);
-	      };
+	      var _console;
+	
+	      (_console = console)[typeof console.error === 'function' ? 'error' : 'log'].apply(_console, arguments);
 	    }
-	    if (console) {
-	      this.defaults.error = function (a, b) {
-	        return console[typeof console.error === 'function' ? 'error' : 'log'](a, b);
-	      };
+	  },
+	  fetch: function (_fetch) {
+	    function fetch(_x, _x2) {
+	      return _fetch.apply(this, arguments);
 	    }
-	    deepMixIn(this.defaults, options);
 	
-	    if (this.defaults.useFetch && hasFetch) {
-	      this.defaults.deserialize = function (resourceConfig, response) {
-	        return response.json();
+	    fetch.toString = function () {
+	      return _fetch.toString();
+	    };
+	
+	    return fetch;
+	  }(function (config, opts) {
+	    var requestConfig = {
+	      method: config.method,
+	      // turn the plain headers object into the Fetch Headers object
+	      headers: new Headers(config.headers)
+	    };
+	
+	    if (config.data) {
+	      requestConfig.body = toJson(config.data);
+	    }
+	
+	    return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
+	      response.config = {
+	        method: config.method,
+	        url: config.url
 	      };
-	      this.http = function (config) {
-	        var requestConfig = {
-	          method: config.method,
-	          // turn the plain headers object into the Fetch Headers object
-	          headers: new Headers(config.headers)
-	        };
+	      return response.json().then(function (data) {
+	        response.data = data;
+	        return response;
+	      });
+	    });
+	  }),
+	  beforeFind: function beforeFind() {},
+	  find: function find(Model, id, opts) {
+	    var self = this;
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.op = 'find';
+	    self.dbg(opts.op, Model, id, opts);
+	    return resolve(self.beforeFind(Model, id, opts)).then(function () {
+	      return self.GET(self.getPath('find', Model, id, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterFind(Model, id, data, opts)).then(function (_data) {
+	        return _data || data;
+	      });
+	    });
+	  },
+	  afterFind: function afterFind() {},
+	  findAll: function findAll(Model, query, opts) {
+	    var self = this;
+	    query || (query = {});
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.op = 'findAll';
+	    self.dbg(opts.op, Model, query, opts);
+	    deepMixIn(opts.params, query);
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    return resolve(self.beforeFindAll(Model, query, opts)).then(function () {
+	      return self.GET(self.getPath('findAll', Model, query, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterFindAll(Model, query, data, opts)).then(function (_data) {
+	        return _data || data;
+	      });
+	    });
+	  },
+	  beforeGET: function beforeGET() {},
+	  GET: function GET(url, config, opts) {
+	    var self = this;
+	    config || (config = {});
+	    config.url = url || config.url;
+	    config.method = config.method || 'get';
+	    return resolve(self.beforeGET(url, config, opts)).then(function (_config) {
+	      config = _config || config;
+	      return self.HTTP(config, opts);
+	    }).then(function (response) {
+	      return resolve(self.afterGET(url, config, opts, response)).then(function (_response) {
+	        return _response || response;
+	      });
+	    });
+	  },
+	  afterGET: function afterGET() {},
+	  getEndpoint: function getEndpoint(Model, id, opts) {
+	    var _this = this;
 	
-	        if (config.data) {
-	          requestConfig.body = toJson(config.data);
-	        }
+	    opts || (opts = {});
+	    opts.params || (opts.params = {});
 	
-	        return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
-	          response.config = {
-	            method: config.method,
-	            url: config.url
+	    var item = undefined;
+	    var parentKey = Model.parentKey;
+	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : Model.endpoint;
+	    var parentField = Model.parentField;
+	    var parentDef = Model.getResource(Model.parent);
+	    var parentId = opts.params[parentKey];
+	
+	    if (parentId === false || !parentKey || !parentDef) {
+	      if (parentId === false) {
+	        delete opts.params[parentKey];
+	      }
+	      return endpoint;
+	    } else {
+	      delete opts.params[parentKey];
+	
+	      if (isString(id) || isNumber(id)) {
+	        item = Model.get(id);
+	      } else if (isObject(id)) {
+	        item = id;
+	      }
+	
+	      if (item) {
+	        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+	      }
+	
+	      if (parentId) {
+	        var _ret = function () {
+	          delete opts.endpoint;
+	          var _opts = {};
+	          forOwn(opts, function (value, key) {
+	            _opts[key] = value;
+	          });
+	          _(_opts, parentDef);
+	          return {
+	            v: makePath(_this.getEndpoint(parentDef, parentId, _opts, parentId, endpoint))
 	          };
-	          return response;
-	        });
-	      };
-	    }
-	  }
+	        }();
 	
-	  _createClass(DSHttpAdapter, [{
-	    key: 'getEndpoint',
-	    value: function getEndpoint(resourceConfig, id, options) {
-	      var _this2 = this;
-	
-	      options || (options = {});
-	      options.params || (options.params = {});
-	
-	      var item = undefined;
-	      var parentKey = resourceConfig.parentKey;
-	      var endpoint = options.hasOwnProperty('endpoint') ? options.endpoint : resourceConfig.endpoint;
-	      var parentField = resourceConfig.parentField;
-	      var parentDef = resourceConfig.getResource(resourceConfig.parent);
-	      var parentId = options.params[parentKey];
-	
-	      if (parentId === false || !parentKey || !parentDef) {
-	        if (parentId === false) {
-	          delete options.params[parentKey];
-	        }
-	        return endpoint;
+	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 	      } else {
-	        delete options.params[parentKey];
+	        return endpoint;
+	      }
+	    }
+	  },
+	  getPath: function getPath(method, Model, id, opts) {
+	    var self = this;
+	    opts || (opts = {});
+	    var args = [opts.basePath === undefined ? self.basePath : opts.basePath, self.getEndpoint(Model, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
+	    if (method === 'find' || method === 'update' || method === 'destroy') {
+	      args.push(id);
+	    }
+	    return makePath.apply(_jsData.utils, args);
+	  },
+	  beforeHTTP: function beforeHTTP() {},
+	  HTTP: function HTTP(config, opts) {
+	    var self = this;
+	    var start = new Date();
+	    opts || (opts = {});
+	    config = copy(config);
+	    config = deepMixIn(config, self.httpConfig);
+	    if (self.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
+	      config.url += '/';
+	    }
+	    config.method = config.method.toUpperCase();
+	    var suffix = config.suffix || opts.suffix || self.suffix;
+	    if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
+	      config.url += suffix;
+	    }
 	
-	        if (isString(id) || isNumber(id)) {
-	          item = resourceConfig.get(id);
-	        } else if (isObject(id)) {
-	          item = id;
+	    function logResponse(data) {
+	      var str = start.toUTCString() + ' - ' + config.method.toUpperCase() + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
+	      if (data.status >= 200 && data.status < 300) {
+	        if (self.log) {
+	          self.dbg('debug', str, data);
 	        }
-	
-	        if (item) {
-	          parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+	        return data;
+	      } else {
+	        if (self.error) {
+	          self.error('\'FAILED: ' + str, data);
 	        }
+	        return reject(data);
+	      }
+	    }
 	
-	        if (parentId) {
-	          var _ret = (function () {
-	            delete options.endpoint;
-	            var _options = {};
-	            forOwn(options, function (value, key) {
-	              _options[key] = value;
-	            });
-	            _(_options, parentDef);
-	            return {
-	              v: makePath(_this2.getEndpoint(parentDef, parentId, _options, parentId, endpoint))
-	            };
-	          })();
+	    if (!self.http) {
+	      throw new Error('You have not configured this adapter with an http library!');
+	    }
 	
-	          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
-	        } else {
-	          return endpoint;
-	        }
+	    return resolve(self.beforeHTTP(config)).then(function (_config) {
+	      config = _config || config;
+	      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
+	        return self.fetch(config, opts).then(logResponse, logResponse);
 	      }
+	      return self.http(config).then(logResponse, logResponse);
+	    }).then(function (response) {
+	      return resolve(self.afterHTTP(config, response)).then(function (_response) {
+	        return _response || response;
+	      });
+	    });
+	  },
+	  afterHTTP: function afterHTTP() {},
+	  queryTransform: function queryTransform(Model, params, opts) {
+	    return params;
+	  },
+	  serialize: function serialize(Model, data, opts) {
+	    opts || (opts = {});
+	    if (isFunction(opts.serialize)) {
+	      return opts.serialize(Model, data, opts);
 	    }
-	  }, {
-	    key: 'getPath',
-	    value: function getPath(method, resourceConfig, id, options) {
-	      var _this = this;
-	      options || (options = {});
-	      var args = [options.basePath || _this.defaults.basePath || resourceConfig.basePath, this.getEndpoint(resourceConfig, isString(id) || isNumber(id) || method === 'create' ? id : null, options)];
-	      if (method === 'find' || method === 'update' || method === 'destroy') {
-	        args.push(id);
-	      }
-	      return makePath.apply(_jsData.utils, args);
+	    return data;
+	  },
+	  log: function log(level) {
+	    for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
+	      args[_key3 - 1] = arguments[_key3];
 	    }
-	  }, {
-	    key: 'HTTP',
-	    value: function HTTP(config) {
-	      var _this = this;
-	      var start = new Date();
-	      config = copy(config);
-	      config = deepMixIn(config, _this.defaults.httpConfig);
-	      if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
-	        config.url += '/';
-	      }
-	      // if (typeof config.data === 'object') {
-	      //   config.data = removeCircular(config.data)
-	      // }
-	      config.method = config.method.toUpperCase();
-	      var suffix = config.suffix || _this.defaults.suffix;
-	      if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
-	        config.url += suffix;
-	      }
 	
-	      function logResponse(data) {
-	        var str = start.toUTCString() + ' - ' + config.method.toUpperCase() + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
-	        if (data.status >= 200 && data.status < 300) {
-	          if (_this.defaults.log) {
-	            _this.defaults.log(str, data);
-	          }
-	          return data;
-	        } else {
-	          if (_this.defaults.error) {
-	            _this.defaults.error('\'FAILED: ' + str, data);
-	          }
-	          return reject(data);
-	        }
-	      }
+	    if (level && !args.length) {
+	      args.push(level);
+	      level = 'debug';
+	    }
+	    if (level === 'debug' && !this.debug) {
+	      return;
+	    }
+	    var prefix = level.toUpperCase() + ': (' + this.name + ')';
+	    if (console[level]) {
+	      var _console2;
 	
-	      if (!this.http) {
-	        throw new Error('You have not configured this adapter with an http library!');
-	      }
+	      (_console2 = console)[level].apply(_console2, [prefix].concat(args));
+	    } else {
+	      var _console3;
 	
-	      return this.http(config).then(logResponse, logResponse);
+	      (_console3 = console).log.apply(_console3, [prefix].concat(args));
 	    }
-	  }, {
-	    key: 'GET',
-	    value: function GET(url, config) {
-	      config || (config = {});
-	      if (!('method' in config)) {
-	        config.method = 'get';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url
-	      }));
-	    }
-	  }, {
-	    key: 'POST',
-	    value: function POST(url, attrs, config) {
-	      config || (config = {});
-	      if (!('method' in config)) {
-	        config.method = 'post';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url,
-	        data: attrs
-	      }));
-	    }
-	  }, {
-	    key: 'PUT',
-	    value: function PUT(url, attrs, config) {
-	      config || (config = {});
-	      if (!('method' in config)) {
-	        config.method = 'put';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url,
-	        data: attrs || {}
-	      }));
-	    }
-	  }, {
-	    key: 'DEL',
-	    value: function DEL(url, config) {
-	      config || (config = {});
-	      if (!('method' in config)) {
-	        config.method = 'delete';
-	      }
-	      return this.HTTP(deepMixIn(config, {
-	        url: url
-	      }));
-	    }
-	  }, {
-	    key: 'find',
-	    value: function find(resourceConfig, id, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	      return _this.GET(_this.getPath('find', resourceConfig, id, options), options).then(function (data) {
-	        var item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	        return !item ? reject(new Error('Not Found!')) : item;
+	  },
+	  beforePOST: function beforePOST() {},
+	  POST: function POST(url, data, config, opts) {
+	    var self = this;
+	    config || (config = {});
+	    config.url = url || config.url;
+	    config.data = data || config.data;
+	    config.method = config.method || 'post';
+	    return resolve(self.beforePOST(url, data, config, opts)).then(function (_config) {
+	      config = _config || config;
+	      return self.HTTP(config, opts);
+	    }).then(function (response) {
+	      return resolve(self.afterPOST(url, data, config, opts, response)).then(function (_response) {
+	        return _response || response;
 	      });
-	    }
-	  }, {
-	    key: 'findAll',
-	    value: function findAll(resourceConfig, params, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      if (params) {
-	        params = _this.defaults.queryTransform(resourceConfig, params);
-	        deepMixIn(options.params, params);
-	      }
-	      return _this.GET(_this.getPath('findAll', resourceConfig, params, options), options).then(function (data) {
-	        return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	    });
+	  },
+	  afterPOST: function afterPOST() {},
+	  beforePUT: function beforePUT() {},
+	  PUT: function PUT(url, data, config, opts) {
+	    var self = this;
+	    config || (config = {});
+	    config.url = url || config.url;
+	    config.data = data || config.data;
+	    config.method = config.method || 'put';
+	    return resolve(self.beforePUT(url, data, config, opts)).then(function (_config) {
+	      config = _config || config;
+	      return self.HTTP(config, opts);
+	    }).then(function (response) {
+	      return resolve(self.afterPUT(url, data, config, opts, response)).then(function (_response) {
+	        return _response || response;
 	      });
-	    }
-	  }, {
-	    key: 'create',
-	    value: function create(resourceConfig, attrs, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	      return _this.POST(_this.getPath('create', resourceConfig, attrs, options), options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs), options).then(function (data) {
-	        return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	    });
+	  },
+	  afterPUT: function afterPUT() {},
+	  update: function update(Model, id, props, opts) {
+	    var self = this;
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.op = 'update';
+	    self.dbg(opts.op, Model, id, props, opts);
+	    return resolve(self.beforeUpdate(Model, id, props, opts)).then(function () {
+	      return self.POST(self.getPath('update', Model, id, opts), self.serialize(Model, props, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterUpdate(Model, id, props, opts, data)).then(function (_data) {
+	        return _data || data;
 	      });
-	    }
-	  }, {
-	    key: 'update',
-	    value: function update(resourceConfig, id, attrs, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	      return _this.PUT(_this.getPath('update', resourceConfig, id, options), options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs), options).then(function (data) {
-	        return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
+	    });
+	  },
+	  updateAll: function updateAll(Model, props, query, opts) {
+	    var self = this;
+	    query || (query = {});
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.op = 'updateAll';
+	    self.dbg(opts.op, Model, props, query, opts);
+	    deepMixIn(opts.params, query);
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
+	      return self.PUT(self.getPath('updateAll', Model, query, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterUpdateAll(Model, props, query, opts, data)).then(function (_data) {
+	        return _data || data;
 	      });
-	    }
-	  }, {
-	    key: 'updateAll',
-	    value: function updateAll(resourceConfig, attrs, params, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      if (params) {
-	        params = _this.defaults.queryTransform(resourceConfig, params);
-	        deepMixIn(options.params, params);
-	      }
-	      return this.PUT(_this.getPath('updateAll', resourceConfig, attrs, options), options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs), options).then(function (data) {
-	        return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	      });
-	    }
-	  }, {
-	    key: 'destroy',
-	    value: function destroy(resourceConfig, id, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      options.params = _this.defaults.queryTransform(resourceConfig, options.params);
-	      return _this.DEL(_this.getPath('destroy', resourceConfig, id, options), options).then(function (data) {
-	        return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	      });
-	    }
-	  }, {
-	    key: 'destroyAll',
-	    value: function destroyAll(resourceConfig, params, options) {
-	      var _this = this;
-	      options = options ? copy(options) : {};
-	      options.suffix = options.suffix || resourceConfig.suffix;
-	      options.params || (options.params = {});
-	      if (params) {
-	        params = _this.defaults.queryTransform(resourceConfig, params);
-	        deepMixIn(options.params, params);
-	      }
-	      return this.DEL(_this.getPath('destroyAll', resourceConfig, params, options), options).then(function (data) {
-	        return (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data);
-	      });
-	    }
-	  }]);
-	
-	  return DSHttpAdapter;
-	})();
+	    });
+	  }
+	});
 	
 	DSHttpAdapter.addAction = function (name, opts) {
 	  if (!name || !isString(name)) {
@@ -515,12 +603,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (typeof _opts.getEndpoint === 'function') {
 	        config.url = _opts.getEndpoint(this, _opts);
 	      } else {
-	        var args = [_opts.basePath || this.basePath || adapter.defaults.basePath, adapter.getEndpoint(this, isSorN(id) ? id : null, _opts)];
+	        var _args = [_opts.basePath || this.basePath || adapter.defaults.basePath, adapter.getEndpoint(this, isSorN(id) ? id : null, _opts)];
 	        if (isSorN(id)) {
-	          args.push(id);
+	          _args.push(id);
 	        }
-	        args.push(opts.pathname || name);
-	        config.url = makePath.apply(null, args);
+	        _args.push(opts.pathname || name);
+	        config.url = makePath.apply(null, _args);
 	      }
 	      config.method = config.method || 'GET';
 	      config.modelName = this.name;
@@ -549,11 +637,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	DSHttpAdapter.version = {
-	  full: '3.0.0-alpha.1',
+	  full: '3.0.0-alpha.2',
 	  major: parseInt('3', 10),
 	  minor: parseInt('0', 10),
 	  patch: parseInt('0', 10),
-	  alpha:  true ? '1' : false,
+	  alpha:  true ? '2' : false,
 	  beta:  true ? 'false' : false
 	};
 	
@@ -581,9 +669,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	var defaults = __webpack_require__(5);
 	var utils = __webpack_require__(6);
 	var dispatchRequest = __webpack_require__(7);
-	var InterceptorManager = __webpack_require__(15);
+	var InterceptorManager = __webpack_require__(16);
+	var isAbsoluteURL = __webpack_require__(17);
+	var combineURLs = __webpack_require__(18);
+	var bind = __webpack_require__(19);
 	
-	var axios = module.exports = function (config) {
+	function Axios(defaultConfig) {
+	  this.defaultConfig = utils.merge({
+	    headers: {},
+	    timeout: defaults.timeout,
+	    transformRequest: defaults.transformRequest,
+	    transformResponse: defaults.transformResponse
+	  }, defaultConfig);
+	
+	  this.interceptors = {
+	    request: new InterceptorManager(),
+	    response: new InterceptorManager()
+	  };
+	}
+	
+	Axios.prototype.request = function request(config) {
+	  /*eslint no-param-reassign:0*/
 	  // Allow for axios('example/url'[, config]) a la fetch API
 	  if (typeof config === 'string') {
 	    config = utils.merge({
@@ -591,13 +697,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }, arguments[1]);
 	  }
 	
-	  config = utils.merge({
-	    method: 'get',
-	    headers: {},
-	    timeout: defaults.timeout,
-	    transformRequest: defaults.transformRequest,
-	    transformResponse: defaults.transformResponse
-	  }, config);
+	  config = utils.merge(this.defaultConfig, { method: 'get' }, config);
+	
+	  if (config.baseURL && !isAbsoluteURL(config.url)) {
+	    config.url = combineURLs(config.baseURL, config.url);
+	  }
 	
 	  // Don't allow overriding defaults.withCredentials
 	  config.withCredentials = config.withCredentials || defaults.withCredentials;
@@ -606,11 +710,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	  var chain = [dispatchRequest, undefined];
 	  var promise = Promise.resolve(config);
 	
-	  axios.interceptors.request.forEach(function (interceptor) {
+	  this.interceptors.request.forEach(function unshiftRequestInterceptors(interceptor) {
 	    chain.unshift(interceptor.fulfilled, interceptor.rejected);
 	  });
 	
-	  axios.interceptors.response.forEach(function (interceptor) {
+	  this.interceptors.response.forEach(function pushResponseInterceptors(interceptor) {
 	    chain.push(interceptor.fulfilled, interceptor.rejected);
 	  });
 	
@@ -621,49 +725,49 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return promise;
 	};
 	
+	var defaultInstance = new Axios();
+	
+	var axios = module.exports = bind(Axios.prototype.request, defaultInstance);
+	
+	axios.create = function create(defaultConfig) {
+	  return new Axios(defaultConfig);
+	};
+	
 	// Expose defaults
 	axios.defaults = defaults;
 	
 	// Expose all/spread
-	axios.all = function (promises) {
+	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(16);
+	axios.spread = __webpack_require__(20);
 	
 	// Expose interceptors
-	axios.interceptors = {
-	  request: new InterceptorManager(),
-	  response: new InterceptorManager()
-	};
+	axios.interceptors = defaultInstance.interceptors;
 	
 	// Provide aliases for supported request methods
-	(function () {
-	  function createShortMethods() {
-	    utils.forEach(arguments, function (method) {
-	      axios[method] = function (url, config) {
-	        return axios(utils.merge(config || {}, {
-	          method: method,
-	          url: url
-	        }));
-	      };
-	    });
-	  }
+	utils.forEach(['delete', 'get', 'head'], function forEachMethodNoData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, config) {
+	    return this.request(utils.merge(config || {}, {
+	      method: method,
+	      url: url
+	    }));
+	  };
+	  axios[method] = bind(Axios.prototype[method], defaultInstance);
+	});
 	
-	  function createShortMethodsWithData() {
-	    utils.forEach(arguments, function (method) {
-	      axios[method] = function (url, data, config) {
-	        return axios(utils.merge(config || {}, {
-	          method: method,
-	          url: url,
-	          data: data
-	        }));
-	      };
-	    });
-	  }
-	
-	  createShortMethods('delete', 'get', 'head');
-	  createShortMethodsWithData('post', 'put', 'patch');
-	})();
+	utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
+	  /*eslint func-names:0*/
+	  Axios.prototype[method] = function(url, data, config) {
+	    return this.request(utils.merge(config || {}, {
+	      method: method,
+	      url: url,
+	      data: data
+	    }));
+	  };
+	  axios[method] = bind(Axios.prototype[method], defaultInstance);
+	});
 
 
 /***/ },
@@ -680,8 +784,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	module.exports = {
-	  transformRequest: [function (data, headers) {
-	    if(utils.isFormData(data)) {
+	  transformRequest: [function transformResponseJSON(data, headers) {
+	    if (utils.isFormData(data)) {
 	      return data;
 	    }
 	    if (utils.isArrayBuffer(data)) {
@@ -693,7 +797,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (utils.isObject(data) && !utils.isFile(data) && !utils.isBlob(data)) {
 	      // Set application/json if no Content-Type has been specified
 	      if (!utils.isUndefined(headers)) {
-	        utils.forEach(headers, function (val, key) {
+	        utils.forEach(headers, function processContentTypeHeader(val, key) {
 	          if (key.toLowerCase() === 'content-type') {
 	            headers['Content-Type'] = val;
 	          }
@@ -708,7 +812,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return data;
 	  }],
 	
-	  transformResponse: [function (data) {
+	  transformResponse: [function transformResponseJSON(data) {
+	    /*eslint no-param-reassign:0*/
 	    if (typeof data === 'string') {
 	      data = data.replace(PROTECTION_PREFIX, '');
 	      try {
@@ -783,11 +888,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {boolean} True if value is a view on an ArrayBuffer, otherwise false
 	 */
 	function isArrayBufferView(val) {
+	  var result;
 	  if ((typeof ArrayBuffer !== 'undefined') && (ArrayBuffer.isView)) {
-	    return ArrayBuffer.isView(val);
+	    result = ArrayBuffer.isView(val);
 	  } else {
-	    return (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
+	    result = (val) && (val.buffer) && (val.buffer instanceof ArrayBuffer);
 	  }
+	  return result;
 	}
 	
 	/**
@@ -871,16 +978,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	}
 	
 	/**
-	 * Determine if a value is an Arguments object
-	 *
-	 * @param {Object} val The value to test
-	 * @returns {boolean} True if value is an Arguments object, otherwise false
-	 */
-	function isArguments(val) {
-	  return toString.call(val) === '[object Arguments]';
-	}
-	
-	/**
 	 * Determine if we're running in a standard browser environment
 	 *
 	 * This allows axios to run in a web worker, and react-native.
@@ -891,7 +988,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *  typeof document -> undefined
 	 *
 	 * react-native:
-	 *  typeof document.createelement -> undefined
+	 *  typeof document.createElement -> undefined
 	 */
 	function isStandardBrowserEnv() {
 	  return (
@@ -904,7 +1001,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Iterate over an Array or an Object invoking a function for each item.
 	 *
-	 * If `obj` is an Array or arguments callback will be called passing
+	 * If `obj` is an Array callback will be called passing
 	 * the value, index, and complete array for each item.
 	 *
 	 * If 'obj' is an Object callback will be called passing
@@ -919,22 +1016,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return;
 	  }
 	
-	  // Check if obj is array-like
-	  var isArrayLike = isArray(obj) || isArguments(obj);
-	
 	  // Force an array if not already something iterable
-	  if (typeof obj !== 'object' && !isArrayLike) {
+	  if (typeof obj !== 'object' && !isArray(obj)) {
+	    /*eslint no-param-reassign:0*/
 	    obj = [obj];
 	  }
 	
-	  // Iterate over array values
-	  if (isArrayLike) {
+	  if (isArray(obj)) {
+	    // Iterate over array values
 	    for (var i = 0, l = obj.length; i < l; i++) {
 	      fn.call(null, obj[i], i, obj);
 	    }
-	  }
-	  // Iterate over object keys
-	  else {
+	  } else {
+	    // Iterate over object keys
 	    for (var key in obj) {
 	      if (obj.hasOwnProperty(key)) {
 	        fn.call(null, obj[key], key, obj);
@@ -960,13 +1054,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Object} obj1 Object to merge
 	 * @returns {Object} Result of all merge properties
 	 */
-	function merge(/*obj1, obj2, obj3, ...*/) {
+	function merge(/* obj1, obj2, obj3, ... */) {
 	  var result = {};
-	  forEach(arguments, function (obj) {
-	    forEach(obj, function (val, key) {
-	      result[key] = val;
-	    });
-	  });
+	  function assignValue(val, key) {
+	    result[key] = val;
+	  }
+	
+	  for (var i = 0, l = arguments.length; i < l; i++) {
+	    forEach(arguments[i], assignValue);
+	  }
 	  return result;
 	}
 	
@@ -1003,14 +1099,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Promise} The Promise to be fulfilled
 	 */
 	module.exports = function dispatchRequest(config) {
-	  return new Promise(function (resolve, reject) {
+	  return new Promise(function executor(resolve, reject) {
 	    try {
-	      // For browsers use XHR adapter
 	      if ((typeof XMLHttpRequest !== 'undefined') || (typeof ActiveXObject !== 'undefined')) {
+	        // For browsers use XHR adapter
 	        __webpack_require__(9)(resolve, reject, config);
-	      }
-	      // For node use HTTP adapter
-	      else if (typeof process !== 'undefined') {
+	      } else if (typeof process !== 'undefined') {
+	        // For node use HTTP adapter
 	        __webpack_require__(9)(resolve, reject, config);
 	      }
 	    } catch (e) {
@@ -1129,9 +1224,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var defaults = __webpack_require__(5);
 	var utils = __webpack_require__(6);
-	var buildUrl = __webpack_require__(10);
+	var buildURL = __webpack_require__(10);
 	var parseHeaders = __webpack_require__(11);
 	var transformData = __webpack_require__(12);
+	var isURLSameOrigin = __webpack_require__(13);
+	var btoa = window.btoa || __webpack_require__(14);
 	
 	module.exports = function xhrAdapter(resolve, reject, config) {
 	  // Transform request data
@@ -1152,18 +1249,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	    delete requestHeaders['Content-Type']; // Let the browser set it
 	  }
 	
+	  var Adapter = (XMLHttpRequest || ActiveXObject);
+	  var loadEvent = 'onreadystatechange';
+	  var xDomain = false;
+	
+	  // For IE 8/9 CORS support
+	  if (!isURLSameOrigin(config.url) && window.XDomainRequest) {
+	    Adapter = window.XDomainRequest;
+	    loadEvent = 'onload';
+	    xDomain = true;
+	  }
+	
+	  // HTTP basic authentication
+	  if (config.auth) {
+	    var username = config.auth.username || '';
+	    var password = config.auth.password || '';
+	    requestHeaders.Authorization = 'Basic ' + btoa(username + ':' + password);
+	  }
+	
 	  // Create the request
-	  var request = new (XMLHttpRequest || ActiveXObject)('Microsoft.XMLHTTP');
-	  request.open(config.method.toUpperCase(), buildUrl(config.url, config.params), true);
+	  var request = new Adapter('Microsoft.XMLHTTP');
+	  request.open(config.method.toUpperCase(), buildURL(config.url, config.params, config.paramsSerializer), true);
 	
 	  // Set the request timeout in MS
 	  request.timeout = config.timeout;
 	
 	  // Listen for ready state
-	  request.onreadystatechange = function () {
-	    if (request && request.readyState === 4) {
+	  request[loadEvent] = function handleReadyState() {
+	    if (request && (request.readyState === 4 || xDomain)) {
 	      // Prepare the response
-	      var responseHeaders = parseHeaders(request.getAllResponseHeaders());
+	      var responseHeaders = xDomain ? null : parseHeaders(request.getAllResponseHeaders());
 	      var responseData = ['text', ''].indexOf(config.responseType || '') !== -1 ? request.responseText : request.response;
 	      var response = {
 	        data: transformData(
@@ -1176,9 +1291,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        headers: responseHeaders,
 	        config: config
 	      };
-	
 	      // Resolve or reject the Promise based on the status
-	      (request.status >= 200 && request.status < 300 ?
+	      ((request.status >= 200 && request.status < 300) || (xDomain && request.responseText) ?
 	        resolve :
 	        reject)(response);
 	
@@ -1191,11 +1305,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // This is only done if running in a standard browser environment.
 	  // Specifically not if we're in a web worker, or react-native.
 	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(13);
-	    var urlIsSameOrigin = __webpack_require__(14);
+	    var cookies = __webpack_require__(15);
 	
 	    // Add xsrf header
-	    var xsrfValue = urlIsSameOrigin(config.url) ?
+	    var xsrfValue =  config.withCredentials || isURLSameOrigin(config.url) ?
 	        cookies.read(config.xsrfCookieName || defaults.xsrfCookieName) :
 	        undefined;
 	
@@ -1205,16 +1318,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  }
 	
 	  // Add headers to the request
-	  utils.forEach(requestHeaders, function (val, key) {
-	    // Remove Content-Type if data is undefined
-	    if (!data && key.toLowerCase() === 'content-type') {
-	      delete requestHeaders[key];
-	    }
-	    // Otherwise add header to the request
-	    else {
-	      request.setRequestHeader(key, val);
-	    }
-	  });
+	  if (!xDomain) {
+	    utils.forEach(requestHeaders, function setRequestHeader(val, key) {
+	      if (!data && key.toLowerCase() === 'content-type') {
+	        // Remove Content-Type if data is undefined
+	        delete requestHeaders[key];
+	      } else {
+	        // Otherwise add header to the request
+	        request.setRequestHeader(key, val);
+	      }
+	    });
+	  }
 	
 	  // Add withCredentials to request if needed
 	  if (config.withCredentials) {
@@ -1267,43 +1381,51 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {object} [params] The params to be appended
 	 * @returns {string} The formatted url
 	 */
-	module.exports = function buildUrl(url, params) {
+	module.exports = function buildURL(url, params, paramsSerializer) {
+	  /*eslint no-param-reassign:0*/
 	  if (!params) {
 	    return url;
 	  }
 	
-	  var parts = [];
+	  var serializedParams;
+	  if (paramsSerializer) {
+	    serializedParams = paramsSerializer(params);
+	  } else {
+	    var parts = [];
 	
-	  utils.forEach(params, function (val, key) {
-	    if (val === null || typeof val === 'undefined') {
-	      return;
-	    }
-	
-	    if (utils.isArray(val)) {
-	      key = key + '[]';
-	    }
-	
-	    if (!utils.isArray(val)) {
-	      val = [val];
-	    }
-	
-	    utils.forEach(val, function (v) {
-	      if (utils.isDate(v)) {
-	        v = v.toISOString();
+	    utils.forEach(params, function serialize(val, key) {
+	      if (val === null || typeof val === 'undefined') {
+	        return;
 	      }
-	      else if (utils.isObject(v)) {
-	        v = JSON.stringify(v);
+	
+	      if (utils.isArray(val)) {
+	        key = key + '[]';
 	      }
-	      parts.push(encode(key) + '=' + encode(v));
+	
+	      if (!utils.isArray(val)) {
+	        val = [val];
+	      }
+	
+	      utils.forEach(val, function parseValue(v) {
+	        if (utils.isDate(v)) {
+	          v = v.toISOString();
+	        } else if (utils.isObject(v)) {
+	          v = JSON.stringify(v);
+	        }
+	        parts.push(encode(key) + '=' + encode(v));
+	      });
 	    });
-	  });
 	
-	  if (parts.length > 0) {
-	    url += (url.indexOf('?') === -1 ? '?' : '&') + parts.join('&');
+	    serializedParams = parts.join('&');
+	  }
+	
+	  if (serializedParams) {
+	    url += (url.indexOf('?') === -1 ? '?' : '&') + serializedParams;
 	  }
 	
 	  return url;
 	};
+	
 
 
 /***/ },
@@ -1328,11 +1450,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Object} Headers parsed into an object
 	 */
 	module.exports = function parseHeaders(headers) {
-	  var parsed = {}, key, val, i;
+	  var parsed = {};
+	  var key;
+	  var val;
+	  var i;
 	
 	  if (!headers) { return parsed; }
 	
-	  utils.forEach(headers.split('\n'), function(line) {
+	  utils.forEach(headers.split('\n'), function parser(line) {
 	    i = line.indexOf(':');
 	    key = utils.trim(line.substr(0, i)).toLowerCase();
 	    val = utils.trim(line.substr(i + 1));
@@ -1363,7 +1488,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {*} The resulting transformed data
 	 */
 	module.exports = function transformData(data, headers, fns) {
-	  utils.forEach(fns, function (fn) {
+	  /*eslint no-param-reassign:0*/
+	  utils.forEach(fns, function transform(fn) {
 	    data = fn(data, headers);
 	  });
 	
@@ -1377,115 +1503,177 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	/**
-	 * WARNING:
-	 *  This file makes references to objects that aren't safe in all environments.
-	 *  Please see lib/utils.isStandardBrowserEnv before including this file.
-	 */
-	
 	var utils = __webpack_require__(6);
 	
-	module.exports = {
-	  write: function write(name, value, expires, path, domain, secure) {
-	    var cookie = [];
-	    cookie.push(name + '=' + encodeURIComponent(value));
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
 	
-	    if (utils.isNumber(expires)) {
-	      cookie.push('expires=' + new Date(expires).toGMTString());
+	  // Standard browser envs have full support of the APIs needed to test
+	  // whether the request URL is of the same origin as current location.
+	  (function standardBrowserEnv() {
+	    var msie = /(msie|trident)/i.test(navigator.userAgent);
+	    var urlParsingNode = document.createElement('a');
+	    var originURL;
+	
+	    /**
+	    * Parse a URL to discover it's components
+	    *
+	    * @param {String} url The URL to be parsed
+	    * @returns {Object}
+	    */
+	    function resolveURL(url) {
+	      var href = url;
+	
+	      if (msie) {
+	        // IE needs attribute set twice to normalize properties
+	        urlParsingNode.setAttribute('href', href);
+	        href = urlParsingNode.href;
+	      }
+	
+	      urlParsingNode.setAttribute('href', href);
+	
+	      // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
+	      return {
+	        href: urlParsingNode.href,
+	        protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
+	        host: urlParsingNode.host,
+	        search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
+	        hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
+	        hostname: urlParsingNode.hostname,
+	        port: urlParsingNode.port,
+	        pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
+	                  urlParsingNode.pathname :
+	                  '/' + urlParsingNode.pathname
+	      };
 	    }
 	
-	    if (utils.isString(path)) {
-	      cookie.push('path=' + path);
-	    }
+	    originURL = resolveURL(window.location.href);
 	
-	    if (utils.isString(domain)) {
-	      cookie.push('domain=' + domain);
-	    }
+	    /**
+	    * Determine if a URL shares the same origin as the current location
+	    *
+	    * @param {String} requestURL The URL to test
+	    * @returns {boolean} True if URL shares the same origin, otherwise false
+	    */
+	    return function isURLSameOrigin(requestURL) {
+	      var parsed = (utils.isString(requestURL)) ? resolveURL(requestURL) : requestURL;
+	      return (parsed.protocol === originURL.protocol &&
+	            parsed.host === originURL.host);
+	    };
+	  })() :
 	
-	    if (secure === true) {
-	      cookie.push('secure');
-	    }
-	
-	    document.cookie = cookie.join('; ');
-	  },
-	
-	  read: function read(name) {
-	    var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
-	    return (match ? decodeURIComponent(match[3]) : null);
-	  },
-	
-	  remove: function remove(name) {
-	    this.write(name, '', Date.now() - 86400000);
-	  }
-	};
+	  // Non standard browser envs (web workers, react-native) lack needed support.
+	  (function nonStandardBrowserEnv() {
+	    return function isURLSameOrigin() {
+	      return true;
+	    };
+	  })()
+	);
 
 
 /***/ },
 /* 14 */
-/***/ function(module, exports, __webpack_require__) {
+/***/ function(module, exports) {
 
 	'use strict';
 	
-	/**
-	 * WARNING:
-	 *  This file makes references to objects that aren't safe in all environments.
-	 *  Please see lib/utils.isStandardBrowserEnv before including this file.
-	 */
+	// btoa polyfill for IE<10 courtesy https://github.com/davidchambers/Base64.js
 	
-	var utils = __webpack_require__(6);
-	var msie = /(msie|trident)/i.test(navigator.userAgent);
-	var urlParsingNode = document.createElement('a');
-	var originUrl;
+	var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=';
 	
-	/**
-	 * Parse a URL to discover it's components
-	 *
-	 * @param {String} url The URL to be parsed
-	 * @returns {Object}
-	 */
-	function urlResolve(url) {
-	  var href = url;
+	function InvalidCharacterError(message) {
+	  this.message = message;
+	}
+	InvalidCharacterError.prototype = new Error;
+	InvalidCharacterError.prototype.code = 5;
+	InvalidCharacterError.prototype.name = 'InvalidCharacterError';
 	
-	  if (msie) {
-	    // IE needs attribute set twice to normalize properties
-	    urlParsingNode.setAttribute('href', href);
-	    href = urlParsingNode.href;
+	function btoa(input) {
+	  var str = String(input);
+	  var output = '';
+	  for (
+	    // initialize result and counter
+	    var block, charCode, idx = 0, map = chars;
+	    // if the next str index does not exist:
+	    //   change the mapping table to "="
+	    //   check if d has no fractional digits
+	    str.charAt(idx | 0) || (map = '=', idx % 1);
+	    // "8 - idx % 1 * 8" generates the sequence 2, 4, 6, 8
+	    output += map.charAt(63 & block >> 8 - idx % 1 * 8)
+	  ) {
+	    charCode = str.charCodeAt(idx += 3 / 4);
+	    if (charCode > 0xFF) {
+	      throw new InvalidCharacterError('INVALID_CHARACTER_ERR: DOM Exception 5');
+	    }
+	    block = block << 8 | charCode;
 	  }
-	
-	  urlParsingNode.setAttribute('href', href);
-	
-	  // urlParsingNode provides the UrlUtils interface - http://url.spec.whatwg.org/#urlutils
-	  return {
-	    href: urlParsingNode.href,
-	    protocol: urlParsingNode.protocol ? urlParsingNode.protocol.replace(/:$/, '') : '',
-	    host: urlParsingNode.host,
-	    search: urlParsingNode.search ? urlParsingNode.search.replace(/^\?/, '') : '',
-	    hash: urlParsingNode.hash ? urlParsingNode.hash.replace(/^#/, '') : '',
-	    hostname: urlParsingNode.hostname,
-	    port: urlParsingNode.port,
-	    pathname: (urlParsingNode.pathname.charAt(0) === '/') ?
-	              urlParsingNode.pathname :
-	              '/' + urlParsingNode.pathname
-	  };
+	  return output;
 	}
 	
-	originUrl = urlResolve(window.location.href);
-	
-	/**
-	 * Determine if a URL shares the same origin as the current location
-	 *
-	 * @param {String} requestUrl The URL to test
-	 * @returns {boolean} True if URL shares the same origin, otherwise false
-	 */
-	module.exports = function urlIsSameOrigin(requestUrl) {
-	  var parsed = (utils.isString(requestUrl)) ? urlResolve(requestUrl) : requestUrl;
-	  return (parsed.protocol === originUrl.protocol &&
-	        parsed.host === originUrl.host);
-	};
+	module.exports = btoa;
 
 
 /***/ },
 /* 15 */
+/***/ function(module, exports, __webpack_require__) {
+
+	'use strict';
+	
+	var utils = __webpack_require__(6);
+	
+	module.exports = (
+	  utils.isStandardBrowserEnv() ?
+	
+	  // Standard browser envs support document.cookie
+	  (function standardBrowserEnv() {
+	    return {
+	      write: function write(name, value, expires, path, domain, secure) {
+	        var cookie = [];
+	        cookie.push(name + '=' + encodeURIComponent(value));
+	
+	        if (utils.isNumber(expires)) {
+	          cookie.push('expires=' + new Date(expires).toGMTString());
+	        }
+	
+	        if (utils.isString(path)) {
+	          cookie.push('path=' + path);
+	        }
+	
+	        if (utils.isString(domain)) {
+	          cookie.push('domain=' + domain);
+	        }
+	
+	        if (secure === true) {
+	          cookie.push('secure');
+	        }
+	
+	        document.cookie = cookie.join('; ');
+	      },
+	
+	      read: function read(name) {
+	        var match = document.cookie.match(new RegExp('(^|;\\s*)(' + name + ')=([^;]*)'));
+	        return (match ? decodeURIComponent(match[3]) : null);
+	      },
+	
+	      remove: function remove(name) {
+	        this.write(name, '', Date.now() - 86400000);
+	      }
+	    };
+	  })() :
+	
+	  // Non standard browser env (web workers, react-native) lack needed support.
+	  (function nonStandardBrowserEnv() {
+	    return {
+	      write: function write() {},
+	      read: function read() { return null; },
+	      remove: function remove() {}
+	    };
+	  })()
+	);
+
+
+/***/ },
+/* 16 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
@@ -1504,7 +1692,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @return {Number} An ID used to remove interceptor later
 	 */
-	InterceptorManager.prototype.use = function (fulfilled, rejected) {
+	InterceptorManager.prototype.use = function use(fulfilled, rejected) {
 	  this.handlers.push({
 	    fulfilled: fulfilled,
 	    rejected: rejected
@@ -1517,7 +1705,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * @param {Number} id The ID that was returned by `use`
 	 */
-	InterceptorManager.prototype.eject = function (id) {
+	InterceptorManager.prototype.eject = function eject(id) {
 	  if (this.handlers[id]) {
 	    this.handlers[id] = null;
 	  }
@@ -1527,12 +1715,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Iterate over all the registered interceptors
 	 *
 	 * This method is particularly useful for skipping over any
-	 * interceptors that may have become `null` calling `remove`.
+	 * interceptors that may have become `null` calling `eject`.
 	 *
 	 * @param {Function} fn The function to call for each interceptor
 	 */
-	InterceptorManager.prototype.forEach = function (fn) {
-	  utils.forEach(this.handlers, function (h) {
+	InterceptorManager.prototype.forEach = function forEach(fn) {
+	  utils.forEach(this.handlers, function forEachHandler(h) {
 	    if (h !== null) {
 	      fn(h);
 	    }
@@ -1543,7 +1731,62 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 17 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Determines whether the specified URL is absolute
+	 *
+	 * @param {string} url The URL to test
+	 * @returns {boolean} True if the specified URL is absolute, otherwise false
+	 */
+	module.exports = function isAbsoluteURL(url) {
+	  // A URL is considered absolute if it begins with "<scheme>://" or "//" (protocol-relative URL).
+	  // RFC 3986 defines scheme name as a sequence of characters beginning with a letter and followed
+	  // by any combination of letters, digits, plus, period, or hyphen.
+	  return /^([a-z][a-z\d\+\-\.]*:)?\/\//i.test(url);
+	};
+
+
+/***/ },
+/* 18 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	/**
+	 * Creates a new URL by combining the specified URLs
+	 *
+	 * @param {string} baseURL The base URL
+	 * @param {string} relativeURL The relative URL
+	 * @returns {string} The combined URL
+	 */
+	module.exports = function combineURLs(baseURL, relativeURL) {
+	  return baseURL.replace(/\/+$/, '') + '/' + relativeURL.replace(/^\/+/, '');
+	};
+
+
+/***/ },
+/* 19 */
+/***/ function(module, exports) {
+
+	'use strict';
+	
+	module.exports = function bind(fn, thisArg) {
+	  return function wrap() {
+	    var args = new Array(arguments.length);
+	    for (var i = 0; i < args.length; i++) {
+	      args[i] = arguments[i];
+	    }
+	    return fn.apply(thisArg, args);
+	  };
+	};
+
+
+/***/ },
+/* 20 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1569,7 +1812,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @returns {Function}
 	 */
 	module.exports = function spread(callback) {
-	  return function (arr) {
+	  return function wrap(arr) {
 	    return callback.apply(null, arr);
 	  };
 	};

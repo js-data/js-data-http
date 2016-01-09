@@ -1,12 +1,3 @@
-/*!
-* js-data-http-node
-* @version 3.0.0-alpha.2 - Homepage <http://www.js-data.io/docs/dshttpadapter>
-* @author Jason Dobry <jason.dobry@gmail.com>
-* @copyright (c) 2014-2016 Jason Dobry
-* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
-*
-* @overview Node.js HTTP adapter for js-data.
-*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-data"), require("axios"));
@@ -16,7 +7,7 @@
 		var a = typeof exports === 'object' ? factory(require("js-data"), require("axios")) : factory(root["js-data"], root["axios"]);
 		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
 	}
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -67,10 +58,10 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 
-	var _jsData = __webpack_require__(2);
+	var _jsData = __webpack_require__(1);
 
 	/* global fetch:true Headers:true Request:true */
-	var axios = __webpack_require__(3);
+	var axios = __webpack_require__(2);
 	var _ = _jsData.utils._;
 	var copy = _jsData.utils.copy;
 	var deepMixIn = _jsData.utils.deepMixIn;
@@ -173,7 +164,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch;
 
 	  // Use "window.fetch" if available and the user asks for it
-	  if (hasFetch && (self.useFetch || self.http === undefined)) {}
+	  if (self.useFetch && hasFetch) {
+	    self.deserialize = function (Model, response, opts) {
+	      opts || (opts = {});
+	      return response.json();
+	    };
+	    self.http = function (config) {
+	      var requestConfig = {
+	        method: config.method,
+	        // turn the plain headers object into the Fetch Headers object
+	        headers: new Headers(config.headers)
+	      };
+
+	      if (config.data) {
+	        requestConfig.body = toJson(config.data);
+	      }
+
+	      return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
+	        response.config = {
+	          method: config.method,
+	          url: config.url
+	        };
+	        return response;
+	      });
+	    };
+	  }
 	}
 
 	fillIn(DSHttpAdapter, {
@@ -274,38 +289,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      (_console = console)[typeof console.error === 'function' ? 'error' : 'log'].apply(_console, arguments);
 	    }
 	  },
-	  fetch: function (_fetch) {
-	    function fetch(_x, _x2) {
-	      return _fetch.apply(this, arguments);
-	    }
-
-	    fetch.toString = function () {
-	      return _fetch.toString();
-	    };
-
-	    return fetch;
-	  }(function (config, opts) {
-	    var requestConfig = {
-	      method: config.method,
-	      // turn the plain headers object into the Fetch Headers object
-	      headers: new Headers(config.headers)
-	    };
-
-	    if (config.data) {
-	      requestConfig.body = toJson(config.data);
-	    }
-
-	    return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
-	      response.config = {
-	        method: config.method,
-	        url: config.url
-	      };
-	      return response.json().then(function (data) {
-	        response.data = data;
-	        return response;
-	      });
-	    });
-	  }),
 	  beforeFind: function beforeFind() {},
 	  find: function find(Model, id, opts) {
 	    var self = this;
@@ -423,7 +406,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  HTTP: function HTTP(config, opts) {
 	    var self = this;
 	    var start = new Date();
-	    opts || (opts = {});
 	    config = copy(config);
 	    config = deepMixIn(config, self.httpConfig);
 	    if (self.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
@@ -456,9 +438,6 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	    return resolve(self.beforeHTTP(config)).then(function (_config) {
 	      config = _config || config;
-	      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
-	        return self.fetch(config, opts).then(logResponse, logResponse);
-	      }
 	      return self.http(config).then(logResponse, logResponse);
 	    }).then(function (response) {
 	      return resolve(self.afterHTTP(config, response)).then(function (_response) {
@@ -637,28 +616,27 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 
 	DSHttpAdapter.version = {
-	  full: '3.0.0-alpha.2',
-	  major: parseInt('3', 10),
-	  minor: parseInt('0', 10),
-	  patch: parseInt('0', 10),
-	  alpha:  true ? '2' : false,
-	  beta:  true ? 'false' : false
+	  full: '<%= pkg.version %>',
+	  major: parseInt('<%= major %>', 10),
+	  minor: parseInt('<%= minor %>', 10),
+	  patch: parseInt('<%= patch %>', 10),
+	  alpha:  true ? '<%= alpha %>' : false,
+	  beta:  true ? '<%= beta %>' : false
 	};
 
 	module.exports = DSHttpAdapter;
 
 /***/ },
-/* 1 */,
+/* 1 */
+/***/ function(module, exports) {
+
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+
+/***/ },
 /* 2 */
 /***/ function(module, exports) {
 
 	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
-
-/***/ },
-/* 3 */
-/***/ function(module, exports) {
-
-	module.exports = __WEBPACK_EXTERNAL_MODULE_3__;
 
 /***/ }
 /******/ ])

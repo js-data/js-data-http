@@ -16,11 +16,10 @@ module.exports = function (config) {
 			'karma-spec-reporter'
 		],
 		autoWatch: false,
-		browsers: ['Chrome'],
+		browsers: ['PhantomJS'],
 
 		// list of files / patterns to load in the browser
 		files: [
-			'bower_components/axios/dist/axios.js',
 			'node_modules/es6-promise/dist/es6-promise.js',
 			'node_modules/js-data/dist/js-data.js',
 			'dist/js-data-http.js',

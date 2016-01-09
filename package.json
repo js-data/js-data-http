@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-alpha.1",
+  "version": "3.0.0-alpha.2",
   "homepage": "http://www.js-data.io/docs/dshttpadapter",
   "repository": {
     "type": "git",
@@ -36,17 +36,20 @@
     ],
     "ignore": [
       "node_modules",
-      "node/dist/*"
+      "node/dist/*",
+      "fetch/dist/*"
     ]
   },
   "scripts": {
-    "lint": "standard src/**/*.js node/**/*.js",
-    "webpack": "webpack --config webpack.config.js && webpack --config node/webpack.config.js",
+    "lint": "standard src/**/*.js node/**/*.js  fetch/**/*.js",
+    "webpack": "webpack --config webpack.config.js && webpack --config node/webpack.config.js && webpack --config fetch/webpack.config.js",
     "min": "uglifyjs dist/js-data-http.js -o dist/js-data-http.min.js --source-map dist/js-data-http.min.map -v -m -c --screw-ie8",
+    "min_fetch": "uglifyjs fetch/dist/js-data-fetch.js -o fetch/dist/js-data-fetch.min.js --source-map dist/js-data-fetch.min.map -v -m -c --screw-ie8",
     "version": "node scripts/version.js",
     "banner": "node scripts/banner.js",
-    "gzip": "echo gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",
-    "build": "npm run lint && npm run webpack && npm run min && npm run version && npm run banner",
+    "gzip": "echo js-data-http gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",
+    "gzip_fetch": "echo js-data-fetch gzipped size: $(cat fetch/dist/js-data-fetch.min.js | gzip -f9 | wc -c)kb",
+    "build": "npm run lint && npm run webpack && npm run min && && npm run min_fetch && npm run version && npm run banner",
     "karma": "karma start",
     "mocha": "mocha -t 20000 -R spec -r source-map-support/register mocha.start.js node/mocha.start.js",
     "cover": "istanbul cover -x dist/js-data-http-tests.js,node/dist/js-data-http-node-tests.js --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot -r source-map-support/register mocha.start.js node/mocha.start.js",
@@ -57,25 +60,35 @@
     "js-data": "^3.0.0-alpha.1"
   },
   "devDependencies": {
-    "axios": "0.7.0",
-    "babel-core": "6.3.13",
+    "axios": "0.8.1",
+    "babel-core": "6.4.0",
     "babel-eslint": "4.1.6",
-    "babel-loader": "6.2.0",
+    "babel-loader": "6.2.1",
     "babel-plugin-syntax-async-functions": "6.3.13",
-    "babel-plugin-transform-regenerator": "6.3.13",
+    "babel-plugin-transform-regenerator": "6.3.26",
     "babel-polyfill": "6.3.14",
     "babel-preset-es2015": "6.3.13",
     "babel-preset-stage-0": "6.3.13",
     "chai": "3.4.1",
     "codacy-coverage": "1.1.3",
-    "coveralls": "2.11.4",
+    "coveralls": "2.11.6",
     "istanbul": "0.4.1",
+    "karma": "0.13.19",
+    "karma-browserstack-launcher": "0.1.8",
+    "karma-chai": "0.1.0",
+    "karma-chrome-launcher": "^0.2.2",
+    "karma-coverage": "^0.5.3",
+    "karma-firefox-launcher": "^0.1.7",
+    "karma-mocha": "0.2.1",
+    "karma-phantomjs-launcher": "0.2.3",
+    "karma-sinon": "1.0.4",
+    "karma-spec-reporter": "0.0.23",
     "mocha": "2.3.4",
     "sinon": "1.17.2",
     "source-map-support": "0.4.0",
     "standard": "5.4.1",
     "uglify-js": "2.6.1",
-    "webpack": "1.12.9"
+    "webpack": "1.12.10"
   },
   "dependencies": {}
 }

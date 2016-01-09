@@ -1,3 +1,4 @@
+/* global fetch:true Headers:true Request:true */
 const axios = require('axios')
 import {utils} from 'js-data'
 const {
@@ -7,11 +8,11 @@ const {
   fillIn,
   forOwn,
   isArray,
+  isFunction,
   isNumber,
   isObject,
   isSorN,
   isString,
-  // removeCircular,
   resolve,
   reject,
   toJson
@@ -24,9 +25,10 @@ try {
 } catch (e) {}
 
 function isValidString (value) {
-  return (value != null && value !== '') // jshint ignore:line
+  return (value != null && value !== '')
 }
-function join (items, separator = '') {
+function join (items, separator) {
+  separator || (separator = '')
   return items.filter(isValidString).join(separator)
 }
 function makePath (...args) {
@@ -48,7 +50,7 @@ function buildUrl (url, params) {
     return url
   }
 
-  var parts = []
+  const parts = []
 
   forOwn(params, function (val, key) {
     if (val === null || typeof val === 'undefined') {
@@ -64,7 +66,7 @@ function buildUrl (url, params) {
       } else if (isObject(v)) {
         v = toJson(v)
       }
-      parts.push(encode(key) + '=' + encode(v))
+      parts.push(`${encode(key)}=${encode(v)}`)
     })
   })
 
@@ -75,100 +77,267 @@ function buildUrl (url, params) {
   return url
 }
 
-class Defaults {
-  queryTransform (resourceConfig, params) {
-    return params
-  }
+/**
+ * DSHttpAdapter class.
+ * @class DSHttpAdapter
+ *
+ * @param {Object} [opts] Configuration options.
+ * @param {string} [opts.basePath='']
+ * @param {boolean} [opts.debug=false]
+ * @param {boolean} [opts.forceTrailingSlash=false]
+ * @param {Object} [opts.http=axios]
+ * @param {Object} [opts.httpConfig={}]
+ * @param {string} [opts.suffix='']
+ * @param {boolean} [opts.useFetch=false]
+ */
+function DSHttpAdapter (opts) {
+  const self = this
 
-  deserialize (resourceConfig, data) {
-    return data ? ('data' in data ? data.data : data) : data
-  }
+  // Default values for arguments
+  opts || (opts = {})
 
-  serialize (resourceConfig, data) {
-    return data
-  }
+  // Default and user-defined settings
+  self.basePath = opts.basePath === undefined ? '' : opts.basePath
+  self.debug = opts.debug === undefined ? false : opts.debug
+  self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash
+  self.http = opts.http === undefined ? axios : opts.http
+  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig
+  self.suffix = opts.suffix === undefined ? '' : opts.suffix
+  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch
 
-  log () {
-
-  }
-
-  error () {
+  // Use "window.fetch" if available and the user asks for it
+  if (hasFetch && (self.useFetch || self.http === undefined)) {
 
   }
 }
 
-const defaultsPrototype = Defaults.prototype
+fillIn(DSHttpAdapter, {
 
-defaultsPrototype.basePath = ''
+  beforeCreate () {},
 
-defaultsPrototype.forceTrailingSlash = ''
+  create (Model, props, opts) {
+    const self = this
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.op = 'create'
+    self.dbg(opts.op, Model, props, opts)
+    return resolve(self.beforeCreate(Model, props, opts)).then(function () {
+      return self.POST(
+        self.getPath('create', Model, props, opts),
+        self.serialize(Model, props, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterCreate(Model, data, opts)).then(function (_data) {
+        return _data || data
+      })
+    })
+  },
 
-defaultsPrototype.httpConfig = {}
+  afterCreate () {},
 
-defaultsPrototype.useFetch = false
+  dbg (...args) {
+    this.log('debug', ...args)
+  },
 
-class DSHttpAdapter {
-  constructor (options) {
-    options = options || {}
-    this.defaults = new Defaults()
-    this.http = options.http || axios
-    delete options.http
+  beforeDEL () {},
+
+  DEL (url, config, opts) {
+    const self = this
+    config || (config = {})
+    config.url = url || config.url
+    config.method = config.method || 'delete'
+    return resolve(self.beforeDEL(url, config, opts)).then(function (_config) {
+      config = _config || config
+      return self.HTTP(config, opts)
+    }).then(function (response) {
+      return resolve(self.afterDEL(url, config, opts, response)).then(function (_response) {
+        return _response || response
+      })
+    })
+  },
+
+  afterDEL () {},
+
+  deserialize (Model, data, opts) {
+    opts || (opts = {})
+    if (isFunction(opts.deserialize)) {
+      return opts.deserialize(Model, data, opts)
+    }
+    if (opts.raw) {
+      return data
+    }
+    return data ? ('data' in data ? data.data : data) : data
+  },
+
+  beforeDestroy () {},
+
+  destroy (Model, id, opts) {
+    const self = this
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.op = 'destroy'
+    self.dbg(opts.op, Model, id, opts)
+    return resolve(self.beforeDestroy(Model, id, opts)).then(function () {
+      return self.DEL(
+        self.getPath('destroy', Model, id, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterDestroy(Model, id, data, opts)).then(function (_data) {
+        return _data || data
+      })
+    })
+  },
+
+  beforeDestroyAll () {},
+
+  destroyAll (Model, query, opts) {
+    const self = this
+    query || (query = {})
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.op = 'destroy'
+    self.dbg(opts.op, Model, query, opts)
+    deepMixIn(opts.params, query)
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    return resolve(self.beforeDestroyAll(Model, query, opts)).then(function () {
+      return self.DEL(
+        self.getPath('destroyAll', Model, query, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterDestroyAll(Model, query, data, opts)).then(function (_data) {
+        return _data || data
+      })
+    })
+  },
+
+  error (...args) {
     if (console) {
-      this.defaults.log = (a, b) => console[typeof console.info === 'function' ? 'info' : 'log'](a, b)
+      console[typeof console.error === 'function' ? 'error' : 'log'](...args)
     }
-    if (console) {
-      this.defaults.error = (a, b) => console[typeof console.error === 'function' ? 'error' : 'log'](a, b)
-    }
-    deepMixIn(this.defaults, options)
+  },
 
-    if (this.defaults.useFetch && hasFetch) {
-      this.defaults.deserialize = function (resourceConfig, response) {
-        return response.json()
+  fetch (config, opts) {
+    const requestConfig = {
+      method: config.method,
+      // turn the plain headers object into the Fetch Headers object
+      headers: new Headers(config.headers)
+    }
+
+    if (config.data) {
+      requestConfig.body = toJson(config.data)
+    }
+
+    return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
+      response.config = {
+        method: config.method,
+        url: config.url
       }
-      this.http = config => {
-        const requestConfig = {
-          method: config.method,
-          // turn the plain headers object into the Fetch Headers object
-          headers: new Headers(config.headers)
-        }
+      return response.json().then(function (data) {
+        response.data = data
+        return response
+      })
+    })
+  },
 
-        if (config.data) {
-          requestConfig.body = toJson(config.data)
-        }
+  beforeFind () {},
 
-        return fetch(new Request(buildUrl(config.url, config.params), requestConfig))
-          .then(function (response) {
-            response.config = {
-              method: config.method,
-              url: config.url
-            }
-            return response
-          })
-      }
-    }
-  }
+  find (Model, id, opts) {
+    const self = this
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.op = 'find'
+    self.dbg(opts.op, Model, id, opts)
+    return resolve(self.beforeFind(Model, id, opts)).then(function () {
+      return self.GET(
+        self.getPath('find', Model, id, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterFind(Model, id, data, opts)).then(function (_data) {
+        return _data || data
+      })
+    })
+  },
 
-  getEndpoint (resourceConfig, id, options) {
-    options || (options = {})
-    options.params || (options.params = {})
+  afterFind () {},
+
+  findAll (Model, query, opts) {
+    const self = this
+    query || (query = {})
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.op = 'findAll'
+    self.dbg(opts.op, Model, query, opts)
+    deepMixIn(opts.params, query)
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    return resolve(self.beforeFindAll(Model, query, opts)).then(function () {
+      return self.GET(
+        self.getPath('findAll', Model, query, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterFindAll(Model, query, data, opts)).then(function (_data) {
+        return _data || data
+      })
+    })
+  },
+
+  beforeGET () {},
+
+  GET (url, config, opts) {
+    const self = this
+    config || (config = {})
+    config.url = url || config.url
+    config.method = config.method || 'get'
+    return resolve(self.beforeGET(url, config, opts)).then(function (_config) {
+      config = _config || config
+      return self.HTTP(config, opts)
+    }).then(function (response) {
+      return resolve(self.afterGET(url, config, opts, response)).then(function (_response) {
+        return _response || response
+      })
+    })
+  },
+
+  afterGET () {},
+
+  getEndpoint (Model, id, opts) {
+    opts || (opts = {})
+    opts.params || (opts.params = {})
 
     let item
-    const parentKey = resourceConfig.parentKey
-    const endpoint = options.hasOwnProperty('endpoint') ? options.endpoint : resourceConfig.endpoint
-    let parentField = resourceConfig.parentField
-    const parentDef = resourceConfig.getResource(resourceConfig.parent)
-    let parentId = options.params[parentKey]
+    const parentKey = Model.parentKey
+    const endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : Model.endpoint
+    let parentField = Model.parentField
+    const parentDef = Model.getResource(Model.parent)
+    let parentId = opts.params[parentKey]
 
     if (parentId === false || !parentKey || !parentDef) {
       if (parentId === false) {
-        delete options.params[parentKey]
+        delete opts.params[parentKey]
       }
       return endpoint
     } else {
-      delete options.params[parentKey]
+      delete opts.params[parentKey]
 
       if (isString(id) || isNumber(id)) {
-        item = resourceConfig.get(id)
+        item = Model.get(id)
       } else if (isObject(id)) {
         item = id
       }
@@ -178,45 +347,45 @@ class DSHttpAdapter {
       }
 
       if (parentId) {
-        delete options.endpoint
-        const _options = {}
-        forOwn(options, function (value, key) {
-          _options[key] = value
+        delete opts.endpoint
+        const _opts = {}
+        forOwn(opts, function (value, key) {
+          _opts[key] = value
         })
-        _(_options, parentDef)
-        return makePath(this.getEndpoint(parentDef, parentId, _options, parentId, endpoint))
+        _(_opts, parentDef)
+        return makePath(this.getEndpoint(parentDef, parentId, _opts, parentId, endpoint))
       } else {
         return endpoint
       }
     }
-  }
+  },
 
-  getPath (method, resourceConfig, id, options) {
-    const _this = this
-    options || (options = {})
+  getPath (method, Model, id, opts) {
+    const self = this
+    opts || (opts = {})
     const args = [
-      options.basePath || _this.defaults.basePath || resourceConfig.basePath,
-      this.getEndpoint(resourceConfig, (isString(id) || isNumber(id) || method === 'create') ? id : null, options)
+      opts.basePath === undefined ? self.basePath : opts.basePath,
+      self.getEndpoint(Model, (isString(id) || isNumber(id) || method === 'create') ? id : null, opts)
     ]
     if (method === 'find' || method === 'update' || method === 'destroy') {
       args.push(id)
     }
     return makePath.apply(utils, args)
-  }
+  },
 
-  HTTP (config) {
-    const _this = this
+  beforeHTTP () {},
+
+  HTTP (config, opts) {
+    const self = this
     const start = new Date()
+    opts || (opts = {})
     config = copy(config)
-    config = deepMixIn(config, _this.defaults.httpConfig)
-    if (_this.defaults.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
+    config = deepMixIn(config, self.httpConfig)
+    if (self.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
       config.url += '/'
     }
-    // if (typeof config.data === 'object') {
-    //   config.data = removeCircular(config.data)
-    // }
     config.method = config.method.toUpperCase()
-    const suffix = config.suffix || _this.defaults.suffix
+    const suffix = config.suffix || opts.suffix || self.suffix
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
       config.url += suffix
     }
@@ -224,166 +393,150 @@ class DSHttpAdapter {
     function logResponse (data) {
       const str = `${start.toUTCString()} - ${config.method.toUpperCase()} ${config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`
       if (data.status >= 200 && data.status < 300) {
-        if (_this.defaults.log) {
-          _this.defaults.log(str, data)
+        if (self.log) {
+          self.dbg('debug', str, data)
         }
         return data
       } else {
-        if (_this.defaults.error) {
-          _this.defaults.error(`'FAILED: ${str}`, data)
+        if (self.error) {
+          self.error(`'FAILED: ${str}`, data)
         }
         return reject(data)
       }
     }
 
-    if (!this.http) {
+    if (!self.http) {
       throw new Error('You have not configured this adapter with an http library!')
     }
 
-    return this.http(config).then(logResponse, logResponse)
-  }
+    return resolve(self.beforeHTTP(config)).then(function (_config) {
+      config = _config || config
+      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
+        return self.fetch(config, opts).then(logResponse, logResponse)
+      }
+      return self.http(config).then(logResponse, logResponse)
+    }).then(function (response) {
+      return resolve(self.afterHTTP(config, response)).then(function (_response) {
+        return _response || response
+      })
+    })
+  },
 
-  GET (url, config) {
-    config || (config = {})
-    if (!('method' in config)) {
-      config.method = 'get'
+  afterHTTP () {},
+
+  queryTransform (Model, params, opts) {
+    return params
+  },
+
+  serialize (Model, data, opts) {
+    opts || (opts = {})
+    if (isFunction(opts.serialize)) {
+      return opts.serialize(Model, data, opts)
     }
-    return this.HTTP(deepMixIn(config, {
-      url
-    }))
-  }
+    return data
+  },
 
-  POST (url, attrs, config) {
-    config || (config = {})
-    if (!('method' in config)) {
-      config.method = 'post'
+  log (level, ...args) {
+    if (level && !args.length) {
+      args.push(level)
+      level = 'debug'
     }
-    return this.HTTP(deepMixIn(config, {
-      url,
-      data: attrs
-    }))
-  }
-
-  PUT (url, attrs, config) {
-    config || (config = {})
-    if (!('method' in config)) {
-      config.method = 'put'
+    if (level === 'debug' && !this.debug) {
+      return
     }
-    return this.HTTP(deepMixIn(config, {
-      url,
-      data: attrs || {}
-    }))
-  }
-
-  DEL (url, config) {
-    config || (config = {})
-    if (!('method' in config)) {
-      config.method = 'delete'
+    const prefix = `${level.toUpperCase()}: (${this.name})`
+    if (console[level]) {
+      console[level](prefix, ...args)
+    } else {
+      console.log(prefix, ...args)
     }
-    return this.HTTP(deepMixIn(config, {
-      url
-    }))
-  }
+  },
 
-  find (resourceConfig, id, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    options.params = _this.defaults.queryTransform(resourceConfig, options.params)
-    return _this.GET(
-      _this.getPath('find', resourceConfig, id, options),
-      options
-    ).then(data => {
-      let item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data)
-      return !item ? reject(new Error('Not Found!')) : item
+  beforePOST () {},
+
+  POST (url, data, config, opts) {
+    const self = this
+    config || (config = {})
+    config.url = url || config.url
+    config.data = data || config.data
+    config.method = config.method || 'post'
+    return resolve(self.beforePOST(url, data, config, opts)).then(function (_config) {
+      config = _config || config
+      return self.HTTP(config, opts)
+    }).then(function (response) {
+      return resolve(self.afterPOST(url, data, config, opts, response)).then(function (_response) {
+        return _response || response
+      })
+    })
+  },
+
+  afterPOST () {},
+
+  beforePUT () {},
+
+  PUT (url, data, config, opts) {
+    const self = this
+    config || (config = {})
+    config.url = url || config.url
+    config.data = data || config.data
+    config.method = config.method || 'put'
+    return resolve(self.beforePUT(url, data, config, opts)).then(function (_config) {
+      config = _config || config
+      return self.HTTP(config, opts)
+    }).then(function (response) {
+      return resolve(self.afterPUT(url, data, config, opts, response)).then(function (_response) {
+        return _response || response
+      })
+    })
+  },
+
+  afterPUT () {},
+
+  update (Model, id, props, opts) {
+    const self = this
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.op = 'update'
+    self.dbg(opts.op, Model, id, props, opts)
+    return resolve(self.beforeUpdate(Model, id, props, opts)).then(function () {
+      return self.POST(
+        self.getPath('update', Model, id, opts),
+        self.serialize(Model, props, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterUpdate(Model, id, props, opts, data)).then(function (_data) {
+        return _data || data
+      })
+    })
+  },
+
+  updateAll (Model, props, query, opts) {
+    const self = this
+    query || (query = {})
+    opts = opts ? copy(opts) : {}
+    opts.params || (opts.params = {})
+    opts.op = 'updateAll'
+    self.dbg(opts.op, Model, props, query, opts)
+    deepMixIn(opts.params, query)
+    opts.params = self.queryTransform(Model, opts.params, opts)
+    return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
+      return self.PUT(
+        self.getPath('updateAll', Model, query, opts),
+        opts
+      )
+    }).then(function (response) {
+      return self.deserialize(Model, response, opts)
+    }).then(function (data) {
+      return resolve(self.afterUpdateAll(Model, props, query, opts, data)).then(function (_data) {
+        return _data || data
+      })
     })
   }
-
-  findAll (resourceConfig, params, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    if (params) {
-      params = _this.defaults.queryTransform(resourceConfig, params)
-      deepMixIn(options.params, params)
-    }
-    return _this.GET(
-      _this.getPath('findAll', resourceConfig, params, options),
-      options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
-  }
-
-  create (resourceConfig, attrs, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    options.params = _this.defaults.queryTransform(resourceConfig, options.params)
-    return _this.POST(
-      _this.getPath('create', resourceConfig, attrs, options),
-      options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
-      options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
-  }
-
-  update (resourceConfig, id, attrs, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    options.params = _this.defaults.queryTransform(resourceConfig, options.params)
-    return _this.PUT(
-      _this.getPath('update', resourceConfig, id, options),
-      options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
-      options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
-  }
-
-  updateAll (resourceConfig, attrs, params, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    if (params) {
-      params = _this.defaults.queryTransform(resourceConfig, params)
-      deepMixIn(options.params, params)
-    }
-    return this.PUT(
-      _this.getPath('updateAll', resourceConfig, attrs, options),
-      options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
-      options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
-  }
-
-  destroy (resourceConfig, id, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    options.params = _this.defaults.queryTransform(resourceConfig, options.params)
-    return _this.DEL(
-      _this.getPath('destroy', resourceConfig, id, options),
-      options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
-  }
-
-  destroyAll (resourceConfig, params, options) {
-    const _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params || (options.params = {})
-    if (params) {
-      params = _this.defaults.queryTransform(resourceConfig, params)
-      deepMixIn(options.params, params)
-    }
-    return this.DEL(
-      _this.getPath('destroyAll', resourceConfig, params, options),
-      options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
-  }
-}
+})
 
 DSHttpAdapter.addAction = function (name, opts) {
   if (!name || !isString(name)) {

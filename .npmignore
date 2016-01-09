@@ -1,4 +1,5 @@
 test/
+fetch/
 node/
 src/
 mocha.start.js
@@ -7,3 +8,4 @@ karma.conf.js
 .bowerrc
 scripts/
 webpack.config.js
+*.log

@@ -1,4 +1,4 @@
-describe('DSHttpAdapter.create(resourceConfig, attrs, options)', function () {
+describe.only('create', function () {
 
   it('should make a POST request', function () {
     var _this = this;

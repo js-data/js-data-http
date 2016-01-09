@@ -36,6 +36,7 @@ function version(filepath) {
   });
 }
 
+version('fetch/dist/js-data-fetch.js');
 version('node/dist/js-data-http-node.js');
 version('dist/js-data-http.js');
 

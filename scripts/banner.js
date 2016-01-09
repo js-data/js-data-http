@@ -6,7 +6,7 @@ function banner (name, desc) {
     '* js-data-' + name + '\n' +
     '* @version ' + pkg.version + ' - Homepage <http://www.js-data.io/docs/dshttpadapter>\n' +
     '* @author Jason Dobry <jason.dobry@gmail.com>\n' +
-    '* @copyright (c) 2014-2015 Jason Dobry\n' +
+    '* @copyright (c) 2014-2016 Jason Dobry\n' +
     '* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>\n' +
     '*\n' +
     '* @overview ' + desc + '\n' +
@@ -29,6 +29,8 @@ function addBanner(name, desc, filepath) {
 var nodeDescription = 'Node.js HTTP adapter for js-data.'
 var browserDescription = 'HTTP (XHR) adapter for js-data in the browser.'
 
+addBanner('fetch', 'Fetch ' + browserDescription, 'fetch/dist/js-data-fetch.js')
+addBanner('fetch', 'Fetch ' + browserDescription, 'fetch/dist/js-data-fetch.min.js')
 addBanner('http-node', nodeDescription, 'node/dist/js-data-http-node.js')
 addBanner('http', browserDescription, 'dist/js-data-http.js')
 addBanner('http', browserDescription, 'dist/js-data-http.min.js')
