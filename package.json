@@ -44,7 +44,7 @@
     "banner": "node scripts/banner.js",
     "gzip": "echo js-data-http gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",
     "gzip_fetch": "echo js-data-fetch gzipped size: $(cat fetch/dist/js-data-fetch.min.js | gzip -f9 | wc -c)kb",
-    "build": "npm run lint && npm run webpack && npm run min && && npm run min_fetch && npm run version && npm run banner",
+    "build": "npm run lint && npm run webpack && npm run min && npm run min_fetch && npm run version && npm run banner",
     "karma": "karma start",
     "karma_fetch": "karma start fetch/karma.conf.js",
     "mocha": "mocha -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
