@@ -16,7 +16,7 @@
 		exports["DSHttpAdapter"] = factory(require("js-data"));
 	else
 		root["DSHttpAdapter"] = factory(root["JSData"]);
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__) {
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -104,18 +104,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig;
 	  self.suffix = opts.suffix === undefined ? '' : opts.suffix;
 	  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch;
-	
-	  // Use "window.fetch" if available and the user asks for it
-	  if (hasFetch && (self.useFetch || self.http === undefined)) {}
 	}
 	
-	fillIn(DSHttpAdapter, {
+	fillIn(DSHttpAdapter.prototype, {
 	  beforeCreate: function beforeCreate() {},
 	  create: function create(Model, props, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'create';
 	    self.dbg(opts.op, Model, props, opts);
 	    return resolve(self.beforeCreate(Model, props, opts)).then(function () {
@@ -123,7 +121,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterCreate(Model, data, opts)).then(function (_data) {
+	      return resolve(self.afterCreate(Model, props, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
@@ -156,6 +154,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    opts || (opts = {});
 	    if (isFunction(opts.deserialize)) {
 	      return opts.deserialize(Model, data, opts);
+	    }
+	    if (isFunction(Model.deserialize)) {
+	      return Model.deserialize(Model, data, opts);
 	    }
 	    if (opts.raw) {
 	      return data;
@@ -212,6 +213,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'find';
 	    self.dbg(opts.op, Model, id, opts);
 	    return resolve(self.beforeFind(Model, id, opts)).then(function () {
@@ -219,31 +221,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterFind(Model, id, data, opts)).then(function (_data) {
+	      return resolve(self.afterFind(Model, id, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
 	  },
 	  afterFind: function afterFind() {},
+	  beforeFindAll: function beforeFindAll() {},
 	  findAll: function findAll(Model, query, opts) {
 	    var self = this;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'findAll';
 	    self.dbg(opts.op, Model, query, opts);
 	    deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(Model, opts.params, opts);
 	    return resolve(self.beforeFindAll(Model, query, opts)).then(function () {
-	      return self.GET(self.getPath('findAll', Model, query, opts), opts);
+	      return self.GET(self.getPath('findAll', Model, opts.params, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterFindAll(Model, query, data, opts)).then(function (_data) {
+	      return resolve(self.afterFindAll(Model, query, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
 	  },
+	  afterFindAll: function afterFindAll() {},
 	  beforeGET: function beforeGET() {},
 	  GET: function GET(url, config, opts) {
 	    var self = this;
@@ -270,7 +275,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var parentKey = Model.parentKey;
 	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : Model.endpoint;
 	    var parentField = Model.parentField;
-	    var parentDef = Model.getResource(Model.parent);
+	    var parentDef = Model.parent ? Model.getResource(Model.parent) : undefined;
 	    var parentId = opts.params[parentKey];
 	
 	    if (parentId === false || !parentKey || !parentDef) {
@@ -517,15 +522,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  },
 	  afterPUT: function afterPUT() {},
+	  beforeUpdate: function beforeUpdate() {},
 	  update: function update(Model, id, props, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'update';
 	    self.dbg(opts.op, Model, id, props, opts);
 	    return resolve(self.beforeUpdate(Model, id, props, opts)).then(function () {
-	      return self.POST(self.getPath('update', Model, id, opts), self.serialize(Model, props, opts), opts);
+	      return self.PUT(self.getPath('update', Model, id, opts), self.serialize(Model, props, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
@@ -534,17 +541,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
+	  afterUpdate: function afterUpdate() {},
+	  beforeUpdateAll: function beforeUpdateAll() {},
 	  updateAll: function updateAll(Model, props, query, opts) {
 	    var self = this;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.op = 'updateAll';
-	    self.dbg(opts.op, Model, props, query, opts);
 	    deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
+	    opts.op = 'updateAll';
+	    self.dbg(opts.op, Model, props, query, opts);
 	    return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
-	      return self.PUT(self.getPath('updateAll', Model, query, opts), opts);
+	      return self.PUT(self.getPath('updateAll', Model, opts.params, opts), self.serialize(Model, props, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
@@ -556,6 +566,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  return DSHttpAdapter;
 	}();
+	
+	DSHttpAdapter.extend = extend;
 	
 	DSHttpAdapter.version = {
 	  full: '2.2.1',
@@ -569,31 +581,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	module.exports = DSHttpAdapter;
 
 /***/ },
-/* 1 */,
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
+
+/***/ },
+/* 2 */
+/***/ function(module, exports, __webpack_require__) {
+
+	module.exports = __webpack_require__(3);
 
 /***/ },
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	module.exports = __webpack_require__(4);
-
-/***/ },
-/* 4 */
-/***/ function(module, exports, __webpack_require__) {
-
 	'use strict';
 	
-	var defaults = __webpack_require__(5);
-	var utils = __webpack_require__(6);
-	var dispatchRequest = __webpack_require__(7);
-	var InterceptorManager = __webpack_require__(16);
-	var isAbsoluteURL = __webpack_require__(17);
-	var combineURLs = __webpack_require__(18);
-	var bind = __webpack_require__(19);
+	var defaults = __webpack_require__(4);
+	var utils = __webpack_require__(5);
+	var dispatchRequest = __webpack_require__(6);
+	var InterceptorManager = __webpack_require__(15);
+	var isAbsoluteURL = __webpack_require__(16);
+	var combineURLs = __webpack_require__(17);
+	var bind = __webpack_require__(18);
 	
 	function Axios(defaultConfig) {
 	  this.defaultConfig = utils.merge({
@@ -661,7 +672,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	axios.all = function all(promises) {
 	  return Promise.all(promises);
 	};
-	axios.spread = __webpack_require__(20);
+	axios.spread = __webpack_require__(19);
 	
 	// Expose interceptors
 	axios.interceptors = defaultInstance.interceptors;
@@ -692,12 +703,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 5 */
+/* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 	var DEFAULT_CONTENT_TYPE = {
@@ -761,7 +772,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 6 */
+/* 5 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1007,7 +1018,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 7 */
+/* 6 */
 /***/ function(module, exports, __webpack_require__) {
 
 	/* WEBPACK VAR INJECTION */(function(process) {'use strict';
@@ -1024,10 +1035,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    try {
 	      if ((typeof XMLHttpRequest !== 'undefined') || (typeof ActiveXObject !== 'undefined')) {
 	        // For browsers use XHR adapter
-	        __webpack_require__(9)(resolve, reject, config);
+	        __webpack_require__(8)(resolve, reject, config);
 	      } else if (typeof process !== 'undefined') {
 	        // For node use HTTP adapter
-	        __webpack_require__(9)(resolve, reject, config);
+	        __webpack_require__(8)(resolve, reject, config);
 	      }
 	    } catch (e) {
 	      reject(e);
@@ -1036,10 +1047,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	};
 	
 	
-	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8)))
+	/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(7)))
 
 /***/ },
-/* 8 */
+/* 7 */
 /***/ function(module, exports) {
 
 	// shim for using process in browser
@@ -1136,20 +1147,20 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 9 */
+/* 8 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
 	/*global ActiveXObject:true*/
 	
-	var defaults = __webpack_require__(5);
-	var utils = __webpack_require__(6);
-	var buildURL = __webpack_require__(10);
-	var parseHeaders = __webpack_require__(11);
-	var transformData = __webpack_require__(12);
-	var isURLSameOrigin = __webpack_require__(13);
-	var btoa = window.btoa || __webpack_require__(14);
+	var defaults = __webpack_require__(4);
+	var utils = __webpack_require__(5);
+	var buildURL = __webpack_require__(9);
+	var parseHeaders = __webpack_require__(10);
+	var transformData = __webpack_require__(11);
+	var isURLSameOrigin = __webpack_require__(12);
+	var btoa = window.btoa || __webpack_require__(13);
 	
 	module.exports = function xhrAdapter(resolve, reject, config) {
 	  // Transform request data
@@ -1226,7 +1237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  // This is only done if running in a standard browser environment.
 	  // Specifically not if we're in a web worker, or react-native.
 	  if (utils.isStandardBrowserEnv()) {
-	    var cookies = __webpack_require__(15);
+	    var cookies = __webpack_require__(14);
 	
 	    // Add xsrf header
 	    var xsrfValue =  config.withCredentials || isURLSameOrigin(config.url) ?
@@ -1277,12 +1288,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 10 */
+/* 9 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	function encode(val) {
 	  return encodeURIComponent(val).
@@ -1350,12 +1361,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 11 */
+/* 10 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	/**
 	 * Parse headers into an object
@@ -1393,12 +1404,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 12 */
+/* 11 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	/**
 	 * Transform the data for a request or a response
@@ -1419,12 +1430,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 13 */
+/* 12 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -1493,7 +1504,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 14 */
+/* 13 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1535,12 +1546,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 15 */
+/* 14 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	module.exports = (
 	  utils.isStandardBrowserEnv() ?
@@ -1594,12 +1605,12 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 16 */
+/* 15 */
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
 	
-	var utils = __webpack_require__(6);
+	var utils = __webpack_require__(5);
 	
 	function InterceptorManager() {
 	  this.handlers = [];
@@ -1652,7 +1663,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 17 */
+/* 16 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1672,7 +1683,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 18 */
+/* 17 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1690,7 +1701,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 19 */
+/* 18 */
 /***/ function(module, exports) {
 
 	'use strict';
@@ -1707,7 +1718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 
 /***/ },
-/* 20 */
+/* 19 */
 /***/ function(module, exports) {
 
 	'use strict';

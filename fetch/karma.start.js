@@ -1,7 +1,4 @@
-'use strict'
-
-var querystring = require('querystring')
-
+/* global JSData:true, DSHttpAdapter:true, sinon:true, chai:true */
 before(function () {
   var Test = this
   Test.fail = function (msg) {
@@ -11,25 +8,25 @@ before(function () {
       Test.assert.equal('should not reach this!: ' + msg, 'failure')
     }
   }
-  Test.assert = require('chai').assert
-  Test.sinon = require('sinon')
-  Test.JSData = require('js-data')
-  Test.DSHttpAdapter = require('./dist/js-data-http-node')
-  Test.User = Test.JSData.Model.extend({}, {
+  Test.assert = chai.assert
+  Test.sinon = sinon
+  Test.JSData = JSData
+  Test.DSHttpAdapter = DSHttpAdapter
+  Test.User = JSData.Model.extend({}, {
     name: 'user'
   })
-  Test.Post = Test.JSData.Model.extend({}, {
+  Test.Post = JSData.Model.extend({}, {
     name: 'post',
     endpoint: 'posts',
     basePath: 'api'
   })
 
-  console.log('Testing against js-data ' + Test.JSData.version.full)
+  console.log('Testing against js-data ' + JSData.version.full)
 })
 
 beforeEach(function () {
   var Test = this
-  Test.adapter = new Test.DSHttpAdapter()
+  Test.adapter = new DSHttpAdapter()
   Test.User.registerAdapter('http', Test.adapter, { default: true })
   Test.Post.registerAdapter('http', Test.adapter, { default: true })
 
@@ -44,16 +41,20 @@ beforeEach(function () {
   Test.adapter.http = function (config) {
     config.headers || (config.headers = {})
     config.headers.Accept = 'application/json, text/plain, */*'
-    var params = 0
+    var params = []
     for (var key in config.params) {
       config.params[key] = Test.JSData.utils.isObject(config.params[key]) ? JSON.stringify(config.params[key]) : config.params[key]
-      params++
+      params.push([key, config.params[key]])
     }
     return new Promise(function (resolve) {
       var url = config.url
-      if (params) {
+      if (params.length) {
         url += '?'
-        url += querystring.stringify(config.params)
+        params.forEach(function (param) {
+          url += param[0]
+          url += '='
+          url += encodeURIComponent(param[1])
+        })
       }
       var request = {
         url: url,

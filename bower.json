@@ -17,12 +17,13 @@
     ".*",
     "*.iml",
     "src/",
-    "lib/",
     "doc/",
-    "guide/",
+    "build_examples/",
     "coverage/",
-    "Gruntfile.js",
+    "scripts/",
+    "junit/",
     "node_modules/",
+    "fetch/",
     "node/",
     "test/",
     "package.json",
@@ -30,7 +31,6 @@
     "karma.start.js"
   ],
   "dependencies": {
-    "axios": "0.5.x",
-    "js-data": ">=2.0.0"
+    "js-data": ">=3.0.0-alpha.8"
   }
 }

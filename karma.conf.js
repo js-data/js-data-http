@@ -69,20 +69,45 @@ module.exports = function (config) {
 		// web server port
 		port: 9876,
 
-		// cli runner port
-		runnerPort: 9100,
-
-		// enable / disable colors in the output (reporters and logs)
-		colors: true,
-
-		// level of logging
-		logLevel: config.LOG_INFO,
-
-		// If browser does not capture in given timeout [ms], kill it
-		captureTimeout: 30000,
-
-		// Continuous Integration mode
-		// if true, it capture browsers, run tests and exit
-		singleRun: true
-	});
-};
+module.exports = function (config) {
+  config.set({
+    basePath: './',
+    frameworks: ['sinon', 'chai', 'mocha'],
+    plugins: [
+      'karma-sinon',
+      'karma-mocha',
+      'karma-chai',
+      'karma-phantomjs-launcher',
+      'karma-browserstack-launcher',
+      'karma-junit-reporter'
+    ],
+    autoWatch: false,
+    browsers: browsers,
+    files: [
+      'node_modules/es6-promise/dist/es6-promise.js',
+      'node_modules/js-data/dist/js-data.js',
+      'dist/js-data-http.js',
+      'karma.start.js',
+      'test/*.test.js'
+    ],
+    browserStack: {
+      username: process.env.BROWSERSTACK_USERNAME,
+      accessKey: process.env.BROWSERSTACK_ACCESS_KEY
+    },
+    customLaunchers: customLaunchers,
+    reporters: ['dots', 'junit'],
+    junitReporter: {
+      outputDir: process.env.CIRCLE_TEST_REPORTS || 'junit',
+      outputFile: undefined,
+      suite: 'js-data-http',
+      userBrowserName: false
+    },
+    port: 9876,
+    runnerPort: 9100,
+    colors: true,
+    logLevel: config.LOG_INFO,
+    browserNoActivityTimeout: 90000,
+    captureTimeout: 90000,
+    singleRun: true
+  })
+}

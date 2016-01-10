@@ -95,6 +95,7 @@ Copyright (c) 2014-2016 js-data-http project authors
 
 [sl_b]: http://slack.js-data.io/badge.svg
 [sl_l]: http://slack.js-data.io
+[so]: http://stackoverflow.com/questions/tagged/jsdata
 [npm_b]: https://img.shields.io/npm/v/js-data-http.svg?style=flat
 [npm_l]: https://www.npmjs.org/package/js-data-http
 [circle_b]: https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat
