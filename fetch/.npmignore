@@ -1,4 +1,4 @@
-test/
-mocha.start.js
-dist/js-data-fetch-tests.js
 webpack.config.js
+karma.conf.js
+karma.start.js
+junit/

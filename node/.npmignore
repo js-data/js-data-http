@@ -1,4 +1,2 @@
-test/
 mocha.start.js
-dist/js-data-http-node-tests.js
 webpack.config.js

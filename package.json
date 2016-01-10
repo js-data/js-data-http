@@ -26,7 +26,7 @@
     "lint": "standard src/**/*.js",
     "bundle": "webpack --config webpack.config.js --colors",
     "min": "uglifyjs dist/js-data-http.js -o dist/js-data-http.min.js --source-map dist/js-data-http.min.map -v -m -c --screw-ie8",
-    "min_fetch": "uglifyjs fetch/dist/js-data-fetch.js -o fetch/dist/js-data-fetch.min.js --source-map dist/js-data-fetch.min.map -v -m -c --screw-ie8",
+    "min_fetch": "uglifyjs fetch/dist/js-data-fetch.js -o fetch/dist/js-data-fetch.min.js --source-map fetch/dist/js-data-fetch.min.map -v -m -c --screw-ie8",
     "version": "node scripts/version.js",
     "banner": "node scripts/banner.js",
     "gzip": "echo gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",

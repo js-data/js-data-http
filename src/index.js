@@ -345,6 +345,8 @@ class DSHttpAdapter {
   }
 }
 
+DSHttpAdapter.extend = extend
+
 DSHttpAdapter.version = {
   full: '<%= pkg.version %>',
   major: parseInt('<%= major %>', 10),

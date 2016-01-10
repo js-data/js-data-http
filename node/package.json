@@ -19,6 +19,6 @@
     "node.js"
   ],
   "peerDependencies": {
-    "axios": "0.7.x"
+    "axios": "0.8.x"
   }
 }
