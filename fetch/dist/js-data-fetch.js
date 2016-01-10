@@ -12,49 +12,49 @@
 		module.exports = factory(require("js-data"), require("undefined"));
 	else if(typeof define === 'function' && define.amd)
 		define(["js-data", "undefined"], factory);
-	else {
-		var a = typeof exports === 'object' ? factory(require("js-data"), require("undefined")) : factory(root["js-data"], root["undefined"]);
-		for(var i in a) (typeof exports === 'object' ? exports : root)[i] = a[i];
-	}
-})(this, function(__WEBPACK_EXTERNAL_MODULE_2__, __WEBPACK_EXTERNAL_MODULE_3__) {
+	else if(typeof exports === 'object')
+		exports["DSHttpAdapter"] = factory(require("js-data"), require("undefined"));
+	else
+		root["DSHttpAdapter"] = factory(root["JSData"], root["undefined"]);
+})(this, function(__WEBPACK_EXTERNAL_MODULE_1__, __WEBPACK_EXTERNAL_MODULE_2__) {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
-
+/******/
 /******/ 	// The require function
 /******/ 	function __webpack_require__(moduleId) {
-
+/******/
 /******/ 		// Check if module is in cache
 /******/ 		if(installedModules[moduleId])
 /******/ 			return installedModules[moduleId].exports;
-
+/******/
 /******/ 		// Create a new module (and put it into the cache)
 /******/ 		var module = installedModules[moduleId] = {
 /******/ 			exports: {},
 /******/ 			id: moduleId,
 /******/ 			loaded: false
 /******/ 		};
-
+/******/
 /******/ 		// Execute the module function
 /******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-
+/******/
 /******/ 		// Flag the module as loaded
 /******/ 		module.loaded = true;
-
+/******/
 /******/ 		// Return the exports of the module
 /******/ 		return module.exports;
 /******/ 	}
-
-
+/******/
+/******/
 /******/ 	// expose the modules object (__webpack_modules__)
 /******/ 	__webpack_require__.m = modules;
-
+/******/
 /******/ 	// expose the module cache
 /******/ 	__webpack_require__.c = installedModules;
-
+/******/
 /******/ 	// __webpack_public_path__
 /******/ 	__webpack_require__.p = "";
-
+/******/
 /******/ 	// Load entry module and return exports
 /******/ 	return __webpack_require__(0);
 /******/ })
@@ -64,16 +64,17 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports, __webpack_require__) {
 
 	'use strict';
-
+	
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-
-	var _jsData = __webpack_require__(2);
-
+	
+	var _jsData = __webpack_require__(1);
+	
 	/* global fetch:true Headers:true Request:true */
-	var axios = __webpack_require__(3);
+	var axios = __webpack_require__(2);
 	var _ = _jsData.utils._;
 	var copy = _jsData.utils.copy;
 	var deepMixIn = _jsData.utils.deepMixIn;
+	var extend = _jsData.utils.extend;
 	var fillIn = _jsData.utils.fillIn;
 	var forOwn = _jsData.utils.forOwn;
 	var isArray = _jsData.utils.isArray;
@@ -85,13 +86,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	var resolve = _jsData.utils.resolve;
 	var reject = _jsData.utils.reject;
 	var toJson = _jsData.utils.toJson;
-
+	
 	var hasFetch = false;
-
+	
 	try {
 	  hasFetch = window && window.fetch;
 	} catch (e) {}
-
+	
 	function isValidString(value) {
 	  return value != null && value !== '';
 	}
@@ -103,22 +104,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	  for (var _len = arguments.length, args = Array(_len), _key = 0; _key < _len; _key++) {
 	    args[_key] = arguments[_key];
 	  }
-
+	
 	  var result = join(args, '/');
 	  return result.replace(/([^:\/]|^)\/{2,}/g, '$1/');
 	}
-
+	
 	function encode(val) {
-	  return encodeURIComponent(val).replace(/%40/gi, '@').replace(/%3A/gi, ':').replace(/%24/g, '$').replace(/%2C/gi, ',').replace(/%20/g, '+');
+	  return encodeURIComponent(val).replace(/%40/gi, '@').replace(/%3A/gi, ':').replace(/%24/g, '$').replace(/%2C/gi, ',').replace(/%20/g, '+').replace(/%5B/gi, '[').replace(/%5D/gi, ']');
 	}
-
+	
 	function buildUrl(url, params) {
 	  if (!params) {
 	    return url;
 	  }
-
+	
 	  var parts = [];
-
+	
 	  forOwn(params, function (val, key) {
 	    if (val === null || typeof val === 'undefined') {
 	      return;
@@ -126,7 +127,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (!isArray(val)) {
 	      val = [val];
 	    }
-
+	
 	    val.forEach(function (v) {
 	      if (window.toString.call(v) === '[object Date]') {
 	        v = v.toISOString();
@@ -136,14 +137,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	      parts.push(encode(key) + '=' + encode(v));
 	    });
 	  });
-
+	
 	  if (parts.length > 0) {
 	    url += (url.indexOf('?') === -1 ? '?' : '&') + parts.join('&');
 	  }
-
+	
 	  return url;
 	}
-
+	
 	/**
 	 * DSHttpAdapter class.
 	 * @class DSHttpAdapter
@@ -159,10 +160,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	 */
 	function DSHttpAdapter(opts) {
 	  var self = this;
-
+	
 	  // Default values for arguments
 	  opts || (opts = {});
-
+	
 	  // Default and user-defined settings
 	  self.basePath = opts.basePath === undefined ? '' : opts.basePath;
 	  self.debug = opts.debug === undefined ? false : opts.debug;
@@ -171,18 +172,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig;
 	  self.suffix = opts.suffix === undefined ? '' : opts.suffix;
 	  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch;
-
-	  // Use "window.fetch" if available and the user asks for it
-	  if (hasFetch && (self.useFetch || self.http === undefined)) {}
 	}
-
-	fillIn(DSHttpAdapter, {
+	
+	fillIn(DSHttpAdapter.prototype, {
 	  beforeCreate: function beforeCreate() {},
 	  create: function create(Model, props, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'create';
 	    self.dbg(opts.op, Model, props, opts);
 	    return resolve(self.beforeCreate(Model, props, opts)).then(function () {
@@ -190,7 +189,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterCreate(Model, data, opts)).then(function (_data) {
+	      return resolve(self.afterCreate(Model, props, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
@@ -200,7 +199,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
 	      args[_key2] = arguments[_key2];
 	    }
-
+	
 	    this.log.apply(this, ['debug'].concat(args));
 	  },
 	  beforeDEL: function beforeDEL() {},
@@ -224,6 +223,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (isFunction(opts.deserialize)) {
 	      return opts.deserialize(Model, data, opts);
 	    }
+	    if (isFunction(Model.deserialize)) {
+	      return Model.deserialize(Model, data, opts);
+	    }
 	    if (opts.raw) {
 	      return data;
 	    }
@@ -235,6 +237,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'destroy';
 	    self.dbg(opts.op, Model, id, opts);
 	    return resolve(self.beforeDestroy(Model, id, opts)).then(function () {
@@ -242,35 +245,38 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterDestroy(Model, id, data, opts)).then(function (_data) {
+	      return resolve(self.afterDestroy(Model, id, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
 	  },
+	  afterDestroy: function afterDestroy() {},
 	  beforeDestroyAll: function beforeDestroyAll() {},
 	  destroyAll: function destroyAll(Model, query, opts) {
 	    var self = this;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.op = 'destroy';
-	    self.dbg(opts.op, Model, query, opts);
 	    deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
+	    opts.op = 'destroy';
+	    self.dbg(opts.op, Model, query, opts);
 	    return resolve(self.beforeDestroyAll(Model, query, opts)).then(function () {
-	      return self.DEL(self.getPath('destroyAll', Model, query, opts), opts);
+	      return self.DEL(self.getPath('destroyAll', Model, opts.params, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterDestroyAll(Model, query, data, opts)).then(function (_data) {
+	      return resolve(self.afterDestroyAll(Model, query, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
 	  },
+	  afterDestroyAll: function afterDestroyAll() {},
 	  error: function error() {
 	    if (console) {
 	      var _console;
-
+	
 	      (_console = console)[typeof console.error === 'function' ? 'error' : 'log'].apply(_console, arguments);
 	    }
 	  },
@@ -278,11 +284,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    function fetch(_x, _x2) {
 	      return _fetch.apply(this, arguments);
 	    }
-
+	
 	    fetch.toString = function () {
 	      return _fetch.toString();
 	    };
-
+	
 	    return fetch;
 	  }(function (config, opts) {
 	    var requestConfig = {
@@ -290,11 +296,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	      // turn the plain headers object into the Fetch Headers object
 	      headers: new Headers(config.headers)
 	    };
-
+	
 	    if (config.data) {
 	      requestConfig.body = toJson(config.data);
 	    }
-
+	
 	    return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
 	      response.config = {
 	        method: config.method,
@@ -312,6 +318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'find';
 	    self.dbg(opts.op, Model, id, opts);
 	    return resolve(self.beforeFind(Model, id, opts)).then(function () {
@@ -319,31 +326,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterFind(Model, id, data, opts)).then(function (_data) {
+	      return resolve(self.afterFind(Model, id, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
 	  },
 	  afterFind: function afterFind() {},
+	  beforeFindAll: function beforeFindAll() {},
 	  findAll: function findAll(Model, query, opts) {
 	    var self = this;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'findAll';
 	    self.dbg(opts.op, Model, query, opts);
 	    deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(Model, opts.params, opts);
 	    return resolve(self.beforeFindAll(Model, query, opts)).then(function () {
-	      return self.GET(self.getPath('findAll', Model, query, opts), opts);
+	      return self.GET(self.getPath('findAll', Model, opts.params, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterFindAll(Model, query, data, opts)).then(function (_data) {
+	      return resolve(self.afterFindAll(Model, query, opts, data)).then(function (_data) {
 	        return _data || data;
 	      });
 	    });
 	  },
+	  afterFindAll: function afterFindAll() {},
 	  beforeGET: function beforeGET() {},
 	  GET: function GET(url, config, opts) {
 	    var self = this;
@@ -362,17 +372,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  afterGET: function afterGET() {},
 	  getEndpoint: function getEndpoint(Model, id, opts) {
 	    var _this = this;
-
+	
 	    opts || (opts = {});
 	    opts.params || (opts.params = {});
-
+	
 	    var item = undefined;
 	    var parentKey = Model.parentKey;
 	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : Model.endpoint;
 	    var parentField = Model.parentField;
-	    var parentDef = Model.getResource(Model.parent);
+	    var parentDef = Model.parent ? Model.getResource(Model.parent) : undefined;
 	    var parentId = opts.params[parentKey];
-
+	
 	    if (parentId === false || !parentKey || !parentDef) {
 	      if (parentId === false) {
 	        delete opts.params[parentKey];
@@ -380,17 +390,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return endpoint;
 	    } else {
 	      delete opts.params[parentKey];
-
+	
 	      if (isString(id) || isNumber(id)) {
 	        item = Model.get(id);
 	      } else if (isObject(id)) {
 	        item = id;
 	      }
-
+	
 	      if (item) {
 	        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
 	      }
-
+	
 	      if (parentId) {
 	        var _ret = function () {
 	          delete opts.endpoint;
@@ -403,7 +413,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            v: makePath(_this.getEndpoint(parentDef, parentId, _opts, parentId, endpoint))
 	          };
 	        }();
-
+	
 	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
 	      } else {
 	        return endpoint;
@@ -413,7 +423,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getPath: function getPath(method, Model, id, opts) {
 	    var self = this;
 	    opts || (opts = {});
-	    var args = [opts.basePath === undefined ? self.basePath : opts.basePath, self.getEndpoint(Model, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
+	    var args = [opts.basePath === undefined ? Model.basePath === undefined ? self.basePath : Model.basePath : opts.basePath, self.getEndpoint(Model, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
 	    if (method === 'find' || method === 'update' || method === 'destroy') {
 	      args.push(id);
 	    }
@@ -434,7 +444,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
 	      config.url += suffix;
 	    }
-
+	
 	    function logResponse(data) {
 	      var str = start.toUTCString() + ' - ' + config.method.toUpperCase() + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
 	      if (data.status >= 200 && data.status < 300) {
@@ -449,11 +459,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return reject(data);
 	      }
 	    }
-
+	
 	    if (!self.http) {
 	      throw new Error('You have not configured this adapter with an http library!');
 	    }
-
+	
 	    return resolve(self.beforeHTTP(config)).then(function (_config) {
 	      config = _config || config;
 	      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
@@ -481,7 +491,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
 	      args[_key3 - 1] = arguments[_key3];
 	    }
-
+	
 	    if (level && !args.length) {
 	      args.push(level);
 	      level = 'debug';
@@ -492,11 +502,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var prefix = level.toUpperCase() + ': (' + this.name + ')';
 	    if (console[level]) {
 	      var _console2;
-
+	
 	      (_console2 = console)[level].apply(_console2, [prefix].concat(args));
 	    } else {
 	      var _console3;
-
+	
 	      (_console3 = console).log.apply(_console3, [prefix].concat(args));
 	    }
 	  },
@@ -534,15 +544,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  },
 	  afterPUT: function afterPUT() {},
+	  beforeUpdate: function beforeUpdate() {},
 	  update: function update(Model, id, props, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
 	    opts.op = 'update';
 	    self.dbg(opts.op, Model, id, props, opts);
 	    return resolve(self.beforeUpdate(Model, id, props, opts)).then(function () {
-	      return self.POST(self.getPath('update', Model, id, opts), self.serialize(Model, props, opts), opts);
+	      return self.PUT(self.getPath('update', Model, id, opts), self.serialize(Model, props, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
@@ -551,17 +563,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
+	  afterUpdate: function afterUpdate() {},
+	  beforeUpdateAll: function beforeUpdateAll() {},
 	  updateAll: function updateAll(Model, props, query, opts) {
 	    var self = this;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.op = 'updateAll';
-	    self.dbg(opts.op, Model, props, query, opts);
 	    deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
+	    opts.op = 'updateAll';
+	    self.dbg(opts.op, Model, props, query, opts);
 	    return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
-	      return self.PUT(self.getPath('updateAll', Model, query, opts), opts);
+	      return self.PUT(self.getPath('updateAll', Model, opts.params, opts), self.serialize(Model, props, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
@@ -569,9 +584,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return _data || data;
 	      });
 	    });
-	  }
+	  },
+	  afterUpdateAll: function afterUpdateAll() {}
 	});
-
+	
 	DSHttpAdapter.addAction = function (name, opts) {
 	  if (!name || !isString(name)) {
 	    throw new TypeError('action(name[, opts]): Expected: string, Found: ' + (typeof name === 'undefined' ? 'undefined' : _typeof(name)));
@@ -625,7 +641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return target;
 	  };
 	};
-
+	
 	DSHttpAdapter.addActions = function (opts) {
 	  opts || (opts = {});
 	  return function (target) {
@@ -635,7 +651,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return target;
 	  };
 	};
-
+	
+	DSHttpAdapter.extend = extend;
+	
 	DSHttpAdapter.version = {
 	  full: '3.0.0-alpha.2',
 	  major: parseInt('3', 10),
@@ -644,18 +662,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	  alpha:  true ? '2' : false,
 	  beta:  true ? 'false' : false
 	};
-
+	
 	module.exports = DSHttpAdapter;
 
 /***/ },
-/* 1 */,
-/* 2 */
+/* 1 */
 /***/ function(module, exports) {
 
-	module.exports = __WEBPACK_EXTERNAL_MODULE_2__;
+	module.exports = __WEBPACK_EXTERNAL_MODULE_1__;
 
 /***/ },
-/* 3 */
+/* 2 */
 /***/ function(module, exports) {
 
 	module.exports = undefined;
@@ -664,3 +681,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
+//# sourceMappingURL=js-data-fetch.js.map

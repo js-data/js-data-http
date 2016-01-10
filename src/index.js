@@ -5,6 +5,7 @@ const {
   _,
   copy,
   deepMixIn,
+  extend,
   fillIn,
   forOwn,
   isArray,
@@ -43,6 +44,8 @@ function encode (val) {
     .replace(/%24/g, '$')
     .replace(/%2C/gi, ',')
     .replace(/%20/g, '+')
+    .replace(/%5B/gi, '[')
+    .replace(/%5D/gi, ']')
 }
 
 function buildUrl (url, params) {
@@ -104,14 +107,9 @@ function DSHttpAdapter (opts) {
   self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig
   self.suffix = opts.suffix === undefined ? '' : opts.suffix
   self.useFetch = opts.useFetch === undefined ? false : opts.useFetch
-
-  // Use "window.fetch" if available and the user asks for it
-  if (hasFetch && (self.useFetch || self.http === undefined)) {
-
-  }
 }
 
-fillIn(DSHttpAdapter, {
+fillIn(DSHttpAdapter.prototype, {
 
   beforeCreate () {},
 
@@ -120,6 +118,7 @@ fillIn(DSHttpAdapter, {
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.suffix || (opts.suffix = Model.suffix)
     opts.op = 'create'
     self.dbg(opts.op, Model, props, opts)
     return resolve(self.beforeCreate(Model, props, opts)).then(function () {
@@ -131,7 +130,7 @@ fillIn(DSHttpAdapter, {
     }).then(function (response) {
       return self.deserialize(Model, response, opts)
     }).then(function (data) {
-      return resolve(self.afterCreate(Model, data, opts)).then(function (_data) {
+      return resolve(self.afterCreate(Model, props, opts, data)).then(function (_data) {
         return _data || data
       })
     })
@@ -167,6 +166,9 @@ fillIn(DSHttpAdapter, {
     if (isFunction(opts.deserialize)) {
       return opts.deserialize(Model, data, opts)
     }
+    if (isFunction(Model.deserialize)) {
+      return Model.deserialize(Model, data, opts)
+    }
     if (opts.raw) {
       return data
     }
@@ -180,6 +182,7 @@ fillIn(DSHttpAdapter, {
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.suffix || (opts.suffix = Model.suffix)
     opts.op = 'destroy'
     self.dbg(opts.op, Model, id, opts)
     return resolve(self.beforeDestroy(Model, id, opts)).then(function () {
@@ -190,11 +193,13 @@ fillIn(DSHttpAdapter, {
     }).then(function (response) {
       return self.deserialize(Model, response, opts)
     }).then(function (data) {
-      return resolve(self.afterDestroy(Model, id, data, opts)).then(function (_data) {
+      return resolve(self.afterDestroy(Model, id, opts, data)).then(function (_data) {
         return _data || data
       })
     })
   },
+
+  afterDestroy () {},
 
   beforeDestroyAll () {},
 
@@ -203,23 +208,26 @@ fillIn(DSHttpAdapter, {
     query || (query = {})
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
-    opts.op = 'destroy'
-    self.dbg(opts.op, Model, query, opts)
     deepMixIn(opts.params, query)
     opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.suffix || (opts.suffix = Model.suffix)
+    opts.op = 'destroy'
+    self.dbg(opts.op, Model, query, opts)
     return resolve(self.beforeDestroyAll(Model, query, opts)).then(function () {
       return self.DEL(
-        self.getPath('destroyAll', Model, query, opts),
+        self.getPath('destroyAll', Model, opts.params, opts),
         opts
       )
     }).then(function (response) {
       return self.deserialize(Model, response, opts)
     }).then(function (data) {
-      return resolve(self.afterDestroyAll(Model, query, data, opts)).then(function (_data) {
+      return resolve(self.afterDestroyAll(Model, query, opts, data)).then(function (_data) {
         return _data || data
       })
     })
   },
+
+  afterDestroyAll () {},
 
   error (...args) {
     if (console) {
@@ -257,6 +265,7 @@ fillIn(DSHttpAdapter, {
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.suffix || (opts.suffix = Model.suffix)
     opts.op = 'find'
     self.dbg(opts.op, Model, id, opts)
     return resolve(self.beforeFind(Model, id, opts)).then(function () {
@@ -267,7 +276,7 @@ fillIn(DSHttpAdapter, {
     }).then(function (response) {
       return self.deserialize(Model, response, opts)
     }).then(function (data) {
-      return resolve(self.afterFind(Model, id, data, opts)).then(function (_data) {
+      return resolve(self.afterFind(Model, id, opts, data)).then(function (_data) {
         return _data || data
       })
     })
@@ -275,28 +284,33 @@ fillIn(DSHttpAdapter, {
 
   afterFind () {},
 
+  beforeFindAll () {},
+
   findAll (Model, query, opts) {
     const self = this
     query || (query = {})
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
+    opts.suffix || (opts.suffix = Model.suffix)
     opts.op = 'findAll'
     self.dbg(opts.op, Model, query, opts)
     deepMixIn(opts.params, query)
     opts.params = self.queryTransform(Model, opts.params, opts)
     return resolve(self.beforeFindAll(Model, query, opts)).then(function () {
       return self.GET(
-        self.getPath('findAll', Model, query, opts),
+        self.getPath('findAll', Model, opts.params, opts),
         opts
       )
     }).then(function (response) {
       return self.deserialize(Model, response, opts)
     }).then(function (data) {
-      return resolve(self.afterFindAll(Model, query, data, opts)).then(function (_data) {
+      return resolve(self.afterFindAll(Model, query, opts, data)).then(function (_data) {
         return _data || data
       })
     })
   },
+
+  afterFindAll () {},
 
   beforeGET () {},
 
@@ -325,7 +339,7 @@ fillIn(DSHttpAdapter, {
     const parentKey = Model.parentKey
     const endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : Model.endpoint
     let parentField = Model.parentField
-    const parentDef = Model.getResource(Model.parent)
+    const parentDef = Model.parent ? Model.getResource(Model.parent) : undefined
     let parentId = opts.params[parentKey]
 
     if (parentId === false || !parentKey || !parentDef) {
@@ -364,7 +378,7 @@ fillIn(DSHttpAdapter, {
     const self = this
     opts || (opts = {})
     const args = [
-      opts.basePath === undefined ? self.basePath : opts.basePath,
+      opts.basePath === undefined ? (Model.basePath === undefined ? self.basePath : Model.basePath) : opts.basePath,
       self.getEndpoint(Model, (isString(id) || isNumber(id) || method === 'create') ? id : null, opts)
     ]
     if (method === 'find' || method === 'update' || method === 'destroy') {
@@ -492,15 +506,18 @@ fillIn(DSHttpAdapter, {
 
   afterPUT () {},
 
+  beforeUpdate () {},
+
   update (Model, id, props, opts) {
     const self = this
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.suffix || (opts.suffix = Model.suffix)
     opts.op = 'update'
     self.dbg(opts.op, Model, id, props, opts)
     return resolve(self.beforeUpdate(Model, id, props, opts)).then(function () {
-      return self.POST(
+      return self.PUT(
         self.getPath('update', Model, id, opts),
         self.serialize(Model, props, opts),
         opts
@@ -514,18 +531,24 @@ fillIn(DSHttpAdapter, {
     })
   },
 
+  afterUpdate () {},
+
+  beforeUpdateAll () {},
+
   updateAll (Model, props, query, opts) {
     const self = this
     query || (query = {})
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
-    opts.op = 'updateAll'
-    self.dbg(opts.op, Model, props, query, opts)
     deepMixIn(opts.params, query)
     opts.params = self.queryTransform(Model, opts.params, opts)
+    opts.suffix || (opts.suffix = Model.suffix)
+    opts.op = 'updateAll'
+    self.dbg(opts.op, Model, props, query, opts)
     return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
       return self.PUT(
-        self.getPath('updateAll', Model, query, opts),
+        self.getPath('updateAll', Model, opts.params, opts),
+        self.serialize(Model, props, opts),
         opts
       )
     }).then(function (response) {
@@ -535,7 +558,9 @@ fillIn(DSHttpAdapter, {
         return _data || data
       })
     })
-  }
+  },
+
+  afterUpdateAll () {}
 })
 
 DSHttpAdapter.addAction = function (name, opts) {
@@ -600,6 +625,8 @@ DSHttpAdapter.addActions = function (opts) {
     return target
   }
 }
+
+DSHttpAdapter.extend = extend
 
 DSHttpAdapter.version = {
   full: '<%= pkg.version %>',

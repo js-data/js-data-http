@@ -39,7 +39,7 @@ if (
 
 module.exports = function (config) {
   config.set({
-    basePath: './',
+    basePath: '../',
     frameworks: ['sinon', 'chai', 'mocha'],
     plugins: [
       'karma-sinon',
@@ -54,8 +54,8 @@ module.exports = function (config) {
     files: [
       'node_modules/es6-promise/dist/es6-promise.js',
       'node_modules/js-data/dist/js-data.js',
-      'dist/js-data-http.js',
-      'karma.start.js',
+      'fetch/dist/js-data-fetch.js',
+      'fetch/karma.start.js',
       'test/*.test.js'
     ],
     browserStack: {

@@ -33,31 +33,27 @@
       "after",
       "beforeEach",
       "afterEach"
-    ],
-    "ignore": [
-      "node_modules",
-      "node/dist/*",
-      "fetch/dist/*"
     ]
   },
   "scripts": {
-    "lint": "standard src/**/*.js node/**/*.js  fetch/**/*.js",
+    "lint": "standard karma.start.js karma.conf.js src/**/*.js test/*.test.js fetch/karma.*.js node/mocha.start.js",
     "webpack": "webpack --config webpack.config.js && webpack --config node/webpack.config.js && webpack --config fetch/webpack.config.js",
     "min": "uglifyjs dist/js-data-http.js -o dist/js-data-http.min.js --source-map dist/js-data-http.min.map -v -m -c --screw-ie8",
-    "min_fetch": "uglifyjs fetch/dist/js-data-fetch.js -o fetch/dist/js-data-fetch.min.js --source-map dist/js-data-fetch.min.map -v -m -c --screw-ie8",
+    "min_fetch": "uglifyjs fetch/dist/js-data-fetch.js -o fetch/dist/js-data-fetch.min.js --source-map fetch/dist/js-data-fetch.min.map -v -m -c --screw-ie8",
     "version": "node scripts/version.js",
     "banner": "node scripts/banner.js",
     "gzip": "echo js-data-http gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",
     "gzip_fetch": "echo js-data-fetch gzipped size: $(cat fetch/dist/js-data-fetch.min.js | gzip -f9 | wc -c)kb",
     "build": "npm run lint && npm run webpack && npm run min && && npm run min_fetch && npm run version && npm run banner",
     "karma": "karma start",
-    "mocha": "mocha -t 20000 -R spec -r source-map-support/register mocha.start.js node/mocha.start.js",
-    "cover": "istanbul cover -x dist/js-data-http-tests.js,node/dist/js-data-http-node-tests.js --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot -r source-map-support/register mocha.start.js node/mocha.start.js",
-    "test": "npm run build && npm run cover",
-    "ci": "npm test && cat coverage/lcov.info | coveralls || true && cat ./coverage/lcov.info | codacy-coverage || true"
+    "karma_fetch": "karma start fetch/karma.conf.js",
+    "mocha": "mocha -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
+    "cover": "istanbul cover -x node/dist/js-data-http-node-tests.js --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
+    "test": "npm run build && npm run karma && npm run karma_fetch && npm run cover",
+    "ci": "npm test && cat ./coverage/lcov.info | coveralls || true && cat ./coverage/lcov.info | codacy-coverage || true"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-alpha.1"
+    "js-data": "^3.0.0-alpha.8"
   },
   "devDependencies": {
     "axios": "0.8.1",
@@ -72,18 +68,17 @@
     "chai": "3.4.1",
     "codacy-coverage": "1.1.3",
     "coveralls": "2.11.6",
+    "es6-promise": "3.0.2",
     "istanbul": "0.4.1",
     "karma": "0.13.19",
     "karma-browserstack-launcher": "0.1.8",
     "karma-chai": "0.1.0",
-    "karma-chrome-launcher": "^0.2.2",
-    "karma-coverage": "^0.5.3",
-    "karma-firefox-launcher": "^0.1.7",
+    "karma-junit-reporter": "0.3.8",
     "karma-mocha": "0.2.1",
     "karma-phantomjs-launcher": "0.2.3",
     "karma-sinon": "1.0.4",
-    "karma-spec-reporter": "0.0.23",
     "mocha": "2.3.4",
+    "phantomjs": "1.9.19",
     "sinon": "1.17.2",
     "source-map-support": "0.4.0",
     "standard": "5.4.1",

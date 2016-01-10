@@ -1,3 +1,15 @@
+##### 3.0.0-alpha.2 - 09 January 2016
+
+###### Breaking API changes
+- All options that could be found at `DSHttpAdapter#defaults` will now be on
+the actual instances of `DSHttpAdapter`. e.g. `DSHttpAdapter#defaults.deserialize`
+is now at `DSHttpAdapter#deserialize`. This makes it easier to extend the
+`DSHttpAdapter` class and override its methods.
+
+###### Backwards compatible API changes
+- Added lifecycle methods: beforeFind, afterPOST, etc.
+- Added support for the `raw` option
+
 ##### 3.0.0-alpha.1 - 12 December 2015
 
 ###### Breaking API changes
