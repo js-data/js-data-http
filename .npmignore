@@ -1,5 +1,6 @@
 build_examples/
 coverage/
+doc/
 fetch/
 node/
 scripts/

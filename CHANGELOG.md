@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.3 - 10 January 2016
+
+###### Backwards compatible API changes
+- Added updateMany, createMany, and responseError methods.
+
 ##### 3.0.0-alpha.2 - 09 January 2016
 
 ###### Breaking API changes
