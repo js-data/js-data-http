@@ -97,17 +97,498 @@ return /******/ (function(modules) { // webpackBootstrap
 	  opts || (opts = {});
 	
 	  // Default and user-defined settings
+	  /**
+	   * @name DSHttpAdapter#basePath
+	   * @type {string}
+	   */
 	  self.basePath = opts.basePath === undefined ? '' : opts.basePath;
+	
+	  /**
+	   * @name DSHttpAdapter#debug
+	   * @type {boolean}
+	   * @default false
+	   */
 	  self.debug = opts.debug === undefined ? false : opts.debug;
+	
+	  /**
+	   * @name DSHttpAdapter#forceTrailingSlash
+	   * @type {boolean}
+	   * @default false
+	   */
 	  self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash;
+	
+	  /**
+	   * @name DSHttpAdapter#http
+	   * @type {Function}
+	   */
 	  self.http = opts.http === undefined ? axios : opts.http;
+	
+	  /**
+	   * @name DSHttpAdapter#httpConfig
+	   * @type {Object}
+	   */
 	  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig;
+	
+	  /**
+	   * @name DSHttpAdapter#suffix
+	   * @type {string}
+	   */
 	  self.suffix = opts.suffix === undefined ? '' : opts.suffix;
+	
+	  /**
+	   * @name DSHttpAdapter#useFetch
+	   * @type {boolean}
+	   * @default false
+	   */
 	  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch;
 	}
 	
 	fillIn(DSHttpAdapter.prototype, {
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#create}. If this method
+	   * returns a promise then {@link DSHttpAdapter#create} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#create}.
+	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#create}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#create}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#create} will return.
+	   */
+	
+	  afterCreate: function afterCreate() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#createMany}. If this method
+	   * returns a promise then {@link DSHttpAdapter#createMany} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#createMany}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#createMany}.
+	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#createMany}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#createMany}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#createMany} will return.
+	   */
+	  afterCreateMany: function afterCreateMany() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#DEL}. If this method
+	   * returns a promise then {@link DSHttpAdapter#DEL} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#DEL}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#DEL}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#DEL}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#DEL}.
+	   * @param {Object} response The `response` value that {@link DSHttpAdapter#DEL} will return.
+	   */
+	  afterDEL: function afterDEL() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#destroy}. If this method
+	   * returns a promise then {@link DSHttpAdapter#destroy} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#destroy}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroy}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#destroy}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroy}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#destroy} will return.
+	   */
+	  afterDestroy: function afterDestroy() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#destroyAll}. If this method
+	   * returns a promise then {@link DSHttpAdapter#destroyAll} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#destroyAll}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#destroyAll} will return.
+	   */
+	  afterDestroyAll: function afterDestroyAll() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#find}. If this method
+	   * returns a promise then {@link DSHttpAdapter#find} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#find}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#find}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#find}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#find}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#find} will return.
+	   */
+	  afterFind: function afterFind() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#findAll}. If this method
+	   * returns a promise then {@link DSHttpAdapter#findAll} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#findAll}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#findAll}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#findAll}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#findAll}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#findAll} will return.
+	   */
+	  afterFindAll: function afterFindAll() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#GET}. If this method
+	   * returns a promise then {@link DSHttpAdapter#GET} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#GET}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#GET}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#GET}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#GET}.
+	   * @param {Object} response The `response` value that {@link DSHttpAdapter#GET} will return.
+	   */
+	  afterGET: function afterGET() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#HTTP}. If this method
+	   * returns a promise then {@link DSHttpAdapter#HTTP} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#HTTP}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#HTTP}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#HTTP}.
+	   * @param {Object} response The `response` value that {@link DSHttpAdapter#HTTP} will return.
+	   */
+	  afterHTTP: function afterHTTP() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#POST}. If this method
+	   * returns a promise then {@link DSHttpAdapter#POST} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#POST}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} response The `response` value that {@link DSHttpAdapter#POST} will return.
+	   */
+	  afterPOST: function afterPOST() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#PUT}. If this method
+	   * returns a promise then {@link DSHttpAdapter#PUT} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#PUT}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} response The `response` value that {@link DSHttpAdapter#PUT} will return.
+	   */
+	  afterPUT: function afterPUT() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#update}. If this method
+	   * returns a promise then {@link DSHttpAdapter#update} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#update}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#update} will return.
+	   */
+	  afterUpdate: function afterUpdate() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#updateAll}. If this method
+	   * returns a promise then {@link DSHttpAdapter#updateAll} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#updateAll}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#updateAll} will return.
+	   */
+	  afterUpdateAll: function afterUpdateAll() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#updateMany}. If this method
+	   * returns a promise then {@link DSHttpAdapter#updateMany} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#updateMany}
+	   * will resolve with that same value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateMany}.
+	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#updateMany}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateMany}.
+	   * @param {Object} data The `data` value that {@link DSHttpAdapter#updateMany} will return.
+	   */
+	  afterUpdateMany: function afterUpdateMany() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#create}. If this method
+	   * returns a promise then {@link DSHttpAdapter#create} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#create}.
+	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#create}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#create}.
+	   */
 	  beforeCreate: function beforeCreate() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#createMany}. If this method
+	   * returns a promise then {@link DSHttpAdapter#createMany} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#createMany}.
+	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#createMany}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#createMany}.
+	   */
+	  beforeCreateMany: function beforeCreateMany() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#DEL}. If this method
+	   * returns a promise then {@link DSHttpAdapter#DEL} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
+	   * will resolve with that same value, then the `config` argument passed to
+	   * {@link DSHttpAdapter#DEL} will be replaced by the value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#DEL}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#DEL}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#DEL}.
+	   */
+	  beforeDEL: function beforeDEL() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#destroy}. If this method
+	   * returns a promise then {@link DSHttpAdapter#destroy} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroy}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#destroy}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroy}.
+	   */
+	  beforeDestroy: function beforeDestroy() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#destroyAll}. If this method
+	   * returns a promise then {@link DSHttpAdapter#destroyAll} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   */
+	  beforeDestroyAll: function beforeDestroyAll() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#find}. If this method
+	   * returns a promise then {@link DSHttpAdapter#find} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#find}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#find}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#find}.
+	   */
+	  beforeFind: function beforeFind() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#findAll}. If this method
+	   * returns a promise then {@link DSHttpAdapter#findAll} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#findAll}.
+	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#findAll}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#findAll}.
+	   */
+	  beforeFindAll: function beforeFindAll() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#GET}. If this method
+	   * returns a promise then {@link DSHttpAdapter#GET} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
+	   * will resolve with that same value, then the `config` argument passed to
+	   * {@link DSHttpAdapter#GET} will be replaced by the value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#GET}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#GET}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#GET}.
+	   */
+	  beforeGET: function beforeGET() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#HTTP}. If this method
+	   * returns a promise then {@link DSHttpAdapter#HTTP} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
+	   * will resolve with that same value, then the `config` argument passed to
+	   * {@link DSHttpAdapter#HTTP} will be replaced by the value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#HTTP}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#HTTP}.
+	   */
+	  beforeHTTP: function beforeHTTP() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#POST}. If this method
+	   * returns a promise then {@link DSHttpAdapter#POST} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
+	   * will resolve with that same value, then the `config` argument passed to
+	   * {@link DSHttpAdapter#POST} will be replaced by the value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#POST}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#POST}.
+	   */
+	  beforePOST: function beforePOST() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#PUT}. If this method
+	   * returns a promise then {@link DSHttpAdapter#PUT} will wait for the
+	   * promise to resolve before continuing. If this method returns any other
+	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
+	   * will resolve with that same value, then the `config` argument passed to
+	   * {@link DSHttpAdapter#PUT} will be replaced by the value.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#PUT}.
+	   */
+	  beforePUT: function beforePUT() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#update}. If this method
+	   * returns a promise then {@link DSHttpAdapter#update} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#update}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#update}.
+	   */
+	  beforeUpdate: function beforeUpdate() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#updateAll}. If this method
+	   * returns a promise then {@link DSHttpAdapter#updateAll} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateAll}.
+	   */
+	  beforeUpdateAll: function beforeUpdateAll() {},
+	
+	  /**
+	   * Lifecycle hook called by {@link DSHttpAdapter#updateMany}. If this method
+	   * returns a promise then {@link DSHttpAdapter#updateMany} will wait for the
+	   * promise to resolve before continuing.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateMany}.
+	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#updateMany}.
+	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateMany}.
+	   */
+	  beforeUpdateMany: function beforeUpdateMany() {},
+	
+	  /**
+	   * Create a new the entity from the provided `props`.
+	   *
+	   * {@link DSHttpAdapter#beforeCreate} will be called before calling
+	   * {@link DSHttpAdapter#POST}.
+	   * {@link DSHttpAdapter#afterCreate} will be called after calling
+	   * {@link DSHttpAdapter#POST}.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The Model.
+	   * @param {Object} props Properties to send as the payload.
+	   * @param {Object} [opts] Configuration options.
+	   * @param {string} [opts.params] TODO
+	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @return {Promise}
+	   */
 	  create: function create(Model, props, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
@@ -126,7 +607,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterCreate: function afterCreate() {},
+	
+	  /**
+	   * Create multiple new entities in batch.
+	   *
+	   * {@link DSHttpAdapter#beforeCreateMany} will be called before calling
+	   * {@link DSHttpAdapter#POST}.
+	   * {@link DSHttpAdapter#afterCreateMany} will be called after calling
+	   * {@link DSHttpAdapter#POST}.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The Model.
+	   * @param {Array} models Array of property objects to send as the payload.
+	   * @param {Object} [opts] Configuration options.
+	   * @param {string} [opts.params] TODO
+	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @return {Promise}
+	   */
+	  createMany: function createMany(Model, models, opts) {
+	    var self = this;
+	    opts = opts ? copy(opts) : {};
+	    opts.params || (opts.params = {});
+	    opts.params = self.queryTransform(Model, opts.params, opts);
+	    opts.suffix || (opts.suffix = Model.suffix);
+	    opts.op = 'createMany';
+	    self.dbg(opts.op, Model, models, opts);
+	    return resolve(self.beforeCreateMany(Model, models, opts)).then(function () {
+	      return self.POST(self.getPath('createMany', Model, null, opts), self.serialize(Model, models, opts), opts);
+	    }).then(function (response) {
+	      return self.deserialize(Model, response, opts);
+	    }).then(function (data) {
+	      return resolve(self.afterCreateMany(Model, models, opts, data)).then(function (_data) {
+	        return _data || data;
+	      });
+	    });
+	  },
+	
+	  /**
+	   * Call {@link DSHttpAdapter#log} at the "debug" level.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {...*} [args] Args passed to {@link DSHttpAdapter#log}.
+	   */
 	  dbg: function dbg() {
 	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
 	      args[_key2] = arguments[_key2];
@@ -134,7 +658,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    this.log.apply(this, ['debug'].concat(args));
 	  },
-	  beforeDEL: function beforeDEL() {},
+	
+	  /**
+	   * Make an Http request to `url` according to the configuration in `config`.
+	   *
+	   * {@link DSHttpAdapter#beforeDEL} will be called before calling
+	   * {@link DSHttpAdapter#HTTP}.
+	   * {@link DSHttpAdapter#afterDEL} will be called after calling
+	   * {@link DSHttpAdapter#HTTP}.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {string} url Url for the request.
+	   * @param {Object} [config] Http configuration that will be passed to
+	   * {@link DSHttpAdapter#HTTP}.
+	   * @param {Object} [opts] Configuration options.
+	   * @return {Promise}
+	   */
 	  DEL: function DEL(url, config, opts) {
 	    var self = this;
 	    config || (config = {});
@@ -149,17 +689,28 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterDEL: function afterDEL() {},
-	  deserialize: function deserialize(Model, data, opts) {
+	
+	  /**
+	   * Transform the server response object into the payload that will be returned
+	   * to JSData.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The Model used for the operation.
+	   * @param {Object} response Response object from {@link DSHttpAdapter#HTTP}.
+	   * @param {Object} opts Configuration options.
+	   * @return {(Object|Array)} Deserialized data.
+	   */
+	  deserialize: function deserialize(Model, response, opts) {
 	    opts || (opts = {});
 	    if (isFunction(opts.deserialize)) {
-	      return opts.deserialize(Model, data, opts);
+	      return opts.deserialize(Model, response, opts);
 	    }
 	    if (isFunction(Model.deserialize)) {
-	      return Model.deserialize(Model, data, opts);
+	      return Model.deserialize(Model, response, opts);
 	    }
 	    if (opts.raw) {
-	      return data;
+	      return response;
 	    }
 	  }, {
 	    key: 'log',
@@ -181,6 +732,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	      (_console = console)[typeof console.error === 'function' ? 'error' : 'log'].apply(_console, arguments);
 	    }
 	  },
+	
+	  /**
+	   * Make an Http request using `window.fetch`.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} config Request configuration.
+	   * @param {Object} config.data Payload for the request.
+	   * @param {string} config.method Http method for the request.
+	   * @param {Object} config.headers Headers for the request.
+	   * @param {Object} config.params Querystring for the request.
+	   * @param {string} config.url Url for the request.
+	   * @param {Object} [opts] Configuration options.
+	   */
 	  fetch: function (_fetch) {
 	    function fetch(_x, _x2) {
 	      return _fetch.apply(this, arguments);
@@ -207,7 +772,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  }),
-	  beforeFind: function beforeFind() {},
+	
+	  /**
+	   * Retrieve the entity with the given primary key.
+	   *
+	   * {@link DSHttpAdapter#beforeFind} will be called before calling
+	   * {@link DSHttpAdapter#GET}.
+	   * {@link DSHttpAdapter#afterFind} will be called after calling
+	   * {@link DSHttpAdapter#GET}.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The Model.
+	   * @param {(string|number)} id Primary key of the entity to retrieve.
+	   * @param {Object} [opts] Configuration options.
+	   * @param {string} [opts.params] TODO
+	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @return {Promise}
+	   */
 	  find: function find(Model, id, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
@@ -226,8 +808,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterFind: function afterFind() {},
-	  beforeFindAll: function beforeFindAll() {},
+	
+	  /**
+	   * Retrieve the entities that match the selection `query`.
+	   *
+	   * {@link DSHttpAdapter#beforeFindAll} will be called before calling
+	   * {@link DSHttpAdapter#GET}.
+	   * {@link DSHttpAdapter#afterFindAll} will be called after calling
+	   * {@link DSHttpAdapter#GET}.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {Object} Model The Model.
+	   * @param {Object} query Selection query.
+	   * @param {Object} [opts] Configuration options.
+	   * @param {string} [opts.params] TODO
+	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @return {Promise}
+	   */
 	  findAll: function findAll(Model, query, opts) {
 	    var self = this;
 	    query || (query = {});
@@ -248,8 +846,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterFindAll: function afterFindAll() {},
-	  beforeGET: function beforeGET() {},
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {string} url The url for the request.
+	   * @param {Object} config Request configuration options.
+	   * @param {Object} [opts] Configuration options.
+	   * @return {Promise}
+	   */
 	  GET: function GET(url, config, opts) {
 	    var self = this;
 	    config || (config = {});
@@ -264,7 +871,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterGET: function afterGET() {},
+	
+	  /**
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} Model { description }
+	   * @param {*} id { description }
+	   * @param {boolean} opts { description }
+	   * @return {string} Full path.
+	   */
 	  getEndpoint: function getEndpoint(Model, id, opts) {
 	    var _this = this;
 	
@@ -488,7 +1103,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      (_console3 = console).log.apply(_console3, [prefix].concat(args));
 	    }
 	  },
-	  beforePOST: function beforePOST() {},
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} url { description }
+	   * @param {*} data { description }
+	   * @param {*} config { description }
+	   * @param {Object} [opts] Configuration options.
+	   * @return {Promise}
+	   */
 	  POST: function POST(url, data, config, opts) {
 	    var self = this;
 	    config || (config = {});
@@ -504,8 +1130,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterPOST: function afterPOST() {},
-	  beforePUT: function beforePUT() {},
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} url { description }
+	   * @param {*} data { description }
+	   * @param {*} config { description }
+	   * @param {Object} [opts] Configuration options.
+	   * @return {Promise}
+	   */
 	  PUT: function PUT(url, data, config, opts) {
 	    var self = this;
 	    config || (config = {});
@@ -521,8 +1157,77 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterPUT: function afterPUT() {},
-	  beforeUpdate: function beforeUpdate() {},
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} Model { description }
+	   * @param {*} params { description }
+	   * @param {*} opts { description }
+	   * @return {*} Transformed params.
+	   */
+	  queryTransform: function queryTransform(Model, params, opts) {
+	    opts || (opts = {});
+	    if (isFunction(opts.queryTransform)) {
+	      return opts.queryTransform(Model, params, opts);
+	    }
+	    if (isFunction(Model.queryTransform)) {
+	      return Model.queryTransform(Model, params, opts);
+	    }
+	    return params;
+	  },
+	
+	  /**
+	   * Error handler invoked when the promise returned by {@link DSHttpAdapter#http}
+	   * is rejected. Default implementation is to just return the error wrapped in
+	   * a rejected Promise, aka rethrow the error. {@link DSHttpAdapter#http} is
+	   * called by {@link DSHttpAdapter#HTTP}.
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} err The error that {@link DSHttpAdapter#http} rejected with.
+	   * @param {*} config The `config` argument that was passed to {@link DSHttpAdapter#HTTP}.
+	   * @param {*} opts The `opts` argument that was passed to {@link DSHttpAdapter#HTTP}.
+	   * @return {Promise}
+	   */
+	  responseError: function responseError(err, config, opts) {
+	    return reject(err);
+	  },
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} Model { description }
+	   * @param {*} data { description }
+	   * @param {*} opts { description }
+	   * @return {*} Serialized data.
+	   */
+	  serialize: function serialize(Model, data, opts) {
+	    opts || (opts = {});
+	    if (isFunction(opts.serialize)) {
+	      return opts.serialize(Model, data, opts);
+	    }
+	    if (isFunction(Model.serialize)) {
+	      return Model.serialize(Model, data, opts);
+	    }
+	    return data;
+	  },
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} Model { description }
+	   * @param {*} id { description }
+	   * @param {*} props { description }
+	   * @param {Object} [opts] Configuration options.
+	   * @return {Promise}
+	   */
 	  update: function update(Model, id, props, opts) {
 	    var self = this;
 	    opts = opts ? copy(opts) : {};
@@ -541,8 +1246,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	      });
 	    });
 	  },
-	  afterUpdate: function afterUpdate() {},
-	  beforeUpdateAll: function beforeUpdateAll() {},
+	
+	  /**
+	   * { function_description }
+	   *
+	   * @memberof DSHttpAdapter
+	   * @instance
+	   * @param {*} Model { description }
+	   * @param {*} props { description }
+	   * @param {*} query { description }
+	   * @param {Object} [opts] Configuration options.
+	   * @return {Promise}
+	   */
 	  updateAll: function updateAll(Model, props, query, opts) {
 	    var self = this;
 	    query || (query = {});
@@ -554,7 +1269,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    opts.op = 'updateAll';
 	    self.dbg(opts.op, Model, props, query, opts);
 	    return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
-	      return self.PUT(self.getPath('updateAll', Model, opts.params, opts), self.serialize(Model, props, opts), opts);
+	      return self.PUT(self.getPath('updateAll', Model, null, opts), self.serialize(Model, props, opts), opts);
 	    }).then(function (response) {
 	      return self.deserialize(Model, response, opts);
 	    }).then(function (data) {
@@ -567,8 +1282,68 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return DSHttpAdapter;
 	}();
 	
+	/**
+	 * Alternative to ES6 class syntax for extending `DSHttpAdapter`.
+	 *
+	 * __ES6__:
+	 * ```javascript
+	 * class MyHttpAdapter extends DSHttpAdapter {
+	 *   deserialize (Model, data, opts) {
+	 *     const data = super.deserialize(Model, data, opts)
+	 *     data.foo = 'bar'
+	 *     return data
+	 *   }
+	 * }
+	 * ```
+	 *
+	 * __ES5__:
+	 * ```javascript
+	 * var instanceProps = {
+	 *   // override deserialize
+	 *   deserialize: function (Model, data, opts) {
+	 *     var Ctor = this.constructor
+	 *     var superDeserialize = (Ctor.__super__ || Object.getPrototypeOf(Ctor)).deserialize
+	 *     // call the super deserialize
+	 *     var data = superDeserialize(Model, data, opts)
+	 *     data.foo = 'bar'
+	 *     return data
+	 *   },
+	 *   say: function () { return 'hi' }
+	 * }
+	 * var classProps = {
+	 *   yell: function () { return 'HI' }
+	 * }
+	 *
+	 * var MyHttpAdapter = DSHttpAdapter.extend(instanceProps, classProps)
+	 * var adapter = new MyHttpAdapter()
+	 * adapter.say() // "hi"
+	 * MyHttpAdapter.yell() // "HI"
+	 * ```
+	 *
+	 * @name DSHttpAdapter.extend
+	 * @method
+	 * @param {Object} [instanceProps] Properties that will be added to the
+	 * prototype of the subclass.
+	 * @param {Object} [classProps] Properties that will be added as static
+	 * properties to the subclass itself.
+	 * @return {Object} Subclass of `DSHttpAdapter`.
+	 */
 	DSHttpAdapter.extend = extend;
 	
+	/**
+	 * Details of the current version of the `js-data-http` module.
+	 *
+	 * @name DSHttpAdapter.version
+	 * @type {Object}
+	 * @property {string} version.full The full semver value.
+	 * @property {number} version.major The major version number.
+	 * @property {number} version.minor The minor version number.
+	 * @property {number} version.patch The patch version number.
+	 * @property {(string|boolean)} version.alpha The alpha version value,
+	 * otherwise `false` if the current version is not alpha.
+	 * @property {(string|boolean)} version.beta The beta version value,
+	 * otherwise `false` if the current version is not beta.
+	 */
 	DSHttpAdapter.version = {
 	  full: '2.2.1',
 	  major: parseInt('2', 10),
@@ -577,6 +1352,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	  alpha:  true ? 'false' : false,
 	  beta:  true ? 'false' : false
 	};
+	
+	/**
+	 * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
+	 * that works on Node.js is registered in NPM as `js-data-http-node`. The build
+	 * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
+	 * as `js-data-fetch`.
+	 *
+	 * __Script tag__:
+	 * ```javascript
+	 * window.DSHttpAdapter
+	 * ```
+	 * __CommonJS__:
+	 * ```javascript
+	 * var DSHttpAdapter = require('js-data-http')
+	 * ```
+	 * __ES6 Modules__:
+	 * ```javascript
+	 * import DSHttpAdapter from 'js-data-http'
+	 * ```
+	 * __AMD__:
+	 * ```javascript
+	 * define('myApp', ['js-data-http'], function (DSHttpAdapter) { ... })
+	 * ```
+	 *
+	 * @module js-data-http
+	 */
 	
 	module.exports = DSHttpAdapter;
 

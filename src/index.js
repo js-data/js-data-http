@@ -11,6 +11,7 @@ let { deepMixIn, removeCircular, copy, makePath, isString, isNumber } = DSUtils
 /**
  * DSHttpAdapter class.
  * @class DSHttpAdapter
+ * @alias DSHttpAdapter
  *
  * @param {Object} [opts] Configuration options.
  * @param {string} [opts.basePath='']
@@ -28,12 +29,49 @@ function DSHttpAdapter (opts) {
   opts || (opts = {})
 
   // Default and user-defined settings
+  /**
+   * @name DSHttpAdapter#basePath
+   * @type {string}
+   */
   self.basePath = opts.basePath === undefined ? '' : opts.basePath
+
+  /**
+   * @name DSHttpAdapter#debug
+   * @type {boolean}
+   * @default false
+   */
   self.debug = opts.debug === undefined ? false : opts.debug
+
+  /**
+   * @name DSHttpAdapter#forceTrailingSlash
+   * @type {boolean}
+   * @default false
+   */
   self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash
+
+  /**
+   * @name DSHttpAdapter#http
+   * @type {Function}
+   */
   self.http = opts.http === undefined ? axios : opts.http
+
+  /**
+   * @name DSHttpAdapter#httpConfig
+   * @type {Object}
+   */
   self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig
+
+  /**
+   * @name DSHttpAdapter#suffix
+   * @type {string}
+   */
   self.suffix = opts.suffix === undefined ? '' : opts.suffix
+
+  /**
+   * @name DSHttpAdapter#useFetch
+   * @type {boolean}
+   * @default false
+   */
   self.useFetch = opts.useFetch === undefined ? false : opts.useFetch
 
   log () {}
@@ -43,8 +81,22 @@ function DSHttpAdapter (opts) {
 
 let defaultsPrototype = Defaults.prototype
 
-  beforeDEL () {},
-
+  /**
+   * Make an Http request to `url` according to the configuration in `config`.
+   *
+   * {@link DSHttpAdapter#beforeDEL} will be called before calling
+   * {@link DSHttpAdapter#HTTP}.
+   * {@link DSHttpAdapter#afterDEL} will be called after calling
+   * {@link DSHttpAdapter#HTTP}.
+   *
+   * @memberof DSHttpAdapter
+   * @instance
+   * @param {string} url Url for the request.
+   * @param {Object} [config] Http configuration that will be passed to
+   * {@link DSHttpAdapter#HTTP}.
+   * @param {Object} [opts] Configuration options.
+   * @return {Promise}
+   */
   DEL (url, config, opts) {
     const self = this
     config || (config = {})
@@ -75,6 +127,19 @@ class DSHttpAdapter {
     }
   },
 
+  /**
+   * Make an Http request using `window.fetch`.
+   *
+   * @memberof DSHttpAdapter
+   * @instance
+   * @param {Object} config Request configuration.
+   * @param {Object} config.data Payload for the request.
+   * @param {string} config.method Http method for the request.
+   * @param {Object} config.headers Headers for the request.
+   * @param {Object} config.params Querystring for the request.
+   * @param {string} config.url Url for the request.
+   * @param {Object} [opts] Configuration options.
+   */
   fetch (config, opts) {
     const requestConfig = {
       method: config.method,
@@ -353,8 +418,68 @@ class DSHttpAdapter {
   }
 }
 
+/**
+ * Alternative to ES6 class syntax for extending `DSHttpAdapter`.
+ *
+ * __ES6__:
+ * ```javascript
+ * class MyHttpAdapter extends DSHttpAdapter {
+ *   deserialize (Model, data, opts) {
+ *     const data = super.deserialize(Model, data, opts)
+ *     data.foo = 'bar'
+ *     return data
+ *   }
+ * }
+ * ```
+ *
+ * __ES5__:
+ * ```javascript
+ * var instanceProps = {
+ *   // override deserialize
+ *   deserialize: function (Model, data, opts) {
+ *     var Ctor = this.constructor
+ *     var superDeserialize = (Ctor.__super__ || Object.getPrototypeOf(Ctor)).deserialize
+ *     // call the super deserialize
+ *     var data = superDeserialize(Model, data, opts)
+ *     data.foo = 'bar'
+ *     return data
+ *   },
+ *   say: function () { return 'hi' }
+ * }
+ * var classProps = {
+ *   yell: function () { return 'HI' }
+ * }
+ *
+ * var MyHttpAdapter = DSHttpAdapter.extend(instanceProps, classProps)
+ * var adapter = new MyHttpAdapter()
+ * adapter.say() // "hi"
+ * MyHttpAdapter.yell() // "HI"
+ * ```
+ *
+ * @name DSHttpAdapter.extend
+ * @method
+ * @param {Object} [instanceProps] Properties that will be added to the
+ * prototype of the subclass.
+ * @param {Object} [classProps] Properties that will be added as static
+ * properties to the subclass itself.
+ * @return {Object} Subclass of `DSHttpAdapter`.
+ */
 DSHttpAdapter.extend = extend
 
+/**
+ * Details of the current version of the `js-data-http` module.
+ *
+ * @name DSHttpAdapter.version
+ * @type {Object}
+ * @property {string} version.full The full semver value.
+ * @property {number} version.major The major version number.
+ * @property {number} version.minor The minor version number.
+ * @property {number} version.patch The patch version number.
+ * @property {(string|boolean)} version.alpha The alpha version value,
+ * otherwise `false` if the current version is not alpha.
+ * @property {(string|boolean)} version.beta The beta version value,
+ * otherwise `false` if the current version is not beta.
+ */
 DSHttpAdapter.version = {
   full: '<%= pkg.version %>',
   major: parseInt('<%= major %>', 10),
@@ -363,5 +488,31 @@ DSHttpAdapter.version = {
   alpha: '<%= alpha %>' !== 'false' ? '<%= alpha %>' : false,
   beta: '<%= beta %>' !== 'false' ? '<%= beta %>' : false
 }
+
+/**
+ * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
+ * that works on Node.js is registered in NPM as `js-data-http-node`. The build
+ * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
+ * as `js-data-fetch`.
+ *
+ * __Script tag__:
+ * ```javascript
+ * window.DSHttpAdapter
+ * ```
+ * __CommonJS__:
+ * ```javascript
+ * var DSHttpAdapter = require('js-data-http')
+ * ```
+ * __ES6 Modules__:
+ * ```javascript
+ * import DSHttpAdapter from 'js-data-http'
+ * ```
+ * __AMD__:
+ * ```javascript
+ * define('myApp', ['js-data-http'], function (DSHttpAdapter) { ... })
+ * ```
+ *
+ * @module js-data-http
+ */
 
 module.exports = DSHttpAdapter
