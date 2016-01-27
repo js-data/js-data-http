@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Js-data-http by js-data</title>
+    <title>js-data-http by js-data</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/github-light.css">
@@ -15,7 +15,7 @@
   <body>
     <div class="wrapper">
       <header>
-        <h1>Js-data-http</h1>
+        <h1>js-data-http</h1>
         <p>Http adapter for js-data</p>
 
         <p class="view"><a href="https://github.com/js-data/js-data-http">View the Project on GitHub <small>js-data/js-data-http</small></a></p>
@@ -28,109 +28,17 @@
         </ul>
       </header>
       <section>
-        <p><img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="64" height="64"></p>
+        <p><img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="96" height="96"></p>
 
-<h2>
-<a id="js-data-http------" class="anchor" href="#js-data-http------" aria-hidden="true"><span class="octicon octicon-link"></span></a>js-data-http <a href="http://slack.js-data.io"><img src="http://slack.js-data.io/badge.svg" alt="Slack Status"></a> <a href="https://www.npmjs.org/package/js-data-http"><img src="https://img.shields.io/npm/v/js-data-http.svg?style=flat" alt="npm version"></a> <a href="https://circleci.com/gh/js-data/js-data-http/tree/master"><img src="https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat" alt="Circle CI"></a> <a href="https://www.npmjs.org/package/js-data-http"><img src="https://img.shields.io/npm/dm/js-data-http.svg?style=flat" alt="npm downloads"></a> <a href="https://coveralls.io/github/js-data/js-data-http?branch=master"><img src="https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat" alt="Coverage Status"></a> <a href="https://www.codacy.com/app/jasondobry/js-data-http/dashboard"><img src="https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg" alt="Codacy"></a>
-</h2>
+<h1>
+<a id="js-data-http-api-reference-docs" class="anchor" href="#js-data-http-api-reference-docs" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>js-data-http API Reference Docs</h1>
 
-<p>HTTP adapter for <a href="http://www.js-data.io/">js-data</a>.</p>
-
-<h3>
-<a id="api-documentation" class="anchor" href="#api-documentation" aria-hidden="true"><span class="octicon octicon-link"></span></a>API Documentation</h3>
-
-<p><a href="http://www.js-data.io/docs/dshttpadapter">DSHttpAdapter</a></p>
-
-<h3>
-<a id="quick-start" class="anchor" href="#quick-start" aria-hidden="true"><span class="octicon octicon-link"></span></a>Quick Start</h3>
-
-<p><code>npm install --save js-data js-data-http</code> or <code>bower install --save js-data js-data-http</code>.</p>
-
-<p>Load <code>js-data-http.js</code> after <code>js-data.js</code>.</p>
-
-<div class="highlight highlight-source-js"><pre><span class="pl-k">var</span> adapter <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">DSHttpAdapter</span>();
-
-<span class="pl-k">var</span> store <span class="pl-k">=</span> <span class="pl-k">new</span> <span class="pl-en">JSData.DS</span>();
-store.registerAdapter(<span class="pl-s"><span class="pl-pds">'</span>http<span class="pl-pds">'</span></span>, adapter, { <span class="pl-k">default</span><span class="pl-k">:</span> <span class="pl-c1">true</span> });
-
-<span class="pl-c">// "store" will now use the http adapter for all async operations</span></pre></div>
-
-<h3>
-<a id="changelog" class="anchor" href="#changelog" aria-hidden="true"><span class="octicon octicon-link"></span></a>Changelog</h3>
-
-<p><a href="https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md">CHANGELOG.md</a></p>
-
-<h3>
-<a id="community" class="anchor" href="#community" aria-hidden="true"><span class="octicon octicon-link"></span></a>Community</h3>
+<p>For Getting Started guides, visit <strong><a href="http://www.js-data.io">http://js-data.io</a></strong>!</p>
 
 <ul>
-<li>
-<a href="http://slack.js-data.io">Slack Channel</a> - Better than IRC!</li>
-<li><a href="http://www.js-data.io/blog">Announcements</a></li>
-<li>
-<a href="https://groups.io/org/groupsio/jsdata">Mailing List</a> - Ask your questions!</li>
-<li>
-<a href="https://github.com/js-data/js-data-http/issues">Issues</a> - Found a bug? Feature request? Submit an issue!</li>
-<li>
-<a href="https://github.com/js-data/js-data-http">GitHub</a> - View the source code for js-data.</li>
-<li><a href="https://github.com/js-data/js-data-http/blob/master/CONTRIBUTING.md">Contributing Guide</a></li>
+<li><a href="http://api.js-data.io/js-data-http/3.0.0-alpha.3/index.html">3.0.0-alpha.3</a></li>
+<li><a href="http://js-data.io/v2.8/docs/home">2.x</a></li>
 </ul>
-
-<h3>
-<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h3>
-
-<p>First, support is handled via the <a href="http://slack.js-data.io">Slack Channel</a> and the <a href="https://groups.io/org/groupsio/jsdata">Mailing List</a>. Ask your questions there.</p>
-
-<p>When submitting issues on GitHub, please include as much detail as possible to make debugging quick and easy.</p>
-
-<ul>
-<li>good - Your versions of js-data, js-data-http, etc., relevant console logs/error, code examples that revealed the issue</li>
-<li>better - A <a href="http://plnkr.co/">plnkr</a>, <a href="http://jsfiddle.net/">fiddle</a>, or <a href="http://jsbin.com/?html,output">bin</a> that demonstrates the issue</li>
-<li>best - A Pull Request that fixes the issue, including test coverage for the issue and the fix</li>
-</ul>
-
-<p><a href="https://github.com/js-data/js-data-http/issues">Github Issues</a>.</p>
-
-<h4>
-<a id="submitting-pull-requests" class="anchor" href="#submitting-pull-requests" aria-hidden="true"><span class="octicon octicon-link"></span></a>Submitting Pull Requests</h4>
-
-<ol>
-<li>Contribute to the issue/discussion that is the reason you'll be developing in the first place</li>
-<li>Fork js-data-http</li>
-<li><code>git clone git@github.com:&lt;you&gt;/js-data-http.git</code></li>
-<li><code>cd js-data-http; npm install;</code></li>
-<li>Write your code, including relevant documentation and tests</li>
-<li>Run <code>npm test</code> (build and test)</li>
-<li>Your code will be linted and checked for formatting, the tests will be run</li>
-<li>The <code>dist/</code> folder &amp; files will be generated, do NOT commit <code>dist/*</code>! They will be committed when a release is cut.</li>
-<li>Submit your PR and we'll review!</li>
-<li>Thanks!</li>
-</ol>
-
-<h3>
-<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h3>
-
-<p>The MIT License (MIT)</p>
-
-<p>Copyright (c) 2014-2015 Jason Dobry</p>
-
-<p>Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:</p>
-
-<p>The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.</p>
-
-<p>THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/js-data">js-data</a></p>
