@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<title>js-data-http Index</title>
+
+	<!--[if lt IE 9]>
+	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<link type="text/css" rel="stylesheet" href="styles/sunlight.dark.css">
+
+	<link type="text/css" rel="stylesheet" href="styles/site.lumen.css">
+
+</head>
+
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top ">
+<div class="container">
+	<div class="navbar-header">
+		<a class="navbar-brand" href="index.html">js-data-http</a>
+		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+        </button>
+	</div>
+	<div class="navbar-collapse collapse" id="topNavigation">
+		<ul class="nav navbar-nav">
+			
+			<li class="dropdown">
+				<a href="modules.list.html" class="dropdown-toggle" data-toggle="dropdown">Modules<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="module-js-data-http.html">js-data-http</a></li>
+				</ul>
+			</li>
+			
+			<li class="dropdown">
+				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
+				<ul class="dropdown-menu ">
+					<li><a href="DSHttpAdapter.html">DSHttpAdapter</a></li>
+				</ul>
+			</li>
+			
+		</ul>
+		<div class="col-sm-3 col-md-3">
+            <form class="navbar-form" role="search">
+                <div class="input-group">
+                    <input type="text" class="form-control" placeholder="Search" name="q" id="search-input">
+                    <div class="input-group-btn">
+                        <button class="btn btn-default" id="search-submit"><i class="glyphicon glyphicon-search"></i></button>
+                    </div>
+                </div>
+            </form>
+        </div>
+	</div>
+
+</div>
+</div>
+
+
+<div class="container" id="toc-content">
+<div class="row">
+
+	
+	<div class="col-md-8">
+	
+		<div id="main">
+			
+
+	
+	
+
+
+
+    <h3>js-data-http 3.0.0-alpha.3</h3>
+
+
+
+
+
+
+
+
+
+	
+	
+
+
+
+
+
+    <section class="readme-section">
+        <article><p><img src="https://raw.githubusercontent.com/js-data/js-data/master/js-data.png" alt="js-data logo" title="js-data" align="right" width="96" height="96" /></p>
+<h1>js-data-http</h1><p><a href="http://slack.js-data.io"><img src="http://slack.js-data.io/badge.svg" alt="Slack Status"></a>
+<a href="https://www.npmjs.org/package/js-data-http"><img src="https://img.shields.io/npm/v/js-data-http.svg?style=flat" alt="npm version"></a>
+<a href="https://circleci.com/gh/js-data/js-data-http/tree/master"><img src="https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat" alt="Circle CI"></a>
+<a href="https://www.npmjs.org/package/js-data-http"><img src="https://img.shields.io/npm/dm/js-data-http.svg?style=flat" alt="npm downloads"></a>
+<a href="https://coveralls.io/github/js-data/js-data-http?branch=master"><img src="https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat" alt="Coverage Status"></a>
+<a href="https://www.codacy.com/app/jasondobry/js-data-http/dashboard"><img src="https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg" alt="Codacy"></a></p>
+<p>This repo contains HTTP adapters for <a href="http://www.js-data.io/">js-data</a>:</p>
+<ul>
+<li>js-data-http - HTTP (XHR, includes <a href="https://github.com/mzabriskie/axios">axios</a>) adapter for js-data in the
+browser. Capable of using <code>window.fetch</code> instead of axios.</li>
+<li>js-data-fetch - Same as js-data-http but doesn't include axios and will use
+<code>window.fetch</code> if available and if you don't provide your own http library.</li>
+<li>js-data-http-node - Same as js-data-http but runs on Node.js. Depends on axios
+and will use axios unless you provide a different http library.</li>
+</ul>
+<p>Tested on IE9, Chrome 46, Firefox 41 &amp; Safari 7.1 using
+<img src="https://raw.githubusercontent.com/js-data/js-data-localstorage/master/bs.jpg" alt="bs logo" title="browserstack" width="150" height="35" style="vertical-align: middle" /></p>
+<h2>Table of contents</h2><ul>
+<li><a href="#quick-start">Quick start</a></li>
+<li><a href="#dependencies">Dependencies</a></li>
+<li><a href="#documentation">Documentation</a></li>
+<li><a href="#api-reference">API Reference</a></li>
+<li><a href="#support">Support</a></li>
+<li><a href="#community">Community</a></li>
+<li><a href="#contributing">Contributing</a></li>
+<li><a href="#license">License</a></li>
+</ul>
+<h2>Quick Start</h2><h4>Browser</h4><p><code>bower install --save js-data js-data-http</code> or <code>npm install --save js-data js-data-http</code>.</p>
+<p><strong>ES6</strong></p>
+<pre class="prettyprint source lang-js"><code>const adapter = new DSHttpAdapter()
+
+class Base extends JSData.Model {}
+Base.registerAdapter('http', adapter, { default: true })
+
+class School extends Model {}
+class Student extends Model {}
+
+// &quot;School&quot; and &quot;Student&quot; will now use the http adapter by default</code></pre><p><strong>ES5</strong></p>
+<pre class="prettyprint source lang-js"><code>var adapter = new DSHttpAdapter()
+
+var Base = JSData.Model.extend({}, { name: 'Base' })
+Base.registerAdapter('http', adapter, { default: true })
+
+var School = Base.extend({}, { name: 'School' })
+var Student = Base.extend({}, { name: 'Student' })
+
+// &quot;School&quot; and &quot;Student&quot; will now use the http adapter by default</code></pre><h4>Node.js</h4><p><code>npm install --save axios js-data js-data-http-node</code></p>
+<p><strong>ES6</strong></p>
+<pre class="prettyprint source lang-js"><code>import {Model} from 'js-data'
+import DSHttpAdapter from 'js-data-http-node'
+
+const adapter = new DSHttpAdapter()
+
+class Base extends Model {}
+Base.registerAdapter('http', adapter, { default: true })
+
+class School extends Model {}
+class Student extends Model {}
+
+// &quot;School&quot; and &quot;Student&quot; will now use the http adapter by default</code></pre><p><strong>ES5</strong></p>
+<pre class="prettyprint source lang-js"><code>var JSData = require('js-data')
+var Model = JSData.Model
+var DSHttpAdapter = require('js-data-http-node')
+
+var adapter = new DSHttpAdapter()
+
+var Base = Model.extend({}, { name: 'Base' })
+Base.registerAdapter('http', adapter, { default: true })
+
+var School = Base.extend({}, { name: 'School' })
+var Student = Base.extend({}, { name: 'Student' })
+
+// &quot;School&quot; and &quot;Student&quot; will now use the http adapter by default</code></pre><h2>Dependencies</h2><p><code>js-data-http</code> bundles axios and depends on <code>js-data</code>. <code>js-data-fetch</code> depends
+on <code>js-data</code>. <code>js-data-http-node</code> depends on <code>js-data</code> and optionally axios.</p>
+<p>See <a href="https://github.com/js-data/js-data/blob/master/README.md#dependencies">JSData's dependencies</a>.</p>
+<h2>Documentation</h2><ul>
+<li><a href="http://www.js-data.io/docs/home">Getting Started with js-data</a></li>
+<li><a href="http://www.js-data.io/docs/js-data-http">js-data-http</a></li>
+<li><a href="https://github.com/js-data/js-data-http/blob/master/CHANGELOG.md">CHANGELOG.md</a></li>
+</ul>
+<h2>API Reference</h2><ul>
+<li><a href="http://www.js-data.io/docs/ds">DS</a></li>
+<li><a href="http://www.js-data.io/docs/dshttpadapter">DSHttpAdapter</a></li>
+</ul>
+<h2>Support</h2><p>Support questions are handled via <a href="http://stackoverflow.com/questions/tagged/jsdata">Stack Overflow</a>, <a href="http://slack.js-data.io">Slack</a>, and the
+<a href="https://groups.io/org/groupsio/jsdata">Mailing List</a>. Ask your questions there.</p>
+<h2>Community</h2><ul>
+<li><a href="http://stackoverflow.com/questions/tagged/jsdata">Stack Overflow</a></li>
+<li><a href="http://slack.js-data.io">Slack chat</a></li>
+<li><a href="http://www.js-data.io/blog">Announcements</a></li>
+<li><a href="https://groups.io/org/groupsio/jsdata">Mailing List</a></li>
+<li><a href="https://github.com/js-data/js-data-http/issues">Issue Tracker</a></li>
+<li><a href="https://github.com/js-data/js-data-http">GitHub</a></li>
+<li><a href="https://github.com/js-data/js-data-http/blob/master/CONTRIBUTING.md">Contributing Guide</a></li>
+</ul>
+<h2>Contributing</h2><p>First, support is handled via the <a href="http://slack.js-data.io">Slack Channel</a> and the
+<a href="https://groups.io/org/groupsio/jsdata">Mailing List</a>. Ask your questions there.</p>
+<p>When submitting issues on GitHub, please include as much detail as possible to
+make debugging quick and easy.</p>
+<ul>
+<li>good - Your versions of js-data, js-data-http, etc., relevant console logs/error,
+code examples that revealed the issue</li>
+<li>better - A <a href="http://plnkr.co/">plnkr</a>, <a href="http://jsfiddle.net/">fiddle</a>, or
+<a href="http://jsbin.com/?html,output">bin</a> that demonstrates the issue</li>
+<li>best - A Pull Request that fixes the issue, including test coverage for the
+issue and the fix</li>
+</ul>
+<h4>Pull Requests</h4><ol>
+<li>Contribute to the issue/discussion that is the reason you'll be developing in
+the first place</li>
+<li>Fork js-data-http</li>
+<li><code>git clone git@github.com:&lt;you&gt;/js-data-http.git</code></li>
+<li><code>cd js-data-http; npm install;</code></li>
+<li>Write your code, including relevant documentation and tests</li>
+<li>Run <code>npm test</code> (build and test)</li>
+<li>Your code will be linted and checked for formatting, the tests will be run</li>
+<li>The <code>dist/</code> folder &amp; files will be generated, do NOT commit <code>dist/*</code>! They
+will be committed when a release is cut.</li>
+<li>Submit your PR and we'll review!</li>
+<li>Thanks!</li>
+</ol>
+<h3>License</h3><p>The MIT License (MIT)</p>
+<p>Copyright (c) 2014-2016 Jason Dobry</p>
+<p>Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the &quot;Software&quot;), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:</p>
+<p>The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.</p>
+<p>THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.</p></article>
+    </section>
+
+
+
+
+
+
+
+		</div>
+	</div>
+
+	<div class="clearfix"></div>
+
+	
+		<div class="col-md-3">
+			<div id="toc" class="col-md-3 hidden-xs hidden-sm hidden-md"></div>
+		</div>
+	
+
+</div>
+</div>
+
+<div class="modal fade" id="searchResults">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Search results</h4>
+      </div>
+      <div class="modal-body"></div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+      </div>
+    </div><!-- /.modal-content -->
+  </div><!-- /.modal-dialog -->
+</div>
+
+<footer>
+
+	<div style="text-align:center">Back to <a href="http://js-data.io">js-data.io</a></div>
+
+
+	<span class="copyright">
+	js-data-http Copyright © 2014-2016 Jason Dobry
+	</span>
+
+<span class="jsdoc-message">
+	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
+	
+		on 2016-01-27T00:16:20+00:00
+	
+	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
+</span>
+</footer>
+
+<script src="scripts/docstrap.lib.js"></script>
+<script src="scripts/toc.js"></script>
+<script type="text/javascript" src="scripts/fulltext-search-ui.js"></script>
+
+<script>
+$( function () {
+	$( "[id*='$']" ).each( function () {
+		var $this = $( this );
+
+		$this.attr( "id", $this.attr( "id" ).replace( "$", "__" ) );
+	} );
+
+	$( ".tutorial-section pre, .readme-section pre" ).each( function () {
+		var $this = $( this );
+
+		var example = $this.find( "code" );
+		exampleText = example.html();
+		var lang = /{@lang (.*?)}/.exec( exampleText );
+		if ( lang && lang[1] ) {
+			exampleText = exampleText.replace( lang[0], "" );
+			example.html( exampleText );
+			lang = lang[1];
+		} else {
+			var langClassMatch = example.parent()[0].className.match(/lang\-(\S+)/);
+			lang = langClassMatch ? langClassMatch[1] : "javascript";
+		}
+
+		if ( lang ) {
+
+			$this
+			.addClass( "sunlight-highlight-" + lang )
+			.addClass( "linenums" )
+			.html( example.html() );
+
+		}
+	} );
+
+	Sunlight.highlightAll( {
+		lineNumbers : true,
+		showMenu : true,
+		enableDoclinks : true
+	} );
+
+	$.catchAnchorLinks( {
+        navbarOffset: 10
+	} );
+	$( "#toc" ).toc( {
+		anchorName  : function ( i, heading, prefix ) {
+			var id = $( heading ).attr( "id" );
+			return id && id.replace(/\~/g, '-inner-').replace(/\./g, '-static-') || ( prefix + i );
+		},
+		selectors   : "#toc-content h1,#toc-content h2,#toc-content h3,#toc-content h4",
+		showAndHide : false,
+		smoothScrolling: true
+	} );
+
+	$( "#main span[id^='toc']" ).addClass( "toc-shim" );
+	$( '.dropdown-toggle' ).dropdown();
+
+    $( "table" ).each( function () {
+      var $this = $( this );
+      $this.addClass('table');
+    } );
+
+} );
+</script>
+
+
+
+<!--Navigation and Symbol Display-->
+
+
+<!--Google Analytics-->
+
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		SearcherDisplay.init();
+	});
+</script>
+
+</body>
+</html>
