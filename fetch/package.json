@@ -2,7 +2,7 @@
   "name": "js-data-fetch",
   "description": "HTTP adapter for js-data that uses fetch.",
   "version": "3.0.0-alpha.4",
-  "homepage": "http://www.js-data.io/docs/dshttpadapter",
+  "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
     "url": "https://github.com/js-data/js-data-http.git"
