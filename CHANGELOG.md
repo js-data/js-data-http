@@ -1,3 +1,9 @@
+##### 3.0.0-alpha.4 - 12 February 2016
+
+###### Backwards compatible API changes
+- Better debugging/logging
+- Updates for the newest js-data alpha
+
 ##### 3.0.0-alpha.3 - 10 January 2016
 
 ###### Backwards compatible API changes

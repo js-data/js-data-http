@@ -5,6 +5,7 @@ fetch/
 node/
 scripts/
 src/
+junit/
 test/
 .gitignore
 bower.json

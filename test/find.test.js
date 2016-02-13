@@ -80,13 +80,13 @@ describe('find', function () {
   it('should use suffixes', function () {
     var Test = this
 
-    var Thing = Test.JSData.Model.extend({}, {
+    var Thing = new Test.JSData.Mapper({
       name: 'thing',
       endpoint: 'things',
       suffix: '.xml'
     })
 
-    var otherAdapter = new Test.DSHttpAdapter({
+    var otherAdapter = new Test.HttpAdapter({
       suffix: '.json'
     })
     otherAdapter.http = Test.adapter.http

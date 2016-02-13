@@ -14,11 +14,11 @@ before(function () {
   Test.assert = require('chai').assert
   Test.sinon = require('sinon')
   Test.JSData = require('js-data')
-  Test.DSHttpAdapter = require('./dist/js-data-http-node')
-  Test.User = Test.JSData.Model.extend({}, {
+  Test.HttpAdapter = require('./dist/js-data-http-node')
+  Test.User = new Test.JSData.Mapper({
     name: 'user'
   })
-  Test.Post = Test.JSData.Model.extend({}, {
+  Test.Post = new Test.JSData.Mapper({
     name: 'post',
     endpoint: 'posts',
     basePath: 'api'
@@ -29,7 +29,7 @@ before(function () {
 
 beforeEach(function () {
   var Test = this
-  Test.adapter = new Test.DSHttpAdapter()
+  Test.adapter = new Test.HttpAdapter()
   Test.User.registerAdapter('http', Test.adapter, { default: true })
   Test.Post.registerAdapter('http', Test.adapter, { default: true })
 

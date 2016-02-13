@@ -36,34 +36,25 @@ Tested on IE9, Chrome 46, Firefox 41 & Safari 7.1 using
 
 #### Browser
 
-`bower install --save js-data js-data-http` or `npm install --save js-data js-data-http`.
-
-__ES6__
+`npm install --save js-data js-data-http` or `bower install --save js-data js-data-http`.
 
 ```js
-const adapter = new DSHttpAdapter()
+// JSData.DataStore extends JSData.Container, it adds caching capabilities.
+// Makes more sense to use JSData.DataStore in the browser
+import {DataStore} from 'js-data'
+import HttpAdapter from 'js-data-http-node'
 
-class Base extends JSData.Model {}
-Base.registerAdapter('http', adapter, { default: true })
+const adapter = new HttpAdapter()
+const store = new DataStore()
 
-class School extends Model {}
-class Student extends Model {}
+store.registerAdapter('http', adapter, { default: true })
 
-// "School" and "Student" will now use the http adapter by default
-```
+store.defineMapper('school')
+store.defineMapper('student')
 
-__ES5__
-
-```js
-var adapter = new DSHttpAdapter()
-
-var Base = JSData.Model.extend({}, { name: 'Base' })
-Base.registerAdapter('http', adapter, { default: true })
-
-var School = Base.extend({}, { name: 'School' })
-var Student = Base.extend({}, { name: 'Student' })
-
-// "School" and "Student" will now use the http adapter by default
+store.find('school', 1).then(function (school) {
+  // ...
+})
 ```
 
 #### Node.js
@@ -73,36 +64,21 @@ var Student = Base.extend({}, { name: 'Student' })
 __ES6__
 
 ```js
-import {Model} from 'js-data'
-import DSHttpAdapter from 'js-data-http-node'
+// Doesn't make much sense to use DataStore on the server
+import {Container} from 'js-data'
+import HttpAdapter from 'js-data-http-node'
 
-const adapter = new DSHttpAdapter()
+const adapter = new HttpAdapter()
+const container = new Container()
 
-class Base extends Model {}
-Base.registerAdapter('http', adapter, { default: true })
+container.registerAdapter('http', adapter, { default: true })
 
-class School extends Model {}
-class Student extends Model {}
+container.defineMapper('school')
+container.defineMapper('student')
 
-// "School" and "Student" will now use the http adapter by default
-```
-
-__ES5__
-
-```js
-var JSData = require('js-data')
-var Model = JSData.Model
-var DSHttpAdapter = require('js-data-http-node')
-
-var adapter = new DSHttpAdapter()
-
-var Base = Model.extend({}, { name: 'Base' })
-Base.registerAdapter('http', adapter, { default: true })
-
-var School = Base.extend({}, { name: 'School' })
-var Student = Base.extend({}, { name: 'Student' })
-
-// "School" and "Student" will now use the http adapter by default
+container.find('school', 1).then(function (school) {
+  // ...
+})
 ```
 
 ## Dependencies
@@ -119,7 +95,7 @@ See [JSData's dependencies](https://github.com/js-data/js-data/blob/master/READM
 
 ## API Reference
 - [DS](http://www.js-data.io/docs/ds)
-- [DSHttpAdapter](http://www.js-data.io/docs/dshttpadapter)
+- [HttpAdapter](http://www.js-data.io/docs/dshttpadapter)
 
 ## Support
 

@@ -1,4 +1,4 @@
-/* global JSData:true, DSHttpAdapter:true, sinon:true, chai:true */
+/* global JSData:true, HttpAdapter:true, sinon:true, chai:true */
 before(function () {
   var Test = this
   Test.fail = function (msg) {
@@ -11,11 +11,11 @@ before(function () {
   Test.assert = chai.assert
   Test.sinon = sinon
   Test.JSData = JSData
-  Test.DSHttpAdapter = DSHttpAdapter
-  Test.User = JSData.Model.extend({}, {
+  Test.HttpAdapter = HttpAdapter
+  Test.User = new JSData.Mapper({
     name: 'user'
   })
-  Test.Post = JSData.Model.extend({}, {
+  Test.Post = new JSData.Mapper({
     name: 'post',
     endpoint: 'posts',
     basePath: 'api'
@@ -26,7 +26,7 @@ before(function () {
 
 beforeEach(function () {
   var Test = this
-  Test.adapter = new DSHttpAdapter()
+  Test.adapter = new HttpAdapter()
   Test.User.registerAdapter('http', Test.adapter, { default: true })
   Test.Post.registerAdapter('http', Test.adapter, { default: true })
 
