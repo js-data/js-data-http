@@ -8,7 +8,7 @@ module.exports = {
   output: {
     filename: '[name]',
     libraryTarget: 'umd',
-    library: 'DSHttpAdapter'
+    library: 'HttpAdapter'
   },
   externals: [
     {

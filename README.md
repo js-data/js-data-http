@@ -31,36 +31,21 @@ To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 __ES6__
 
 ```js
-import {Model} from 'js-data'
-import DSHttpAdapter from 'js-data-http-node'
+// Doesn't make much sense to use DataStore on the server
+import {Container} from 'js-data'
+import HttpAdapter from 'js-data-http-node'
 
-const adapter = new DSHttpAdapter()
+const adapter = new HttpAdapter()
+const container = new Container()
 
-class Base extends Model {}
-Base.registerAdapter('http', adapter, { default: true })
+container.registerAdapter('http', adapter, { default: true })
 
-class School extends Model {}
-class Student extends Model {}
+container.defineMapper('school')
+container.defineMapper('student')
 
-// "School" and "Student" will now use the http adapter by default
-```
-
-__ES5__
-
-```js
-var JSData = require('js-data')
-var Model = JSData.Model
-var DSHttpAdapter = require('js-data-http-node')
-
-var adapter = new DSHttpAdapter()
-
-var Base = Model.extend({}, { name: 'Base' })
-Base.registerAdapter('http', adapter, { default: true })
-
-var School = Base.extend({}, { name: 'School' })
-var Student = Base.extend({}, { name: 'Student' })
-
-// "School" and "Student" will now use the http adapter by default
+container.find('school', 1).then(function (school) {
+  // ...
+})
 ```
 
 ## Guides and Tutorials

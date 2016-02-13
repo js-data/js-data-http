@@ -1,12 +1,12 @@
 var JSData = require('js-data')
-// normally this would be "var DSHttpAdapter = require('js-data-http-node')"
-var DSHttpAdapter = require('../../')
+// normally this would be "var HttpAdapter = require('js-data-http-node')"
+var HttpAdapter = require('../../')
 
-var adapter = new DSHttpAdapter()
-var Base = JSData.Model.extend({}, { name: 'Base' })
-Base.registerAdapter('http', adapter, { default: true })
-var User = Base.extend({}, { name: 'User' })
+var adapter = new HttpAdapter()
+var store = new JSData.DataStore()
+store.registerAdapter('http', adapter, { default: true })
+store.defineMapper('user')
 
-User.find(1).catch(function (err) {
+store.find('user', 1).catch(function (err) {
   console.log(err)
 })

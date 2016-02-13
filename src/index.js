@@ -8,67 +8,60 @@ try {
 let { DSUtils } = JSData
 let { deepMixIn, removeCircular, copy, makePath, isString, isNumber } = DSUtils
 
-/**
- * DSHttpAdapter class.
- * @class DSHttpAdapter
- * @alias DSHttpAdapter
- *
- * @param {Object} [opts] Configuration options.
- * @param {string} [opts.basePath='']
- * @param {boolean} [opts.debug=false]
- * @param {boolean} [opts.forceTrailingSlash=false]
- * @param {Object} [opts.http=axios]
- * @param {Object} [opts.httpConfig={}]
- * @param {string} [opts.suffix='']
- * @param {boolean} [opts.useFetch=false]
- */
-function DSHttpAdapter (opts) {
+const noop = function (...args) {
   const self = this
+  const opts = args[args.length - 1]
+  self.dbg(opts.op, ...args)
+}
 
-  // Default values for arguments
-  opts || (opts = {})
+const noop2 = function (...args) {
+  const self = this
+  const opts = args[args.length - 2]
+  self.dbg(opts.op, ...args)
+}
 
+const DEFAULTS = {
   // Default and user-defined settings
   /**
-   * @name DSHttpAdapter#basePath
+   * @name HttpAdapter#basePath
    * @type {string}
    */
-  self.basePath = opts.basePath === undefined ? '' : opts.basePath
+  basePath: '',
 
   /**
-   * @name DSHttpAdapter#debug
+   * @name HttpAdapter#debug
    * @type {boolean}
    * @default false
    */
-  self.debug = opts.debug === undefined ? false : opts.debug
+  debug: false,
 
   /**
-   * @name DSHttpAdapter#forceTrailingSlash
+   * @name HttpAdapter#forceTrailingSlash
    * @type {boolean}
    * @default false
    */
-  self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash
+  forceTrailingSlash: false,
 
   /**
-   * @name DSHttpAdapter#http
+   * @name HttpAdapter#http
    * @type {Function}
    */
-  self.http = opts.http === undefined ? axios : opts.http
+  http: axios,
 
   /**
-   * @name DSHttpAdapter#httpConfig
+   * @name HttpAdapter#httpConfig
    * @type {Object}
    */
-  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig
+  httpConfig: {},
 
   /**
-   * @name DSHttpAdapter#suffix
+   * @name HttpAdapter#suffix
    * @type {string}
    */
-  self.suffix = opts.suffix === undefined ? '' : opts.suffix
+  suffix: '',
 
   /**
-   * @name DSHttpAdapter#useFetch
+   * @name HttpAdapter#useFetch
    * @type {boolean}
    * @default false
    */
@@ -84,30 +77,36 @@ let defaultsPrototype = Defaults.prototype
   /**
    * Make an Http request to `url` according to the configuration in `config`.
    *
-   * {@link DSHttpAdapter#beforeDEL} will be called before calling
-   * {@link DSHttpAdapter#HTTP}.
-   * {@link DSHttpAdapter#afterDEL} will be called after calling
-   * {@link DSHttpAdapter#HTTP}.
-   *
-   * @memberof DSHttpAdapter
-   * @instance
+   * @name HttpAdapter#DEL
+   * @method
    * @param {string} url Url for the request.
    * @param {Object} [config] Http configuration that will be passed to
-   * {@link DSHttpAdapter#HTTP}.
+   * {@link HttpAdapter#HTTP}.
    * @param {Object} [opts] Configuration options.
    * @return {Promise}
    */
   DEL (url, config, opts) {
     const self = this
+    let op
     config || (config = {})
+    opts || (opts = {})
     config.url = url || config.url
     config.method = config.method || 'delete'
-    return resolve(self.beforeDEL(url, config, opts)).then(function (_config) {
-      config = _config || config
+
+    // beforeDEL lifecycle hook
+    op = opts.op = 'beforeDEL'
+    return resolve(self[op](url, config, opts)).then(function (_config) {
+      // Allow re-assignment from lifecycle hook
+      config = isUndefined(_config) ? config : _config
+      op = opts.op = 'DEL'
+      self.dbg(op, url, config, opts)
       return self.HTTP(config, opts)
     }).then(function (response) {
-      return resolve(self.afterDEL(url, config, opts, response)).then(function (_response) {
-        return _response || response
+      // afterDEL lifecycle hook
+      op = opts.op = 'afterDEL'
+      return resolve(self[op](url, config, opts, response)).then(function (_response) {
+        // Allow re-assignment from lifecycle hook
+        return isUndefined(_response) ? response : _response
       })
     })
   },
@@ -130,8 +129,8 @@ class DSHttpAdapter {
   /**
    * Make an Http request using `window.fetch`.
    *
-   * @memberof DSHttpAdapter
-   * @instance
+   * @name HttpAdapter
+   * @method
    * @param {Object} config Request configuration.
    * @param {Object} config.data Payload for the request.
    * @param {string} config.method Http method for the request.
@@ -411,11 +410,11 @@ class DSHttpAdapter {
 }
 
 /**
- * Alternative to ES6 class syntax for extending `DSHttpAdapter`.
+ * Alternative to ES6 class syntax for extending `HttpAdapter`.
  *
  * __ES6__:
  * ```javascript
- * class MyHttpAdapter extends DSHttpAdapter {
+ * class MyHttpAdapter extends HttpAdapter {
  *   deserialize (Model, data, opts) {
  *     const data = super.deserialize(Model, data, opts)
  *     data.foo = 'bar'
@@ -442,26 +441,26 @@ class DSHttpAdapter {
  *   yell: function () { return 'HI' }
  * }
  *
- * var MyHttpAdapter = DSHttpAdapter.extend(instanceProps, classProps)
+ * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
  * var adapter = new MyHttpAdapter()
  * adapter.say() // "hi"
  * MyHttpAdapter.yell() // "HI"
  * ```
  *
- * @name DSHttpAdapter.extend
+ * @name HttpAdapter.extend
  * @method
  * @param {Object} [instanceProps] Properties that will be added to the
  * prototype of the subclass.
  * @param {Object} [classProps] Properties that will be added as static
  * properties to the subclass itself.
- * @return {Object} Subclass of `DSHttpAdapter`.
+ * @return {Object} Subclass of `HttpAdapter`.
  */
-DSHttpAdapter.extend = extend
+HttpAdapter.extend = extend
 
 /**
  * Details of the current version of the `js-data-http` module.
  *
- * @name DSHttpAdapter.version
+ * @name HttpAdapter.version
  * @type {Object}
  * @property {string} version.full The full semver value.
  * @property {number} version.major The major version number.
@@ -472,7 +471,7 @@ DSHttpAdapter.extend = extend
  * @property {(string|boolean)} version.beta The beta version value,
  * otherwise `false` if the current version is not beta.
  */
-DSHttpAdapter.version = {
+HttpAdapter.version = {
   full: '<%= pkg.version %>',
   major: parseInt('<%= major %>', 10),
   minor: parseInt('<%= minor %>', 10),
@@ -489,22 +488,22 @@ DSHttpAdapter.version = {
  *
  * __Script tag__:
  * ```javascript
- * window.DSHttpAdapter
+ * window.HttpAdapter
  * ```
  * __CommonJS__:
  * ```javascript
- * var DSHttpAdapter = require('js-data-http')
+ * var HttpAdapter = require('js-data-http')
  * ```
  * __ES6 Modules__:
  * ```javascript
- * import DSHttpAdapter from 'js-data-http'
+ * import HttpAdapter from 'js-data-http'
  * ```
  * __AMD__:
  * ```javascript
- * define('myApp', ['js-data-http'], function (DSHttpAdapter) { ... })
+ * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
  * ```
  *
  * @module js-data-http
  */
 
-module.exports = DSHttpAdapter
+module.exports = HttpAdapter
