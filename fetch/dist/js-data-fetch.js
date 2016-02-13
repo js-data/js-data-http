@@ -1,6 +1,6 @@
 /*!
 * js-data-fetch
-* @version 3.0.0-alpha.4 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 3.0.0-alpha.4 - Homepage <https://github.com/js-data/js-data-http>
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @copyright (c) 2014-2016 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -755,7 +755,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * Log an error.
 	   *
-	   * @name HttpAdapter
+	   * @name HttpAdapter#error
 	   * @method
 	   * @param {...*} [args] Arguments to log.
 	   */
@@ -771,7 +771,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  /**
 	   * Make an Http request using `window.fetch`.
 	   *
-	   * @name HttpAdapter
+	   * @name HttpAdapter#fetch
 	   * @method
 	   * @param {Object} config Request configuration.
 	   * @param {Object} config.data Payload for the request.
@@ -1329,7 +1329,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * {@link HttpAdapter#afterUpdateMany} will be called after calling
 	   * {@link HttpAdapter#PUT}.
 	   *
-	   * @name HttpAdapter
+	   * @name HttpAdapter#updateMany
 	   * @method
 	   * @param {Object} mapper The mapper.
 	   * @param {Array} records Array of property objects to send as the payload.
@@ -1412,7 +1412,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      if (typeof _opts.getEndpoint === 'function') {
 	        config.url = _opts.getEndpoint(self, _opts);
 	      } else {
-	        var _args = [_opts.basePath || self.basePath || adapter.defaults.basePath, adapter.getEndpoint(self, isSorN(id) ? id : null, _opts)];
+	        var _args = [_opts.basePath || self.basePath || adapter.basePath, adapter.getEndpoint(self, isSorN(id) ? id : null, _opts)];
 	        if (isSorN(id)) {
 	          _args.push(id);
 	        }

@@ -129,7 +129,7 @@ class DSHttpAdapter {
   /**
    * Make an Http request using `window.fetch`.
    *
-   * @name HttpAdapter
+   * @name HttpAdapter#fetch
    * @method
    * @param {Object} config Request configuration.
    * @param {Object} config.data Payload for the request.
