@@ -6,7 +6,7 @@ module.exports = {
   output: {
     filename: './dist/js-data-http.js',
     libraryTarget: 'umd',
-    library: 'DSHttpAdapter'
+    library: 'HttpAdapter'
   },
   externals: {
     'js-data': {

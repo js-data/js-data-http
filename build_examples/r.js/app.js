@@ -1,15 +1,15 @@
 define('app', [
   'js-data',
   'js-data-http'
-], function (JSData, DSHttpAdapter) {
-  document.getElementById('main').innerHTML = DSHttpAdapter.version.full
+], function (JSData, HttpAdapter) {
+  document.getElementById('main').innerHTML = HttpAdapter.version.full
 
-  var adapter = new DSHttpAdapter()
-  var Base = JSData.Model.extend({}, { name: 'Base' })
-  Base.registerAdapter('http', adapter, { default: true })
-  var User = Base.extend({}, { name: 'User' })
+  var adapter = new HttpAdapter()
+  var store = new DataStore()
+  store.registerAdapter('http', adapter, { default: true })
+  store.defineMapper('user')
 
-  User.find(1).catch(function (err) {
+  store.find('user', 1).catch(function (err) {
     console.log(err)
   })
 })

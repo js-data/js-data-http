@@ -1,6 +1,6 @@
 /*!
 * js-data-http-node
-* @version 3.0.0-alpha.3 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 3.0.0-alpha.4 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @copyright (c) 2014-2016 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -72,6 +72,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	/* global fetch:true Headers:true Request:true */
 	var axios = __webpack_require__(2);
 	var _ = _jsData.utils._;
+	var addHiddenPropsToTarget = _jsData.utils.addHiddenPropsToTarget;
 	var copy = _jsData.utils.copy;
 	var deepMixIn = _jsData.utils.deepMixIn;
 	var extend = _jsData.utils.extend;
@@ -83,9 +84,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	var isObject = _jsData.utils.isObject;
 	var isSorN = _jsData.utils.isSorN;
 	var isString = _jsData.utils.isString;
+	var isUndefined = _jsData.utils.isUndefined;
 	var resolve = _jsData.utils.resolve;
 	var reject = _jsData.utils.reject;
 	var toJson = _jsData.utils.toJson;
+	
 	
 	var hasFetch = false;
 	
@@ -145,638 +148,522 @@ return /******/ (function(modules) { // webpackBootstrap
 	  return url;
 	}
 	
+	var noop = function noop() {
+	  var self = this;
+	
+	  for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+	    args[_key2] = arguments[_key2];
+	  }
+	
+	  var opts = args[args.length - 1];
+	  self.dbg.apply(self, [opts.op].concat(args));
+	};
+	
+	var noop2 = function noop2() {
+	  var self = this;
+	
+	  for (var _len3 = arguments.length, args = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+	    args[_key3] = arguments[_key3];
+	  }
+	
+	  var opts = args[args.length - 2];
+	  self.dbg.apply(self, [opts.op].concat(args));
+	};
+	
+	var DEFAULTS = {
+	  // Default and user-defined settings
+	  /**
+	   * @name HttpAdapter#basePath
+	   * @type {string}
+	   */
+	  basePath: '',
+	
+	  /**
+	   * @name HttpAdapter#debug
+	   * @type {boolean}
+	   * @default false
+	   */
+	  debug: false,
+	
+	  /**
+	   * @name HttpAdapter#forceTrailingSlash
+	   * @type {boolean}
+	   * @default false
+	   */
+	  forceTrailingSlash: false,
+	
+	  /**
+	   * @name HttpAdapter#http
+	   * @type {Function}
+	   */
+	  http: axios,
+	
+	  /**
+	   * @name HttpAdapter#httpConfig
+	   * @type {Object}
+	   */
+	  httpConfig: {},
+	
+	  /**
+	   * @name HttpAdapter#suffix
+	   * @type {string}
+	   */
+	  suffix: '',
+	
+	  /**
+	   * @name HttpAdapter#useFetch
+	   * @type {boolean}
+	   * @default false
+	   */
+	  useFetch: false
+	};
+	
 	/**
-	 * DSHttpAdapter class.
-	 * @class DSHttpAdapter
-	 * @alias DSHttpAdapter
+	 * HttpAdapter class.
 	 *
+	 * @class HttpAdapter
 	 * @param {Object} [opts] Configuration options.
-	 * @param {string} [opts.basePath='']
-	 * @param {boolean} [opts.debug=false]
-	 * @param {boolean} [opts.forceTrailingSlash=false]
-	 * @param {Object} [opts.http=axios]
-	 * @param {Object} [opts.httpConfig={}]
-	 * @param {string} [opts.suffix='']
-	 * @param {boolean} [opts.useFetch=false]
+	 * @param {string} [opts.basePath=''] TODO
+	 * @param {boolean} [opts.debug=false] TODO
+	 * @param {boolean} [opts.forceTrailingSlash=false] TODO
+	 * @param {Object} [opts.http=axios] TODO
+	 * @param {Object} [opts.httpConfig={}] TODO
+	 * @param {string} [opts.suffix=''] TODO
+	 * @param {boolean} [opts.useFetch=false] TODO
 	 */
-	function DSHttpAdapter(opts) {
+	function HttpAdapter(opts) {
 	  var self = this;
 	
 	  // Default values for arguments
 	  opts || (opts = {});
 	
-	  // Default and user-defined settings
-	  /**
-	   * @name DSHttpAdapter#basePath
-	   * @type {string}
-	   */
-	  self.basePath = opts.basePath === undefined ? '' : opts.basePath;
-	
-	  /**
-	   * @name DSHttpAdapter#debug
-	   * @type {boolean}
-	   * @default false
-	   */
-	  self.debug = opts.debug === undefined ? false : opts.debug;
-	
-	  /**
-	   * @name DSHttpAdapter#forceTrailingSlash
-	   * @type {boolean}
-	   * @default false
-	   */
-	  self.forceTrailingSlash = opts.forceTrailingSlash === undefined ? false : opts.forceTrailingSlash;
-	
-	  /**
-	   * @name DSHttpAdapter#http
-	   * @type {Function}
-	   */
-	  self.http = opts.http === undefined ? axios : opts.http;
-	
-	  /**
-	   * @name DSHttpAdapter#httpConfig
-	   * @type {Object}
-	   */
-	  self.httpConfig = opts.httpConfig === undefined ? {} : opts.httpConfig;
-	
-	  /**
-	   * @name DSHttpAdapter#suffix
-	   * @type {string}
-	   */
-	  self.suffix = opts.suffix === undefined ? '' : opts.suffix;
-	
-	  /**
-	   * @name DSHttpAdapter#useFetch
-	   * @type {boolean}
-	   * @default false
-	   */
-	  self.useFetch = opts.useFetch === undefined ? false : opts.useFetch;
+	  fillIn(self, opts);
+	  fillIn(self, DEFAULTS);
 	}
 	
-	fillIn(DSHttpAdapter.prototype, {
+	addHiddenPropsToTarget(HttpAdapter.prototype, {
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#create}. If this method
-	   * returns a promise then {@link DSHttpAdapter#create} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#create}.
-	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#create}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#create}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#create} will return.
+	   * @name HttpAdapter#afterCreate
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} props
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	
-	  afterCreate: function afterCreate() {},
+	  afterCreate: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#createMany}. If this method
-	   * returns a promise then {@link DSHttpAdapter#createMany} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#createMany}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#createMany}.
-	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#createMany}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#createMany}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#createMany} will return.
+	   * @name HttpAdapter#afterCreateMany
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} records
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterCreateMany: function afterCreateMany() {},
+	  afterCreateMany: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#DEL}. If this method
-	   * returns a promise then {@link DSHttpAdapter#DEL} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#DEL}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#DEL}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#DEL}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#DEL}.
-	   * @param {Object} response The `response` value that {@link DSHttpAdapter#DEL} will return.
+	   * @name HttpAdapter#afterDEL
+	   * @method
+	   * @param {string} url
+	   * @param {Object} config
+	   * @param {Object} opts
+	   * @param {Object} response
 	   */
-	  afterDEL: function afterDEL() {},
+	  afterDEL: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#destroy}. If this method
-	   * returns a promise then {@link DSHttpAdapter#destroy} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#destroy}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroy}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#destroy}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroy}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#destroy} will return.
+	   * @name HttpAdapter#afterDestroy
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterDestroy: function afterDestroy() {},
+	  afterDestroy: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#destroyAll}. If this method
-	   * returns a promise then {@link DSHttpAdapter#destroyAll} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#destroyAll}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroyAll}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#destroyAll}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroyAll}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#destroyAll} will return.
+	   * @name HttpAdapter#afterDestroyAll
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterDestroyAll: function afterDestroyAll() {},
+	  afterDestroyAll: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#find}. If this method
-	   * returns a promise then {@link DSHttpAdapter#find} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#find}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#find}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#find}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#find}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#find} will return.
+	   * @name HttpAdapter#afterFind
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterFind: function afterFind() {},
+	  afterFind: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#findAll}. If this method
-	   * returns a promise then {@link DSHttpAdapter#findAll} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#findAll}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#findAll}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#findAll}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#findAll}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#findAll} will return.
+	   * @name HttpAdapter#afterFindAll
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterFindAll: function afterFindAll() {},
+	  afterFindAll: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#GET}. If this method
-	   * returns a promise then {@link DSHttpAdapter#GET} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#GET}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#GET}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#GET}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#GET}.
-	   * @param {Object} response The `response` value that {@link DSHttpAdapter#GET} will return.
+	   * @name HttpAdapter#afterGET
+	   * @method
+	   * @param {string} url
+	   * @param {Object} config
+	   * @param {Object} opts
+	   * @param {Object} response
 	   */
-	  afterGET: function afterGET() {},
+	  afterGET: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#HTTP}. If this method
-	   * returns a promise then {@link DSHttpAdapter#HTTP} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#HTTP}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#HTTP}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#HTTP}.
-	   * @param {Object} response The `response` value that {@link DSHttpAdapter#HTTP} will return.
+	   * @name HttpAdapter#afterHTTP
+	   * @method
+	   * @param {Object} config
+	   * @param {Object} opts
+	   * @param {Object} response
 	   */
-	  afterHTTP: function afterHTTP() {},
+	  afterHTTP: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#POST}. If this method
-	   * returns a promise then {@link DSHttpAdapter#POST} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#POST}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} response The `response` value that {@link DSHttpAdapter#POST} will return.
+	   * @name HttpAdapter#afterPOST
+	   * @method
+	   * @param {string} url
+	   * @param {Object} data
+	   * @param {Object} config
+	   * @param {Object} opts
+	   * @param {Object} response
 	   */
-	  afterPOST: function afterPOST() {},
+	  afterPOST: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#PUT}. If this method
-	   * returns a promise then {@link DSHttpAdapter#PUT} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#PUT}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {string} url The `url` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} response The `response` value that {@link DSHttpAdapter#PUT} will return.
+	   * @name HttpAdapter#afterPUT
+	   * @method
+	   * @param {string} url
+	   * @param {Object} data
+	   * @param {Object} config
+	   * @param {Object} opts
+	   * @param {Object} response
 	   */
-	  afterPUT: function afterPUT() {},
+	  afterPUT: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#update}. If this method
-	   * returns a promise then {@link DSHttpAdapter#update} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#update}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#update} will return.
+	   * @name HttpAdapter#afterUpdate
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} props
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterUpdate: function afterUpdate() {},
+	  afterUpdate: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#updateAll}. If this method
-	   * returns a promise then {@link DSHttpAdapter#updateAll} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#updateAll}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#updateAll} will return.
+	   * @name HttpAdapter#afterUpdateAll
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} props
+	   * @param {Object} query
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterUpdateAll: function afterUpdateAll() {},
+	  afterUpdateAll: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#updateMany}. If this method
-	   * returns a promise then {@link DSHttpAdapter#updateMany} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#updateMany}
-	   * will resolve with that same value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateMany}.
-	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#updateMany}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateMany}.
-	   * @param {Object} data The `data` value that {@link DSHttpAdapter#updateMany} will return.
+	   * @name HttpAdapter#afterUpdateMany
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} records
+	   * @param {Object} opts
+	   * @param {Object} data
 	   */
-	  afterUpdateMany: function afterUpdateMany() {},
+	  afterUpdateMany: noop2,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#create}. If this method
-	   * returns a promise then {@link DSHttpAdapter#create} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#create}.
-	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#create}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#create}.
+	   * @name HttpAdapter#beforeCreate
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} props
+	   * @param {Object} opts
 	   */
-	  beforeCreate: function beforeCreate() {},
+	  beforeCreate: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#createMany}. If this method
-	   * returns a promise then {@link DSHttpAdapter#createMany} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#createMany}.
-	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#createMany}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#createMany}.
+	   * @name HttpAdapter#beforeCreateMany
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} records
+	   * @param {Object} opts
 	   */
-	  beforeCreateMany: function beforeCreateMany() {},
+	  beforeCreateMany: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#DEL}. If this method
-	   * returns a promise then {@link DSHttpAdapter#DEL} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
-	   * will resolve with that same value, then the `config` argument passed to
-	   * {@link DSHttpAdapter#DEL} will be replaced by the value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#DEL}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#DEL}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#DEL}.
+	   * @name HttpAdapter#beforeDEL
+	   * @method
+	   * @param {Object} url
+	   * @param {Object} config
+	   * @param {Object} opts
 	   */
-	  beforeDEL: function beforeDEL() {},
+	  beforeDEL: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#destroy}. If this method
-	   * returns a promise then {@link DSHttpAdapter#destroy} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroy}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#destroy}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroy}.
+	   * @name HttpAdapter#beforeDestroy
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} opts
 	   */
-	  beforeDestroy: function beforeDestroy() {},
+	  beforeDestroy: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#destroyAll}. If this method
-	   * returns a promise then {@link DSHttpAdapter#destroyAll} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#destroyAll}.
-	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#destroyAll}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#destroyAll}.
+	   * @name HttpAdapter#beforeDestroyAll
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} query
+	   * @param {Object} opts
 	   */
-	  beforeDestroyAll: function beforeDestroyAll() {},
+	  beforeDestroyAll: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#find}. If this method
-	   * returns a promise then {@link DSHttpAdapter#find} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#find}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#find}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#find}.
+	   * @name HttpAdapter#beforeFind
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} opts
 	   */
-	  beforeFind: function beforeFind() {},
+	  beforeFind: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#findAll}. If this method
-	   * returns a promise then {@link DSHttpAdapter#findAll} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#findAll}.
-	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#findAll}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#findAll}.
+	   * @name HttpAdapter#beforeFindAll
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} query
+	   * @param {Object} opts
 	   */
-	  beforeFindAll: function beforeFindAll() {},
+	  beforeFindAll: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#GET}. If this method
-	   * returns a promise then {@link DSHttpAdapter#GET} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
-	   * will resolve with that same value, then the `config` argument passed to
-	   * {@link DSHttpAdapter#GET} will be replaced by the value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#GET}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#GET}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#GET}.
+	   * @name HttpAdapter#beforeGET
+	   * @method
+	   * @param {Object} url
+	   * @param {Object} config
+	   * @param {Object} opts
 	   */
-	  beforeGET: function beforeGET() {},
+	  beforeGET: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#HTTP}. If this method
-	   * returns a promise then {@link DSHttpAdapter#HTTP} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
-	   * will resolve with that same value, then the `config` argument passed to
-	   * {@link DSHttpAdapter#HTTP} will be replaced by the value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#HTTP}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#HTTP}.
+	   * @name HttpAdapter#beforeHTTP
+	   * @method
+	   * @param {Object} config
+	   * @param {Object} opts
 	   */
-	  beforeHTTP: function beforeHTTP() {},
+	  beforeHTTP: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#POST}. If this method
-	   * returns a promise then {@link DSHttpAdapter#POST} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
-	   * will resolve with that same value, then the `config` argument passed to
-	   * {@link DSHttpAdapter#POST} will be replaced by the value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#POST}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#POST}.
+	   * @name HttpAdapter#beforePOST
+	   * @method
+	   * @param {Object} url
+	   * @param {Object} data
+	   * @param {Object} config
+	   * @param {Object} opts
 	   */
-	  beforePOST: function beforePOST() {},
+	  beforePOST: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#PUT}. If this method
-	   * returns a promise then {@link DSHttpAdapter#PUT} will wait for the
-	   * promise to resolve before continuing. If this method returns any other
-	   * value or the promise resolves with a value, then {@link DSHttpAdapter#create}
-	   * will resolve with that same value, then the `config` argument passed to
-	   * {@link DSHttpAdapter#PUT} will be replaced by the value.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} url The `url` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} data The `data` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} config The `config` argument passed to {@link DSHttpAdapter#PUT}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#PUT}.
+	   * @name HttpAdapter#beforePUT
+	   * @method
+	   * @param {Object} url
+	   * @param {Object} data
+	   * @param {Object} config
+	   * @param {Object} opts
 	   */
-	  beforePUT: function beforePUT() {},
+	  beforePUT: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#update}. If this method
-	   * returns a promise then {@link DSHttpAdapter#update} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {(string|number)} id The `id` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#update}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#update}.
+	   * @name HttpAdapter#beforeUpdate
+	   * @method
+	   * @param {Object} mapper
+	   * @param {(string|number)} id
+	   * @param {Object} props
+	   * @param {Object} opts
 	   */
-	  beforeUpdate: function beforeUpdate() {},
+	  beforeUpdate: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#updateAll}. If this method
-	   * returns a promise then {@link DSHttpAdapter#updateAll} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} props The `props` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} query The `query` argument passed to {@link DSHttpAdapter#updateAll}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateAll}.
+	   * @name HttpAdapter#beforeUpdateAll
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} props
+	   * @param {Object} query
+	   * @param {Object} opts
 	   */
-	  beforeUpdateAll: function beforeUpdateAll() {},
+	  beforeUpdateAll: noop,
 	
 	  /**
-	   * Lifecycle hook called by {@link DSHttpAdapter#updateMany}. If this method
-	   * returns a promise then {@link DSHttpAdapter#updateMany} will wait for the
-	   * promise to resolve before continuing.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The `Model` argument passed to {@link DSHttpAdapter#updateMany}.
-	   * @param {Object} models The `models` argument passed to {@link DSHttpAdapter#updateMany}.
-	   * @param {Object} opts The `opts` argument passed to {@link DSHttpAdapter#updateMany}.
+	   * @name HttpAdapter#beforeUpdateMany
+	   * @method
+	   * @param {Object} mapper
+	   * @param {Object} records
+	   * @param {Object} opts
 	   */
-	  beforeUpdateMany: function beforeUpdateMany() {},
+	  beforeUpdateMany: noop,
 	
 	  /**
-	   * Create a new the entity from the provided `props`.
+	   * Create a new the record from the provided `props`.
 	   *
-	   * {@link DSHttpAdapter#beforeCreate} will be called before calling
-	   * {@link DSHttpAdapter#POST}.
-	   * {@link DSHttpAdapter#afterCreate} will be called after calling
-	   * {@link DSHttpAdapter#POST}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
+	   * @name HttpAdapter#create
+	   * @method
+	   * @param {Object} mapper The mapper.
 	   * @param {Object} props Properties to send as the payload.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  create: function create(Model, props, opts) {
+	  create: function create(mapper, props, opts) {
 	    var self = this;
+	    var op = undefined;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'create';
-	    self.dbg(opts.op, Model, props, opts);
-	    return resolve(self.beforeCreate(Model, props, opts)).then(function () {
-	      return self.POST(self.getPath('create', Model, props, opts), self.serialize(Model, props, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeCreate lifecycle hook
+	    op = opts.op = 'beforeCreate';
+	    return resolve(self[op](mapper, props, opts)).then(function () {
+	      op = opts.op = 'create';
+	      self.dbg(op, mapper, props, opts);
+	      return self.POST(self.getPath('create', mapper, props, opts), self.serialize(mapper, props, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterCreate(Model, props, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterCreate lifecycle hook
+	      op = opts.op = 'afterCreate';
+	      return resolve(self[op](mapper, props, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * Create multiple new entities in batch.
+	   * Create multiple new records in batch.
 	   *
-	   * {@link DSHttpAdapter#beforeCreateMany} will be called before calling
-	   * {@link DSHttpAdapter#POST}.
-	   * {@link DSHttpAdapter#afterCreateMany} will be called after calling
-	   * {@link DSHttpAdapter#POST}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
-	   * @param {Array} models Array of property objects to send as the payload.
+	   * @name HttpAdapter#createMany
+	   * @method
+	   * @param {Object} mapper The mapper.
+	   * @param {Array} records Array of property objects to send as the payload.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  createMany: function createMany(Model, models, opts) {
+	  createMany: function createMany(mapper, records, opts) {
 	    var self = this;
+	    var op = undefined;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'createMany';
-	    self.dbg(opts.op, Model, models, opts);
-	    return resolve(self.beforeCreateMany(Model, models, opts)).then(function () {
-	      return self.POST(self.getPath('createMany', Model, null, opts), self.serialize(Model, models, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeCreateMany lifecycle hook
+	    op = opts.op = 'beforeCreateMany';
+	    return resolve(self[op](mapper, records, opts)).then(function () {
+	      op = opts.op = 'createMany';
+	      self.dbg(op, mapper, records, opts);
+	      return self.POST(self.getPath('createMany', mapper, null, opts), self.serialize(mapper, records, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterCreateMany(Model, models, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterCreateMany lifecycle hook
+	      op = opts.op = 'afterCreateMany';
+	      return resolve(self[op](mapper, records, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * Call {@link DSHttpAdapter#log} at the "debug" level.
+	   * Call {@link HttpAdapter#log} at the "debug" level.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {...*} [args] Args passed to {@link DSHttpAdapter#log}.
+	   * @name HttpAdapter#dbg
+	   * @method
+	   * @param {...*} [args] Args passed to {@link HttpAdapter#log}.
 	   */
 	  dbg: function dbg() {
-	    for (var _len2 = arguments.length, args = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
-	      args[_key2] = arguments[_key2];
+	    for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+	      args[_key4] = arguments[_key4];
 	    }
 	
 	    this.log.apply(this, ['debug'].concat(args));
 	  },
 	
+	
 	  /**
 	   * Make an Http request to `url` according to the configuration in `config`.
 	   *
-	   * {@link DSHttpAdapter#beforeDEL} will be called before calling
-	   * {@link DSHttpAdapter#HTTP}.
-	   * {@link DSHttpAdapter#afterDEL} will be called after calling
-	   * {@link DSHttpAdapter#HTTP}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter#DEL
+	   * @method
 	   * @param {string} url Url for the request.
 	   * @param {Object} [config] Http configuration that will be passed to
-	   * {@link DSHttpAdapter#HTTP}.
+	   * {@link HttpAdapter#HTTP}.
 	   * @param {Object} [opts] Configuration options.
 	   * @return {Promise}
 	   */
 	  DEL: function DEL(url, config, opts) {
 	    var self = this;
+	    var op = undefined;
 	    config || (config = {});
+	    opts || (opts = {});
 	    config.url = url || config.url;
 	    config.method = config.method || 'delete';
-	    return resolve(self.beforeDEL(url, config, opts)).then(function (_config) {
-	      config = _config || config;
+	
+	    // beforeDEL lifecycle hook
+	    op = opts.op = 'beforeDEL';
+	    return resolve(self[op](url, config, opts)).then(function (_config) {
+	      // Allow re-assignment from lifecycle hook
+	      config = isUndefined(_config) ? config : _config;
+	      op = opts.op = 'DEL';
+	      self.dbg(op, url, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
-	      return resolve(self.afterDEL(url, config, opts, response)).then(function (_response) {
-	        return _response || response;
+	      // afterDEL lifecycle hook
+	      op = opts.op = 'afterDEL';
+	      return resolve(self[op](url, config, opts, response)).then(function (_response) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
+	
 	
 	  /**
 	   * Transform the server response object into the payload that will be returned
 	   * to JSData.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model used for the operation.
-	   * @param {Object} response Response object from {@link DSHttpAdapter#HTTP}.
+	   * @name HttpAdapter#deserialize
+	   * @method
+	   * @param {Object} mapper The mapper used for the operation.
+	   * @param {Object} response Response object from {@link HttpAdapter#HTTP}.
 	   * @param {Object} opts Configuration options.
 	   * @return {(Object|Array)} Deserialized data.
 	   */
-	  deserialize: function deserialize(Model, response, opts) {
+	  deserialize: function deserialize(mapper, response, opts) {
 	    opts || (opts = {});
 	    if (isFunction(opts.deserialize)) {
-	      return opts.deserialize(Model, response, opts);
+	      return opts.deserialize(mapper, response, opts);
 	    }
-	    if (isFunction(Model.deserialize)) {
-	      return Model.deserialize(Model, response, opts);
+	    if (isFunction(mapper.deserialize)) {
+	      return mapper.deserialize(mapper, response, opts);
 	    }
 	    if (opts.raw) {
 	      return response;
@@ -784,85 +671,92 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return response ? 'data' in response ? response.data : response : response;
 	  },
 	
+	
 	  /**
-	   * Destroy the entity with the given primary key.
+	   * Destroy the record with the given primary key.
 	   *
-	   * {@link DSHttpAdapter#beforeDestroy} will be called before calling
-	   * {@link DSHttpAdapter#DEL}.
-	   * {@link DSHttpAdapter#afterDestroy} will be called after calling
-	   * {@link DSHttpAdapter#DEL}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
-	   * @param {(string|number)} id Primary key of the entity to destroy.
+	   * @name HttpAdapter#destroy
+	   * @method
+	   * @param {Object} mapper The mapper.
+	   * @param {(string|number)} id Primary key of the record to destroy.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  destroy: function destroy(Model, id, opts) {
+	  destroy: function destroy(mapper, id, opts) {
 	    var self = this;
+	    var op = undefined;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'destroy';
-	    self.dbg(opts.op, Model, id, opts);
-	    return resolve(self.beforeDestroy(Model, id, opts)).then(function () {
-	      return self.DEL(self.getPath('destroy', Model, id, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeDestroy lifecycle hook
+	    op = opts.op = 'beforeDestroy';
+	    return resolve(self[op](mapper, id, opts)).then(function () {
+	      op = opts.op = 'destroy';
+	      self.dbg(op, mapper, id, opts);
+	      return self.DEL(self.getPath('destroy', mapper, id, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterDestroy(Model, id, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterDestroy lifecycle hook
+	      op = opts.op = 'afterDestroy';
+	      return resolve(self[op](mapper, id, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * Destroy the entities that match the selection `query`.
+	   * Destroy the records that match the selection `query`.
 	   *
-	   * {@link DSHttpAdapter#beforeDestroyAll} will be called before calling
-	   * {@link DSHttpAdapter#DEL}.
-	   * {@link DSHttpAdapter#afterDestroyAll} will be called after calling
-	   * {@link DSHttpAdapter#DEL}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
+	   * @name HttpAdapter#destroyAll
+	   * @method
+	   * @param {Object} mapper The mapper.
 	   * @param {Object} query Selection query.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  destroyAll: function destroyAll(Model, query, opts) {
+	  destroyAll: function destroyAll(mapper, query, opts) {
 	    var self = this;
+	    var op = undefined;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    deepMixIn(opts.params, query);
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'destroyAll';
-	    self.dbg(opts.op, Model, query, opts);
-	    return resolve(self.beforeDestroyAll(Model, query, opts)).then(function () {
-	      return self.DEL(self.getPath('destroyAll', Model, null, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeDestroyAll lifecycle hook
+	    op = opts.op = 'beforeDestroyAll';
+	    return resolve(self.beforeDestroyAll(mapper, query, opts)).then(function () {
+	      op = opts.op = 'destroyAll';
+	      self.dbg(op, mapper, query, opts);
+	      return self.DEL(self.getPath('destroyAll', mapper, null, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterDestroyAll(Model, query, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterDestroyAll lifecycle hook
+	      op = opts.op = 'afterDestroyAll';
+	      return resolve(self[op](mapper, query, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
 	   * Log an error.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter
+	   * @method
 	   * @param {...*} [args] Arguments to log.
 	   */
 	  error: function error() {
@@ -873,11 +767,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  },
 	
+	
 	  /**
 	   * Make an Http request using `window.fetch`.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter
+	   * @method
 	   * @param {Object} config Request configuration.
 	   * @param {Object} config.data Payload for the request.
 	   * @param {string} config.method Http method for the request.
@@ -919,85 +814,92 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  }),
 	
+	
 	  /**
-	   * Retrieve the entity with the given primary key.
+	   * Retrieve the record with the given primary key.
 	   *
-	   * {@link DSHttpAdapter#beforeFind} will be called before calling
-	   * {@link DSHttpAdapter#GET}.
-	   * {@link DSHttpAdapter#afterFind} will be called after calling
-	   * {@link DSHttpAdapter#GET}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
-	   * @param {(string|number)} id Primary key of the entity to retrieve.
+	   * @name HttpAdapter#find
+	   * @method
+	   * @param {Object} mapper The mapper.
+	   * @param {(string|number)} id Primary key of the record to retrieve.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  find: function find(Model, id, opts) {
+	  find: function find(mapper, id, opts) {
 	    var self = this;
+	    var op = undefined;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'find';
-	    self.dbg(opts.op, Model, id, opts);
-	    return resolve(self.beforeFind(Model, id, opts)).then(function () {
-	      return self.GET(self.getPath('find', Model, id, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeFind lifecycle hook
+	    op = opts.op = 'beforeFind';
+	    return resolve(self[op](mapper, id, opts)).then(function () {
+	      op = opts.op = 'find';
+	      self.dbg(op, mapper, id, opts);
+	      return self.GET(self.getPath('find', mapper, id, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterFind(Model, id, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterFind lifecycle hook
+	      op = opts.op = 'afterFind';
+	      return resolve(self[op](mapper, id, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * Retrieve the entities that match the selection `query`.
+	   * Retrieve the records that match the selection `query`.
 	   *
-	   * {@link DSHttpAdapter#beforeFindAll} will be called before calling
-	   * {@link DSHttpAdapter#GET}.
-	   * {@link DSHttpAdapter#afterFindAll} will be called after calling
-	   * {@link DSHttpAdapter#GET}.
-	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
+	   * @name HttpAdapter#findAll
+	   * @method
+	   * @param {Object} mapper The mapper.
 	   * @param {Object} query Selection query.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  findAll: function findAll(Model, query, opts) {
+	  findAll: function findAll(mapper, query, opts) {
 	    var self = this;
+	    var op = undefined;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'findAll';
-	    self.dbg(opts.op, Model, query, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
 	    deepMixIn(opts.params, query);
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    return resolve(self.beforeFindAll(Model, query, opts)).then(function () {
-	      return self.GET(self.getPath('findAll', Model, opts.params, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	
+	    // beforeFindAll lifecycle hook
+	    op = opts.op = 'beforeFindAll';
+	    return resolve(self[op](mapper, query, opts)).then(function () {
+	      op = opts.op = 'findAll';
+	      self.dbg(op, mapper, query, opts);
+	      return self.GET(self.getPath('findAll', mapper, opts.params, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterFindAll(Model, query, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterFindAll lifecycle hook
+	      op = opts.op = 'afterFindAll';
+	      return resolve(self[op](mapper, query, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter#GET
+	   * @method
 	   * @param {string} url The url for the request.
 	   * @param {Object} config Request configuration options.
 	   * @param {Object} [opts] Configuration options.
@@ -1005,38 +907,50 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  GET: function GET(url, config, opts) {
 	    var self = this;
+	    var op = undefined;
 	    config || (config = {});
+	    opts || (opts = {});
 	    config.url = url || config.url;
 	    config.method = config.method || 'get';
-	    return resolve(self.beforeGET(url, config, opts)).then(function (_config) {
-	      config = _config || config;
+	
+	    // beforeGET lifecycle hook
+	    op = opts.op = 'beforeGET';
+	    return resolve(self[op](url, config, opts)).then(function (_config) {
+	      // Allow re-assignment from lifecycle hook
+	      config = isUndefined(_config) ? config : _config;
+	      op = opts.op = 'GET';
+	      self.dbg(op, url, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
-	      return resolve(self.afterGET(url, config, opts, response)).then(function (_response) {
-	        return _response || response;
+	      // afterGET lifecycle hook
+	      op = opts.op = 'afterGET';
+	      return resolve(self[op](url, config, opts, response)).then(function (_response) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} Model { description }
-	   * @param {*} id { description }
-	   * @param {boolean} opts { description }
+	   * @name HttpAdapter#getEndpoint
+	   * @method
+	   * @param {Object} mapper TODO
+	   * @param {*} id TODO
+	   * @param {boolean} opts TODO
 	   * @return {string} Full path.
 	   */
-	  getEndpoint: function getEndpoint(Model, id, opts) {
+	  getEndpoint: function getEndpoint(mapper, id, opts) {
 	    var _this = this;
 	
 	    opts || (opts = {});
 	    opts.params || (opts.params = {});
 	
 	    var item = undefined;
-	    var parentKey = Model.parentKey;
-	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : Model.endpoint;
-	    var parentField = Model.parentField;
-	    var parentDef = Model.parent ? Model.getResource(Model.parent) : undefined;
+	    var parentKey = mapper.parentKey;
+	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : mapper.endpoint;
+	    var parentField = mapper.parentField;
+	    var parentDef = mapper.parent ? mapper.getResource(mapper.parent) : undefined;
 	    var parentId = opts.params[parentKey];
 	
 	    if (parentId === false || !parentKey || !parentDef) {
@@ -1048,7 +962,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      delete opts.params[parentKey];
 	
 	      if (isString(id) || isNumber(id)) {
-	        item = Model.get(id);
+	        item = mapper.get(id);
 	      } else if (isObject(id)) {
 	        item = id;
 	      }
@@ -1077,29 +991,31 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  },
 	
+	
 	  /**
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter#getPath
+	   * @method
 	   * @param {string} method TODO
-	   * @param {*} Model TODO
+	   * @param {Object} mapper TODO
 	   * @param {(string|number)?} id TODO
 	   * @param {Object} opts Configuration options.
 	   */
-	  getPath: function getPath(method, Model, id, opts) {
+	  getPath: function getPath(method, mapper, id, opts) {
 	    var self = this;
 	    opts || (opts = {});
-	    var args = [opts.basePath === undefined ? Model.basePath === undefined ? self.basePath : Model.basePath : opts.basePath, self.getEndpoint(Model, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
+	    var args = [opts.basePath === undefined ? mapper.basePath === undefined ? self.basePath : mapper.basePath : opts.basePath, self.getEndpoint(mapper, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
 	    if (method === 'find' || method === 'update' || method === 'destroy') {
 	      args.push(id);
 	    }
 	    return makePath.apply(_jsData.utils, args);
 	  },
 	
+	
 	  /**
 	   * Make an Http request.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter#HTTP
+	   * @method
 	   * @param {Object} config Request configuration options.
 	   * @param {Object} [opts] Configuration options.
 	   * @return {Promise}
@@ -1153,17 +1069,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  },
 	
+	
 	  /**
 	   * Log the provided arguments at the specified leve.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
+	   * @name HttpAdapter#log
+	   * @method
 	   * @param {string} level Log level.
 	   * @param {...*} [args] Arguments to log.
 	   */
 	  log: function log(level) {
-	    for (var _len3 = arguments.length, args = Array(_len3 > 1 ? _len3 - 1 : 0), _key3 = 1; _key3 < _len3; _key3++) {
-	      args[_key3 - 1] = arguments[_key3];
+	    for (var _len5 = arguments.length, args = Array(_len5 > 1 ? _len5 - 1 : 0), _key5 = 1; _key5 < _len5; _key5++) {
+	      args[_key5 - 1] = arguments[_key5];
 	    }
 	
 	    if (level && !args.length) {
@@ -1173,7 +1090,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (level === 'debug' && !this.debug) {
 	      return;
 	    }
-	    var prefix = level.toUpperCase() + ': (' + this.name + ')';
+	    var prefix = level.toUpperCase() + ': (HttpAdapter)';
 	    if (console[level]) {
 	      var _console2;
 	
@@ -1185,222 +1102,273 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} url { description }
-	   * @param {*} data { description }
-	   * @param {*} config { description }
+	   * @name HttpAdapter#POST
+	   * @method
+	   * @param {*} url TODO
+	   * @param {Object} data TODO
+	   * @param {Object} config TODO
 	   * @param {Object} [opts] Configuration options.
 	   * @return {Promise}
 	   */
 	  POST: function POST(url, data, config, opts) {
 	    var self = this;
+	    var op = undefined;
 	    config || (config = {});
+	    opts || (opts = {});
 	    config.url = url || config.url;
 	    config.data = data || config.data;
 	    config.method = config.method || 'post';
-	    return resolve(self.beforePOST(url, data, config, opts)).then(function (_config) {
-	      config = _config || config;
+	
+	    // beforePOST lifecycle hook
+	    op = opts.op = 'beforePOST';
+	    return resolve(self[op](url, data, config, opts)).then(function (_config) {
+	      // Allow re-assignment from lifecycle hook
+	      config = isUndefined(_config) ? config : _config;
+	      op = opts.op = 'POST';
+	      self.dbg(op, url, data, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
-	      return resolve(self.afterPOST(url, data, config, opts, response)).then(function (_response) {
-	        return _response || response;
+	      // afterPOST lifecycle hook
+	      op = opts.op = 'afterPOST';
+	      return resolve(self[op](url, data, config, opts, response)).then(function (_response) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} url { description }
-	   * @param {*} data { description }
-	   * @param {*} config { description }
+	   * @name HttpAdapter#PUT
+	   * @method
+	   * @param {*} url TODO
+	   * @param {Object} data TODO
+	   * @param {Object} config TODO
 	   * @param {Object} [opts] Configuration options.
 	   * @return {Promise}
 	   */
 	  PUT: function PUT(url, data, config, opts) {
 	    var self = this;
+	    var op = undefined;
 	    config || (config = {});
+	    opts || (opts = {});
 	    config.url = url || config.url;
 	    config.data = data || config.data;
 	    config.method = config.method || 'put';
-	    return resolve(self.beforePUT(url, data, config, opts)).then(function (_config) {
-	      config = _config || config;
+	
+	    // beforePUT lifecycle hook
+	    op = opts.op = 'beforePUT';
+	    return resolve(self[op](url, data, config, opts)).then(function (_config) {
+	      // Allow re-assignment from lifecycle hook
+	      config = isUndefined(_config) ? config : _config;
+	      op = opts.op = 'PUT';
+	      self.dbg(op, url, data, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
-	      return resolve(self.afterPUT(url, data, config, opts, response)).then(function (_response) {
-	        return _response || response;
+	      // afterPUT lifecycle hook
+	      op = opts.op = 'afterPUT';
+	      return resolve(self[op](url, data, config, opts, response)).then(function (_response) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} Model { description }
-	   * @param {*} params { description }
-	   * @param {*} opts { description }
+	   * @name HttpAdapter#queryTransform
+	   * @method
+	   * @param {Object} mapper TODO
+	   * @param {*} params TODO
+	   * @param {*} opts TODO
 	   * @return {*} Transformed params.
 	   */
-	  queryTransform: function queryTransform(Model, params, opts) {
+	  queryTransform: function queryTransform(mapper, params, opts) {
 	    opts || (opts = {});
 	    if (isFunction(opts.queryTransform)) {
-	      return opts.queryTransform(Model, params, opts);
+	      return opts.queryTransform(mapper, params, opts);
 	    }
-	    if (isFunction(Model.queryTransform)) {
-	      return Model.queryTransform(Model, params, opts);
+	    if (isFunction(mapper.queryTransform)) {
+	      return mapper.queryTransform(mapper, params, opts);
 	    }
 	    return params;
 	  },
 	
+	
 	  /**
-	   * Error handler invoked when the promise returned by {@link DSHttpAdapter#http}
+	   * Error handler invoked when the promise returned by {@link HttpAdapter#http}
 	   * is rejected. Default implementation is to just return the error wrapped in
-	   * a rejected Promise, aka rethrow the error. {@link DSHttpAdapter#http} is
-	   * called by {@link DSHttpAdapter#HTTP}.
+	   * a rejected Promise, aka rethrow the error. {@link HttpAdapter#http} is
+	   * called by {@link HttpAdapter#HTTP}.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} err The error that {@link DSHttpAdapter#http} rejected with.
-	   * @param {*} config The `config` argument that was passed to {@link DSHttpAdapter#HTTP}.
-	   * @param {*} opts The `opts` argument that was passed to {@link DSHttpAdapter#HTTP}.
+	   * @name HttpAdapter#responseError
+	   * @method
+	   * @param {*} err The error that {@link HttpAdapter#http} rejected with.
+	   * @param {Object} config The `config` argument that was passed to {@link HttpAdapter#HTTP}.
+	   * @param {*} opts The `opts` argument that was passed to {@link HttpAdapter#HTTP}.
 	   * @return {Promise}
 	   */
 	  responseError: function responseError(err, config, opts) {
 	    return reject(err);
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} Model { description }
-	   * @param {*} data { description }
-	   * @param {*} opts { description }
+	   * @name HttpAdapter#serialize
+	   * @method
+	   * @param {Object} mapper TODO
+	   * @param {Object} data TODO
+	   * @param {*} opts TODO
 	   * @return {*} Serialized data.
 	   */
-	  serialize: function serialize(Model, data, opts) {
+	  serialize: function serialize(mapper, data, opts) {
 	    opts || (opts = {});
 	    if (isFunction(opts.serialize)) {
-	      return opts.serialize(Model, data, opts);
+	      return opts.serialize(mapper, data, opts);
 	    }
-	    if (isFunction(Model.serialize)) {
-	      return Model.serialize(Model, data, opts);
+	    if (isFunction(mapper.serialize)) {
+	      return mapper.serialize(mapper, data, opts);
 	    }
 	    return data;
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} Model { description }
-	   * @param {*} id { description }
-	   * @param {*} props { description }
+	   * @name HttpAdapter#update
+	   * @method
+	   * @param {Object} mapper TODO
+	   * @param {*} id TODO
+	   * @param {*} props TODO
 	   * @param {Object} [opts] Configuration options.
 	   * @return {Promise}
 	   */
-	  update: function update(Model, id, props, opts) {
+	  update: function update(mapper, id, props, opts) {
 	    var self = this;
+	    var op = undefined;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'update';
-	    self.dbg(opts.op, Model, id, props, opts);
-	    return resolve(self.beforeUpdate(Model, id, props, opts)).then(function () {
-	      return self.PUT(self.getPath('update', Model, id, opts), self.serialize(Model, props, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeUpdate lifecycle hook
+	    op = opts.op = 'beforeUpdate';
+	    return resolve(self[op](mapper, id, props, opts)).then(function () {
+	      op = opts.op = 'update';
+	      self.dbg(op, mapper, id, props, opts);
+	      return self.PUT(self.getPath('update', mapper, id, opts), self.serialize(mapper, props, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterUpdate(Model, id, props, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterUpdate lifecycle hook
+	      op = opts.op = 'afterUpdate';
+	      return resolve(self[op](mapper, id, props, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * { function_description }
+	   * TODO
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {*} Model { description }
-	   * @param {*} props { description }
-	   * @param {*} query { description }
+	   * @name HttpAdapter#updateAll
+	   * @method
+	   * @param {Object} mapper TODO
+	   * @param {Object} props TODO
+	   * @param {Object} query TODO
 	   * @param {Object} [opts] Configuration options.
 	   * @return {Promise}
 	   */
-	  updateAll: function updateAll(Model, props, query, opts) {
+	  updateAll: function updateAll(mapper, props, query, opts) {
 	    var self = this;
+	    var op = undefined;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    deepMixIn(opts.params, query);
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'updateAll';
-	    self.dbg(opts.op, Model, props, query, opts);
-	    return resolve(self.beforeUpdateAll(Model, props, query, opts)).then(function () {
-	      return self.PUT(self.getPath('updateAll', Model, null, opts), self.serialize(Model, props, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeUpdateAll lifecycle hook
+	    op = opts.op = 'beforeUpdateAll';
+	    return resolve(self[op](mapper, props, query, opts)).then(function () {
+	      op = opts.op = 'updateAll';
+	      self.dbg(op, mapper, props, query, opts);
+	      return self.PUT(self.getPath('updateAll', mapper, null, opts), self.serialize(mapper, props, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterUpdateAll(Model, props, query, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterUpdateAll lifecycle hook
+	      op = opts.op = 'afterUpdateAll';
+	      return resolve(self[op](mapper, props, query, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  },
 	
+	
 	  /**
-	   * Update multiple entities in batch.
+	   * Update multiple records in batch.
 	   *
-	   * {@link DSHttpAdapter#beforeUpdateMany} will be called before calling
-	   * {@link DSHttpAdapter#PUT}.
-	   * {@link DSHttpAdapter#afterUpdateMany} will be called after calling
-	   * {@link DSHttpAdapter#PUT}.
+	   * {@link HttpAdapter#beforeUpdateMany} will be called before calling
+	   * {@link HttpAdapter#PUT}.
+	   * {@link HttpAdapter#afterUpdateMany} will be called after calling
+	   * {@link HttpAdapter#PUT}.
 	   *
-	   * @memberof DSHttpAdapter
-	   * @instance
-	   * @param {Object} Model The Model.
-	   * @param {Array} models Array of property objects to send as the payload.
+	   * @name HttpAdapter
+	   * @method
+	   * @param {Object} mapper The mapper.
+	   * @param {Array} records Array of property objects to send as the payload.
 	   * @param {Object} [opts] Configuration options.
 	   * @param {string} [opts.params] TODO
-	   * @param {string} [opts.suffix={@link DSHttpAdapter#suffix}] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
 	   * @return {Promise}
 	   */
-	  updateMany: function updateMany(Model, models, opts) {
+	  updateMany: function updateMany(mapper, records, opts) {
 	    var self = this;
+	    var op = undefined;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
-	    opts.params = self.queryTransform(Model, opts.params, opts);
-	    opts.suffix || (opts.suffix = Model.suffix);
-	    opts.op = 'updateMany';
-	    self.dbg(opts.op, Model, models, opts);
-	    return resolve(self.beforeUpdateMany(Model, models, opts)).then(function () {
-	      return self.PUT(self.getPath('updateMany', Model, null, opts), self.serialize(Model, models, opts), opts);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix;
+	
+	    // beforeUpdateMany lifecycle hook
+	    op = opts.op = 'beforeUpdateMany';
+	    return resolve(self[op](mapper, records, opts)).then(function () {
+	      op = opts.op = 'updateMany';
+	      self.dbg(op, mapper, records, opts);
+	      return self.PUT(self.getPath('updateMany', mapper, null, opts), self.serialize(mapper, records, opts), opts);
 	    }).then(function (response) {
-	      return self.deserialize(Model, response, opts);
+	      return self.deserialize(mapper, response, opts);
 	    }).then(function (data) {
-	      return resolve(self.afterUpdateMany(Model, models, opts, data)).then(function (_data) {
-	        return _data || data;
+	      // afterUpdateMany lifecycle hook
+	      op = opts.op = 'afterUpdateMany';
+	      return resolve(self[op](mapper, records, opts, data)).then(function (_data) {
+	        // Allow re-assignment from lifecycle hook
+	        return isUndefined(_data) ? data : _data;
 	      });
 	    });
 	  }
 	});
 	
 	/**
-	 * Add an Http actions to a Model.
+	 * Add an Http actions to a mapper.
 	 *
-	 * @name DSHttpAdapter.addAction
+	 * @name HttpAdapter.addAction
 	 * @method
 	 * @param {string} name Name of the new action.
 	 * @param {Object} [opts] Action configuration
@@ -1409,15 +1377,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @param {Function} [opts.request]
 	 * @param {Function} [opts.response]
 	 * @param {Function} [opts.responseError]
-	 * @return {Function} Decoration function, which should be passed the Model to
+	 * @return {Function} Decoration function, which should be passed the mapper to
 	 * decorate when invoked.
 	 */
-	DSHttpAdapter.addAction = function (name, opts) {
+	HttpAdapter.addAction = function (name, opts) {
 	  if (!name || !isString(name)) {
 	    throw new TypeError('action(name[, opts]): Expected: string, Found: ' + (typeof name === 'undefined' ? 'undefined' : _typeof(name)));
 	  }
-	  return function (Model) {
-	    if (Model[name]) {
+	  return function (mapper) {
+	    if (mapper[name]) {
 	      throw new Error('action(name[, opts]): ' + name + ' already exists on target!');
 	    }
 	    opts.request = opts.request || function (config) {
@@ -1429,21 +1397,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	    opts.responseError = opts.responseError || function (err) {
 	      return reject(err);
 	    };
-	    Model[name] = function (id, _opts) {
+	    mapper[name] = function (id, _opts) {
+	      var self = this;
 	      if (isObject(id)) {
 	        _opts = id;
 	      }
 	      _opts = _opts || {};
-	      var adapter = this.getAdapter(opts.adapter || this.defaultAdapter || 'http');
+	      var adapter = self.getAdapter(opts.adapter || self.defaultAdapter || 'http');
 	      var config = {};
 	      fillIn(config, opts);
 	      if (!_opts.hasOwnProperty('endpoint') && config.endpoint) {
 	        _opts.endpoint = config.endpoint;
 	      }
 	      if (typeof _opts.getEndpoint === 'function') {
-	        config.url = _opts.getEndpoint(this, _opts);
+	        config.url = _opts.getEndpoint(self, _opts);
 	      } else {
-	        var _args = [_opts.basePath || this.basePath || adapter.defaults.basePath, adapter.getEndpoint(this, isSorN(id) ? id : null, _opts)];
+	        var _args = [_opts.basePath || self.basePath || adapter.defaults.basePath, adapter.getEndpoint(self, isSorN(id) ? id : null, _opts)];
 	        if (isSorN(id)) {
 	          _args.push(id);
 	        }
@@ -1451,48 +1420,48 @@ return /******/ (function(modules) { // webpackBootstrap
 	        config.url = makePath.apply(null, _args);
 	      }
 	      config.method = config.method || 'GET';
-	      config.modelName = this.name;
+	      config.mapper = self.name;
 	      deepMixIn(config)(_opts);
 	      return resolve(config).then(_opts.request || opts.request).then(function (config) {
 	        return adapter.HTTP(config);
 	      }).then(function (data) {
 	        if (data && data.config) {
-	          data.config.modelName = this.name;
+	          data.config.mapper = self.name;
 	        }
 	        return data;
 	      }).then(_opts.response || opts.response, _opts.responseError || opts.responseError);
 	    };
-	    return Model;
+	    return mapper;
 	  };
 	};
 	
 	/**
-	 * Add multiple Http actions to a Model. See {@link DSHttpAdapter.addAction} for
+	 * Add multiple Http actions to a mapper. See {@link HttpAdapter.addAction} for
 	 * action configuration options.
 	 *
-	 * @name DSHttpAdapter.addActions
+	 * @name HttpAdapter.addActions
 	 * @method
 	 * @param {Object.<string, Object>} opts Object where the key is an action name
 	 * and the value is the configuration for the action.
-	 * @return {Function} Decoration function, which should be passed the Model to
+	 * @return {Function} Decoration function, which should be passed the mapper to
 	 * decorate when invoked.
 	 */
-	DSHttpAdapter.addActions = function (opts) {
+	HttpAdapter.addActions = function (opts) {
 	  opts || (opts = {});
-	  return function (Model) {
-	    forOwn(Model, function (value, key) {
-	      DSHttpAdapter.addAction(key, value)(Model);
+	  return function (mapper) {
+	    forOwn(mapper, function (value, key) {
+	      HttpAdapter.addAction(key, value)(mapper);
 	    });
-	    return Model;
+	    return mapper;
 	  };
 	};
 	
 	/**
-	 * Alternative to ES6 class syntax for extending `DSHttpAdapter`.
+	 * Alternative to ES6 class syntax for extending `HttpAdapter`.
 	 *
 	 * __ES6__:
 	 * ```javascript
-	 * class MyHttpAdapter extends DSHttpAdapter {
+	 * class MyHttpAdapter extends HttpAdapter {
 	 *   deserialize (Model, data, opts) {
 	 *     const data = super.deserialize(Model, data, opts)
 	 *     data.foo = 'bar'
@@ -1519,26 +1488,26 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *   yell: function () { return 'HI' }
 	 * }
 	 *
-	 * var MyHttpAdapter = DSHttpAdapter.extend(instanceProps, classProps)
+	 * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
 	 * var adapter = new MyHttpAdapter()
 	 * adapter.say() // "hi"
 	 * MyHttpAdapter.yell() // "HI"
 	 * ```
 	 *
-	 * @name DSHttpAdapter.extend
+	 * @name HttpAdapter.extend
 	 * @method
 	 * @param {Object} [instanceProps] Properties that will be added to the
 	 * prototype of the subclass.
 	 * @param {Object} [classProps] Properties that will be added as static
 	 * properties to the subclass itself.
-	 * @return {Object} Subclass of `DSHttpAdapter`.
+	 * @return {Object} Subclass of `HttpAdapter`.
 	 */
-	DSHttpAdapter.extend = extend;
+	HttpAdapter.extend = extend;
 	
 	/**
 	 * Details of the current version of the `js-data-http` module.
 	 *
-	 * @name DSHttpAdapter.version
+	 * @name HttpAdapter.version
 	 * @type {Object}
 	 * @property {string} version.full The full semver value.
 	 * @property {number} version.major The major version number.
@@ -1549,12 +1518,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * @property {(string|boolean)} version.beta The beta version value,
 	 * otherwise `false` if the current version is not beta.
 	 */
-	DSHttpAdapter.version = {
-	  full: '3.0.0-alpha.3',
+	HttpAdapter.version = {
+	  full: '3.0.0-alpha.4',
 	  major: parseInt('3', 10),
 	  minor: parseInt('0', 10),
 	  patch: parseInt('0', 10),
-	  alpha:  true ? '3' : false,
+	  alpha:  true ? '4' : false,
 	  beta:  true ? 'false' : false
 	};
 	
@@ -1566,25 +1535,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	 *
 	 * __Script tag__:
 	 * ```javascript
-	 * window.DSHttpAdapter
+	 * window.HttpAdapter
 	 * ```
 	 * __CommonJS__:
 	 * ```javascript
-	 * var DSHttpAdapter = require('js-data-http')
+	 * var HttpAdapter = require('js-data-http')
 	 * ```
 	 * __ES6 Modules__:
 	 * ```javascript
-	 * import DSHttpAdapter from 'js-data-http'
+	 * import HttpAdapter from 'js-data-http'
 	 * ```
 	 * __AMD__:
 	 * ```javascript
-	 * define('myApp', ['js-data-http'], function (DSHttpAdapter) { ... })
+	 * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
 	 * ```
 	 *
 	 * @module js-data-http
 	 */
 	
-	module.exports = DSHttpAdapter;
+	module.exports = HttpAdapter;
 
 /***/ },
 /* 1 */
