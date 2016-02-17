@@ -124,4 +124,33 @@ describe('DSHttpAdapter.find(resourceConfig, id, options)', function () {
       return otherAdapter.find(Post, 1);
     });
   });
+
+  it('should use parent', function () {
+    var _this = this;
+
+    var Thing = datastore.defineResource({
+      name: 'thing',
+      endpoint: 'things',
+      relations: {
+        belongsTo: {
+          user: {
+            localKey: 'userId',
+            localField: 'user',
+            parent: true
+          }
+        }
+      }
+    });
+
+    setTimeout(function () {
+      assert.equal(1, _this.requests.length);
+      assert.equal(_this.requests[0].url, 'user/2/things/1');
+      assert.equal(_this.requests[0].method, 'GET');
+      _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({ id: 1 }));
+    }, 30);
+
+    return dsHttpAdapter.find(Thing, 1, { params: { userId: 2 } }).then(function (data) {
+      assert.deepEqual(data, { id: 1 }, 'thing should have been found');
+    });
+  });
 });

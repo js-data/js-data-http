@@ -32,4 +32,62 @@ describe('dsHttpAdapter.findAll(resourceConfig, params, options)', function () {
       assert.equal(queryTransform.callCount, 2, 'queryTransform should have been called');
     });
   });
+
+  it('should use one of many parents', function () {
+    var _this = this;
+
+    var Thing = datastore.defineResource({
+      name: 'thing',
+      endpoint: 'things',
+      relations: {
+        belongsTo: {
+          user: {
+            localKey: 'userId',
+            localField: 'user',
+            parent: true
+          },
+          posts: {
+            localKey: 'postId',
+            localField: 'post',
+            parent: true
+          }
+        }
+      }
+    });
+
+    if (!Thing.parents) {
+      Thing.parents = {
+        user: {
+          key: 'userId',
+          field: 'user'
+        },
+        posts: {
+          key: 'postId',
+          field: 'post'
+        }
+      }
+    }
+
+    setTimeout(function () {
+      assert.equal(1, _this.requests.length);
+      assert.equal(_this.requests[0].url, 'user/1/things');
+      assert.equal(_this.requests[0].method, 'GET');
+      _this.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify([{ id: 1 }]));
+    }, 30);
+
+    return dsHttpAdapter.findAll(Thing, { userId: 1 }).then(function (data) {
+      assert.deepEqual(data, [{ id: 1 }], 'user thing should have been found');
+
+      setTimeout(function () {
+        assert.equal(2, _this.requests.length);
+        assert.equal(_this.requests[1].url, 'posts/2/things');
+        assert.equal(_this.requests[1].method, 'GET');
+        _this.requests[1].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify([{ id: 2 }]));
+      }, 30);
+
+      return dsHttpAdapter.findAll(Thing, { postId: 2 });
+    }).then(function(data) {
+      assert.deepEqual(data, [{ id: 2 }], 'post thing should have been found');
+    });
+  });
 });

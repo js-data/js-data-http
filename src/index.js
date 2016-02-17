@@ -54,42 +54,51 @@ class DSHttpAdapter {
     options = options || {}
     options.params = options.params || {}
 
-    let item
-    let parentKey = resourceConfig.parentKey
     let endpoint = options.hasOwnProperty('endpoint') ? options.endpoint : resourceConfig.endpoint
-    let parentField = resourceConfig.parentField
-    let parentDef = resourceConfig.getResource(resourceConfig.parent)
-    let parentId = options.params[parentKey]
-
-    if (parentId === false || !parentKey || !parentDef) {
-      if (parentId === false) {
-        delete options.params[parentKey]
+    let parents = resourceConfig.parents || (resourceConfig.parent ? {
+      [resourceConfig.parent]: {
+        key: resourceConfig.parentKey,
+        field: resourceConfig.parentField
       }
-      return endpoint
-    } else {
-      delete options.params[parentKey]
+    } : {})
 
-      if (DSUtils._sn(id)) {
-        item = resourceConfig.get(id)
-      } else if (DSUtils._o(id)) {
-        item = id
-      }
+    DSUtils.forOwn(parents, function (parent, parentName) {
+      let item
+      let parentKey = parent.key
+      let parentField = parent.field
+      let parentDef = resourceConfig.getResource(parentName)
+      let parentId = options.params[parentKey]
 
-      if (item) {
-        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null)
-      }
-
-      if (parentId) {
-        delete options.endpoint
-        let _options = {}
-        DSUtils.forOwn(options, (value, key) => {
-          _options[key] = value
-        })
-        return DSUtils.makePath(this.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint)
+      if (parentId === false || !parentKey || !parentDef) {
+        if (parentId === false) {
+          delete options.params[parentKey]
+        }
       } else {
-        return endpoint
+        delete options.params[parentKey]
+
+        if (DSUtils._sn(id)) {
+          item = resourceConfig.get(id)
+        } else if (DSUtils._o(id)) {
+          item = id
+        }
+        console.log('item', item)
+
+        if (item) {
+          parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null)
+        }
+
+        if (parentId) {
+          delete options.endpoint
+          let _options = {}
+          DSUtils.forOwn(options, (value, key) => {
+            _options[key] = value
+          })
+          endpoint = DSUtils.makePath(this.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint)
+        }
       }
-    }
+    }, this)
+
+    return endpoint
   }
 
   getPath (method, resourceConfig, id, options) {
