@@ -60,8 +60,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	var _jsData = __webpack_require__(1);
 	
-	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
-	
 	/* global fetch:true Headers:true Request:true */
 	var axios = __webpack_require__(2);
 	var _ = _jsData.utils._;
@@ -71,6 +69,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	var extend = _jsData.utils.extend;
 	var fillIn = _jsData.utils.fillIn;
 	var forOwn = _jsData.utils.forOwn;
+	var get = _jsData.utils.get;
 	var isArray = _jsData.utils.isArray;
 	var isFunction = _jsData.utils.isFunction;
 	var isNumber = _jsData.utils.isNumber;
@@ -937,18 +936,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var self = this;
 	    opts || (opts = {});
 	    opts.params || (opts.params = {});
+	    var relationList = mapper.relationList || [];
+	    var endpoint = isUndefined(opts.endpoint) ? isUndefined(mapper.endpoint) ? mapper.name : mapper.endpoint : opts.endpoint;
 	
-	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : mapper.endpoint;
-	    var parents = mapper.parents || (mapper.parent ? _defineProperty({}, mapper.parent, {
-	      key: mapper.parentKey,
-	      field: mapper.parentField
-	    }) : {});
-	
-	    forOwn(parents, function (parent, parentName) {
+	    relationList.forEach(function (def) {
+	      if (def.type !== 'belongsTo' || !def.parent) {
+	        return;
+	      }
 	      var item = undefined;
-	      var parentKey = parent.key;
-	      var parentField = parent.field;
-	      var parentDef = mapper.getResource(parentName);
+	      var parentKey = def.foreignKey;
+	      var parentDef = def.getRelation();
 	      var parentId = opts.params[parentKey];
 	
 	      if (parentId === false || !parentKey || !parentDef) {
@@ -959,14 +956,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        delete opts.params[parentKey];
 	
-	        if (isString(id) || isNumber(id)) {
-	          item = mapper.get(id);
-	        } else if (isObject(id)) {
+	        if (isObject(id)) {
 	          item = id;
 	        }
 	
 	        if (item) {
-	          parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+	          parentId = parentId || def.getForeignKey(item) || (def.getLocalField(item) ? get(def.getLocalField(item), parentDef.idAttribute) : null);
 	        }
 	
 	        if (parentId) {
@@ -977,7 +972,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	              _opts[key] = value;
 	            });
 	            _(_opts, parentDef);
-	            endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts, parentId, endpoint));
+	            endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts), parentId, endpoint);
 	            return {
 	              v: false
 	            };
@@ -1003,7 +998,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getPath: function getPath(method, mapper, id, opts) {
 	    var self = this;
 	    opts || (opts = {});
-	    var args = [opts.basePath === undefined ? mapper.basePath === undefined ? self.basePath : mapper.basePath : opts.basePath, self.getEndpoint(mapper, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
+	    var args = [isUndefined(opts.basePath) ? isUndefined(mapper.basePath) ? self.basePath : mapper.basePath : opts.basePath, self.getEndpoint(mapper, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
 	    if (method === 'find' || method === 'update' || method === 'destroy') {
 	      args.push(id);
 	    }
