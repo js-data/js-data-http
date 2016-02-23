@@ -1,12 +1,3 @@
-/*!
-* js-data-http-node
-* @version 3.0.0-alpha.4 - Homepage <https://github.com/js-data/js-data-http>
-* @author Jason Dobry <jason.dobry@gmail.com>
-* @copyright (c) 2014-2016 Jason Dobry
-* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
-*
-* @overview Node.js HTTP adapter for js-data.
-*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-data"), require("axios"));
@@ -68,6 +59,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _jsData = __webpack_require__(1);
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	/* global fetch:true Headers:true Request:true */
 	var axios = __webpack_require__(2);
@@ -941,54 +934,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {string} Full path.
 	   */
 	  getEndpoint: function getEndpoint(mapper, id, opts) {
-	    var _this = this;
-	
+	    var self = this;
 	    opts || (opts = {});
 	    opts.params || (opts.params = {});
 	
-	    var item = undefined;
-	    var parentKey = mapper.parentKey;
 	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : mapper.endpoint;
-	    var parentField = mapper.parentField;
-	    var parentDef = mapper.parent ? mapper.getResource(mapper.parent) : undefined;
-	    var parentId = opts.params[parentKey];
+	    var parents = mapper.parents || (mapper.parent ? _defineProperty({}, mapper.parent, {
+	      key: mapper.parentKey,
+	      field: mapper.parentField
+	    }) : {});
 	
-	    if (parentId === false || !parentKey || !parentDef) {
-	      if (parentId === false) {
-	        delete opts.params[parentKey];
-	      }
-	      return endpoint;
-	    } else {
-	      delete opts.params[parentKey];
+	    forOwn(parents, function (parent, parentName) {
+	      var item = undefined;
+	      var parentKey = parent.key;
+	      var parentField = parent.field;
+	      var parentDef = mapper.getResource(parentName);
+	      var parentId = opts.params[parentKey];
 	
-	      if (isString(id) || isNumber(id)) {
-	        item = mapper.get(id);
-	      } else if (isObject(id)) {
-	        item = id;
-	      }
-	
-	      if (item) {
-	        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
-	      }
-	
-	      if (parentId) {
-	        var _ret = function () {
-	          delete opts.endpoint;
-	          var _opts = {};
-	          forOwn(opts, function (value, key) {
-	            _opts[key] = value;
-	          });
-	          _(_opts, parentDef);
-	          return {
-	            v: makePath(_this.getEndpoint(parentDef, parentId, _opts, parentId, endpoint))
-	          };
-	        }();
-	
-	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	      if (parentId === false || !parentKey || !parentDef) {
+	        if (parentId === false) {
+	          delete opts.params[parentKey];
+	        }
+	        return false;
 	      } else {
-	        return endpoint;
+	        delete opts.params[parentKey];
+	
+	        if (isString(id) || isNumber(id)) {
+	          item = mapper.get(id);
+	        } else if (isObject(id)) {
+	          item = id;
+	        }
+	
+	        if (item) {
+	          parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+	        }
+	
+	        if (parentId) {
+	          var _ret = function () {
+	            delete opts.endpoint;
+	            var _opts = {};
+	            forOwn(opts, function (value, key) {
+	              _opts[key] = value;
+	            });
+	            _(_opts, parentDef);
+	            endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts, parentId, endpoint));
+	            return {
+	              v: false
+	            };
+	          }();
+	
+	          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	        }
 	      }
-	    }
+	    });
+	
+	    return endpoint;
 	  },
 	
 	
@@ -1519,12 +1519,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '3.0.0-alpha.4',
-	  major: parseInt('3', 10),
-	  minor: parseInt('0', 10),
-	  patch: parseInt('0', 10),
-	  alpha:  true ? '4' : false,
-	  beta:  true ? 'false' : false
+	  full: '<%= pkg.version %>',
+	  major: parseInt('<%= major %>', 10),
+	  minor: parseInt('<%= minor %>', 10),
+	  patch: parseInt('<%= patch %>', 10),
+	  alpha:  true ? '<%= alpha %>' : false,
+	  beta:  true ? '<%= beta %>' : false
 	};
 	
 	/**

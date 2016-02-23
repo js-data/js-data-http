@@ -1,13 +1,13 @@
 {
   "name": "js-data-fetch",
-  "description": "HTTP adapter for js-data that uses fetch.",
-  "version": "3.0.0-alpha.4",
+  "description": "HTTP adapter for js-data that uses the fetch API.",
+  "version": "3.0.0-alpha.5",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
     "url": "https://github.com/js-data/js-data-http.git"
   },
-  "author": "Jason Dobry <jason.dobry@gmail.com> (http://www.pseudobry.com)",
+  "author": "js-data-http project authors",
   "license": "MIT",
   "main": "./dist/js-data-fetch.js",
   "keywords": [

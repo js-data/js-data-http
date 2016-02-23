@@ -1,13 +1,13 @@
 {
   "name": "js-data-http-node",
   "description": "Node.js HTTP adapter for js-data.",
-  "version": "3.0.0-alpha.4",
+  "version": "3.0.0-alpha.5",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
     "url": "https://github.com/js-data/js-data-http.git"
   },
-  "author": "Jason Dobry <jason.dobry@gmail.com> (http://www.pseudobry.com)",
+  "author": "js-data-http project authors",
   "license": "MIT",
   "main": "./dist/js-data-http-node.js",
   "keywords": [
@@ -19,6 +19,6 @@
     "node.js"
   ],
   "peerDependencies": {
-    "axios": "0.8.x"
+    "axios": "0.9.x"
   }
 }

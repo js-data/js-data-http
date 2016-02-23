@@ -30,6 +30,12 @@ exec('git shortlog -s -e < ' + tty, function (err, stdout, stderr) {
     fs.writeFileSync(__dirname + '/../AUTHORS', authorsFile + names.join('\n'), {
       encoding: 'utf-8'
     })
+    fs.writeFileSync(__dirname + '/../fetch/AUTHORS', authorsFile + names.join('\n'), {
+      encoding: 'utf-8'
+    })
+    fs.writeFileSync(__dirname + '/../node/AUTHORS', authorsFile + names.join('\n'), {
+      encoding: 'utf-8'
+    })
     console.log('Done!')
     console.log('Writing CONTRIBUTORS file...')
 
@@ -38,6 +44,12 @@ exec('git shortlog -s -e < ' + tty, function (err, stdout, stderr) {
     // Add to or otherwise modify "names" if necessary
 
     fs.writeFileSync(__dirname + '/../CONTRIBUTORS', contributorsFile + names.join('\n'), {
+      encoding: 'utf-8'
+    })
+    fs.writeFileSync(__dirname + '/../fetch/CONTRIBUTORS', contributorsFile + names.join('\n'), {
+      encoding: 'utf-8'
+    })
+    fs.writeFileSync(__dirname + '/../node/CONTRIBUTORS', contributorsFile + names.join('\n'), {
       encoding: 'utf-8'
     })
     console.log('Done!')

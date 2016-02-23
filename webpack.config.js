@@ -2,13 +2,21 @@ var path = require('path')
 
 module.exports = {
   devtool: 'source-map',
-  entry: './src/index.js',
+  entry: {
+    './dist/js-data-http.js': './src/index.js'
+  },
   output: {
-    filename: './dist/js-data-http.js',
+    filename: '[name]',
     libraryTarget: 'umd',
     library: 'HttpAdapter'
   },
   externals: {
+    'chai': {
+      amd: 'chai',
+      commonjs: 'chai',
+      commonjs2: 'chai',
+      root: 'chai'
+    },
     'js-data': {
       amd: 'js-data',
       commonjs: 'js-data',
