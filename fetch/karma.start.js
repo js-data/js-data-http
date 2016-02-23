@@ -9,6 +9,9 @@ before(function () {
     }
   }
   Test.assert = chai.assert
+  Test.assert.objectsEqual = function (a, b, m) {
+    Test.assert.deepEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), m || (JSON.stringify(a) + ' should be equal to ' + JSON.stringify(b)))
+  }
   Test.sinon = sinon
   Test.JSData = JSData
   Test.HttpAdapter = HttpAdapter

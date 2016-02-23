@@ -1,7 +1,7 @@
 {
   "name": "js-data-http-node",
   "description": "Node.js HTTP adapter for js-data.",
-  "version": "3.0.0-alpha.5",
+  "version": "3.0.0-alpha.6",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -18,7 +18,8 @@
     "http",
     "node.js"
   ],
-  "peerDependencies": {
-    "axios": "0.9.x"
+  "dependencies": {
+    "axios": "^0.9.1",
+    "js-data": "^3.0.0-alpha.15"
   }
 }

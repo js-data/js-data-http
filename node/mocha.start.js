@@ -12,6 +12,9 @@ before(function () {
     }
   }
   Test.assert = require('chai').assert
+  Test.assert.objectsEqual = function (a, b, m) {
+    Test.assert.deepEqual(JSON.parse(JSON.stringify(a)), JSON.parse(JSON.stringify(b)), m || (JSON.stringify(a) + ' should be equal to ' + JSON.stringify(b)))
+  }
   Test.sinon = require('sinon')
   Test.JSData = require('js-data')
   Test.HttpAdapter = require('./dist/js-data-http-node')

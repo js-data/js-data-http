@@ -9,6 +9,7 @@ const {
   extend,
   fillIn,
   forOwn,
+  get,
   isArray,
   isFunction,
   isNumber,
@@ -860,20 +861,16 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
     const self = this
     opts || (opts = {})
     opts.params || (opts.params = {})
+    const relationList = mapper.relationList || []
+    let endpoint = isUndefined(opts.endpoint) ? (isUndefined(mapper.endpoint) ? mapper.name : mapper.endpoint) : opts.endpoint
 
-    let endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : mapper.endpoint
-    let parents = mapper.parents || (mapper.parent ? {
-      [mapper.parent]: {
-        key: mapper.parentKey,
-        field: mapper.parentField
+    relationList.forEach(function (def) {
+      if (def.type !== 'belongsTo' || !def.parent) {
+        return
       }
-    } : {})
-
-    forOwn(parents, function (parent, parentName) {
       let item
-      let parentKey = parent.key
-      let parentField = parent.field
-      let parentDef = mapper.getResource(parentName)
+      const parentKey = def.foreignKey
+      const parentDef = def.getRelation()
       let parentId = opts.params[parentKey]
 
       if (parentId === false || !parentKey || !parentDef) {
@@ -884,14 +881,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
       } else {
         delete opts.params[parentKey]
 
-        if (isString(id) || isNumber(id)) {
-          item = mapper.get(id)
-        } else if (isObject(id)) {
+        if (isObject(id)) {
           item = id
         }
 
         if (item) {
-          parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null)
+          parentId = parentId || def.getForeignKey(item) || (def.getLocalField(item) ? get(def.getLocalField(item), parentDef.idAttribute) : null)
         }
 
         if (parentId) {
@@ -901,7 +896,7 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
             _opts[key] = value
           })
           _(_opts, parentDef)
-          endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts, parentId, endpoint))
+          endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts), parentId, endpoint)
           return false
         }
       }
@@ -922,7 +917,7 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
     const self = this
     opts || (opts = {})
     const args = [
-      opts.basePath === undefined ? (mapper.basePath === undefined ? self.basePath : mapper.basePath) : opts.basePath,
+      isUndefined(opts.basePath) ? (isUndefined(mapper.basePath) ? self.basePath : mapper.basePath) : opts.basePath,
       self.getEndpoint(mapper, (isString(id) || isNumber(id) || method === 'create') ? id : null, opts)
     ]
     if (method === 'find' || method === 'update' || method === 'destroy') {

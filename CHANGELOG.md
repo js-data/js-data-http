@@ -6,6 +6,14 @@
 - #46 - Sending large payloads takes huge amount of time - thanks @ivanvoznyakovsky
 - #47 - perf(http): speed up preparation of http config with large payload - thanks @ivanvoznyakovsky
 
+##### 3.0.0-alpha.6 - 23 February 2016
+
+- getEndpoint now works with multiple parents
+
+##### 3.0.0-alpha.5 - 23 February 2016
+
+- Rebased master
+
 ##### 2.2.0 - 23 February 2016
 
 ###### Backwards compatible API changes
@@ -15,6 +23,42 @@
 - Upgraded dependencies, including bundled axios
 - Added AUTHORS and CONTRIBUTORS files
 - Updated Readme
+
+##### 3.0.0-alpha.4 - 12 February 2016
+
+###### Backwards compatible API changes
+- Better debugging/logging
+- Updates for the newest js-data alpha
+
+##### 3.0.0-alpha.3 - 10 January 2016
+
+###### Backwards compatible API changes
+- Added updateMany, createMany, and responseError methods.
+
+##### 3.0.0-alpha.2 - 09 January 2016
+
+###### Breaking API changes
+- All options that could be found at `DSHttpAdapter#defaults` will now be on
+the actual instances of `DSHttpAdapter`. e.g. `DSHttpAdapter#defaults.deserialize`
+is now at `DSHttpAdapter#deserialize`. This makes it easier to extend the
+`DSHttpAdapter` class and override its methods.
+
+###### Backwards compatible API changes
+- Added lifecycle methods: beforeFind, afterPOST, etc.
+- Added support for the `raw` option
+
+##### 3.0.0-alpha.1 - 12 December 2015
+
+###### Breaking API changes
+- Actions are now part of js-data-http, rather than js-data
+- Now requires js-data 3.x or greater
+
+###### Backwards compatible API changes
+- Added option to support use of `window.fetch`
+- Added option to supply custom http implementation
+
+###### Other
+- Published the js-data-http-node package, a build of js-data-http that works in Node.js
 
 ##### 2.1.2 - 28 October 2015
 
