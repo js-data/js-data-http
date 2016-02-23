@@ -1,3 +1,13 @@
+##### 2.2.0 - 23 February 2016
+
+###### Backwards compatible API changes
+- #40 - Add support for multiple parents by @tfoxy
+
+###### Other
+- Upgraded dependencies, including bundled axios
+- Added AUTHORS and CONTRIBUTORS files
+- Updated Readme
+
 ##### 2.1.2 - 28 October 2015
 
 ###### Other

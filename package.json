@@ -1,23 +1,14 @@
 {
   "name": "js-data-http",
   "description": "HTTP adapter for js-data.",
-  "version": "2.1.2",
-  "homepage": "http://www.js-data.io/docs/dshttpadapter",
+  "version": "2.2.0",
+  "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
     "url": "https://github.com/js-data/js-data-http.git"
   },
-  "author": {
-    "name": "Jason Dobry",
-    "url": "http://www.pseudobry.com",
-    "email": "jason.dobry@gmail.com"
-  },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/js-data/js-data-http/blob/master/LICENSE"
-    }
-  ],
+  "author": "js-data-http project authors",
+  "license": "MIT",
   "main": "./dist/js-data-http.js",
   "keywords": [
     "ajax",
@@ -26,31 +17,6 @@
     "adapter",
     "http"
   ],
-  "devDependencies": {
-    "babel-core": "5.8.25",
-    "babel-eslint": "4.1.3",
-    "babel-loader": "5.3.2",
-    "chai": "3.4.0",
-    "codacy-coverage": "1.1.3",
-    "coveralls": "2.11.4",
-    "es6-promise": "3.0.2",
-    "karma": "0.13.19",
-    "karma-browserstack-launcher": "0.1.6",
-    "karma-chai": "0.1.0",
-    "karma-chrome-launcher": "0.2.1",
-    "karma-coverage": "0.5.3",
-    "karma-firefox-launcher": "0.1.6",
-    "karma-junit-reporter": "0.3.8",
-    "karma-mocha": "0.2.0",
-    "karma-phantomjs-launcher": "0.2.1",
-    "karma-sinon": "1.0.4",
-    "mocha": "2.3.3",
-    "phantomjs": "1.9.18",
-    "sinon": "1.17.2",
-    "standard": "5.3.1",
-    "uglify-js": "2.5.0",
-    "webpack": "1.12.2"
-  },
   "standard": {
     "parser": "babel-eslint"
   },
@@ -61,16 +27,41 @@
     "version": "node scripts/version.js",
     "banner": "node scripts/banner.js",
     "gzip": "echo gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",
-    "build": "npm run lint && npm run bundle && npm run min && npm run version && npm run banner && npm run gzip",
+    "build": "npm run lint && npm run bundle && npm run min && npm run version && npm run banner",
     "karma": "karma start",
     "test": "npm run build && npm run karma",
+    "release": "npm test && node scripts/authors.js",
     "ci": "npm test && cat ./coverage/PhantomJS*/lcov.info | coveralls || true && cat ./coverage/PhantomJS*/lcov.info | codacy-coverage || true"
   },
-  "dependencies": {
-    "axios": "0.5.4",
-    "mout": "0.11.0"
+  "devDependencies": {
+    "axios": "0.9.1",
+    "babel-core": "6.5.2",
+    "babel-eslint": "5.0.0",
+    "babel-loader": "6.2.3",
+    "babel-preset-es2015": "6.5.0",
+    "chai": "3.5.0",
+    "codacy-coverage": "1.1.3",
+    "coveralls": "2.11.6",
+    "es6-promise": "3.1.2",
+    "karma": "0.13.21",
+    "karma-browserstack-launcher": "0.1.10",
+    "karma-chai": "0.1.0",
+    "karma-chrome-launcher": "0.2.2",
+    "karma-coverage": "0.5.3",
+    "karma-firefox-launcher": "0.1.7",
+    "karma-junit-reporter": "0.3.8",
+    "karma-mocha": "0.2.2",
+    "karma-phantomjs-launcher": "0.2.1",
+    "karma-sinon": "1.0.4",
+    "mocha": "2.4.5",
+    "mout": "0.11.1",
+    "phantomjs": "1.9.18",
+    "sinon": "1.17.2",
+    "standard": "6.0.7",
+    "uglify-js": "2.6.2",
+    "webpack": "1.12.14"
   },
-  "peerDependencies": {
-    "js-data": ">=2.0.0"
+  "dependencies": {
+    "js-data": ">=2.0.0 <3"
   }
 }

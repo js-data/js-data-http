@@ -165,7 +165,7 @@ class DSHttpAdapter {
         }
       } else {
         // unknown type for 'data' that is not an Object or Error
-        _this.defaults.error(`FAILED`, data)
+        _this.defaults.error('FAILED', data)
         return DSUtils.Promise.reject(data)
       }
     }
@@ -222,7 +222,7 @@ class DSHttpAdapter {
     return _this.GET(
       _this.getPath('find', resourceConfig, id, options),
       options
-    ).then(data => {
+    ).then((data) => {
       let item = (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data)
       return !item ? DSUtils.Promise.reject(new Error('Not Found!')) : item
     })
@@ -240,7 +240,7 @@ class DSHttpAdapter {
     return _this.GET(
       _this.getPath('findAll', resourceConfig, params, options),
       options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
+    ).then((data) => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
   }
 
   create (resourceConfig, attrs, options) {
@@ -253,7 +253,7 @@ class DSHttpAdapter {
       _this.getPath('create', resourceConfig, attrs, options),
       options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
       options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
+    ).then((data) => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
   }
 
   update (resourceConfig, id, attrs, options) {
@@ -266,7 +266,7 @@ class DSHttpAdapter {
       _this.getPath('update', resourceConfig, id, options),
       options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
       options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
+    ).then((data) => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
   }
 
   updateAll (resourceConfig, attrs, params, options) {
@@ -282,7 +282,7 @@ class DSHttpAdapter {
       _this.getPath('updateAll', resourceConfig, attrs, options),
       options.serialize ? options.serialize(resourceConfig, attrs) : _this.defaults.serialize(resourceConfig, attrs),
       options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
+    ).then((data) => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
   }
 
   destroy (resourceConfig, id, options) {
@@ -294,7 +294,7 @@ class DSHttpAdapter {
     return _this.DEL(
       _this.getPath('destroy', resourceConfig, id, options),
       options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
+    ).then((data) => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
   }
 
   destroyAll (resourceConfig, params, options) {
@@ -309,7 +309,7 @@ class DSHttpAdapter {
     return this.DEL(
       _this.getPath('destroyAll', resourceConfig, params, options),
       options
-    ).then(data => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
+    ).then((data) => (options.deserialize ? options.deserialize : _this.defaults.deserialize)(resourceConfig, data))
   }
 }
 
