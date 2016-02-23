@@ -1,12 +1,3 @@
-/*!
-* js-data-fetch
-* @version 3.0.0-alpha.4 - Homepage <https://github.com/js-data/js-data-http>
-* @author Jason Dobry <jason.dobry@gmail.com>
-* @copyright (c) 2014-2016 Jason Dobry
-* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
-*
-* @overview Fetch HTTP (XHR) adapter for js-data in the browser.
-*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-data"), require("undefined"));
@@ -68,6 +59,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
 	
 	var _jsData = __webpack_require__(1);
+	
+	function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 	
 	/* global fetch:true Headers:true Request:true */
 	var axios = __webpack_require__(2);
@@ -528,7 +521,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  create: function create(mapper, props, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
@@ -567,7 +560,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  createMany: function createMany(mapper, records, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
@@ -621,7 +614,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  DEL: function DEL(url, config, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    config || (config = {});
 	    opts || (opts = {});
 	    config.url = url || config.url;
@@ -686,7 +679,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  destroy: function destroy(mapper, id, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
@@ -725,7 +718,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  destroyAll: function destroyAll(mapper, query, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
@@ -829,7 +822,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  find: function find(mapper, id, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
@@ -868,7 +861,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  findAll: function findAll(mapper, query, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
@@ -907,7 +900,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  GET: function GET(url, config, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    config || (config = {});
 	    opts || (opts = {});
 	    config.url = url || config.url;
@@ -941,54 +934,61 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {string} Full path.
 	   */
 	  getEndpoint: function getEndpoint(mapper, id, opts) {
-	    var _this = this;
-	
+	    var self = this;
 	    opts || (opts = {});
 	    opts.params || (opts.params = {});
 	
-	    var item = undefined;
-	    var parentKey = mapper.parentKey;
 	    var endpoint = opts.hasOwnProperty('endpoint') ? opts.endpoint : mapper.endpoint;
-	    var parentField = mapper.parentField;
-	    var parentDef = mapper.parent ? mapper.getResource(mapper.parent) : undefined;
-	    var parentId = opts.params[parentKey];
+	    var parents = mapper.parents || (mapper.parent ? _defineProperty({}, mapper.parent, {
+	      key: mapper.parentKey,
+	      field: mapper.parentField
+	    }) : {});
 	
-	    if (parentId === false || !parentKey || !parentDef) {
-	      if (parentId === false) {
-	        delete opts.params[parentKey];
-	      }
-	      return endpoint;
-	    } else {
-	      delete opts.params[parentKey];
+	    forOwn(parents, function (parent, parentName) {
+	      var item = void 0;
+	      var parentKey = parent.key;
+	      var parentField = parent.field;
+	      var parentDef = mapper.getResource(parentName);
+	      var parentId = opts.params[parentKey];
 	
-	      if (isString(id) || isNumber(id)) {
-	        item = mapper.get(id);
-	      } else if (isObject(id)) {
-	        item = id;
-	      }
-	
-	      if (item) {
-	        parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
-	      }
-	
-	      if (parentId) {
-	        var _ret = function () {
-	          delete opts.endpoint;
-	          var _opts = {};
-	          forOwn(opts, function (value, key) {
-	            _opts[key] = value;
-	          });
-	          _(_opts, parentDef);
-	          return {
-	            v: makePath(_this.getEndpoint(parentDef, parentId, _opts, parentId, endpoint))
-	          };
-	        }();
-	
-	        if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	      if (parentId === false || !parentKey || !parentDef) {
+	        if (parentId === false) {
+	          delete opts.params[parentKey];
+	        }
+	        return false;
 	      } else {
-	        return endpoint;
+	        delete opts.params[parentKey];
+	
+	        if (isString(id) || isNumber(id)) {
+	          item = mapper.get(id);
+	        } else if (isObject(id)) {
+	          item = id;
+	        }
+	
+	        if (item) {
+	          parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null);
+	        }
+	
+	        if (parentId) {
+	          var _ret = function () {
+	            delete opts.endpoint;
+	            var _opts = {};
+	            forOwn(opts, function (value, key) {
+	              _opts[key] = value;
+	            });
+	            _(_opts, parentDef);
+	            endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts, parentId, endpoint));
+	            return {
+	              v: false
+	            };
+	          }();
+	
+	          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+	        }
 	      }
-	    }
+	    });
+	
+	    return endpoint;
 	  },
 	
 	
@@ -1024,8 +1024,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var self = this;
 	    var start = new Date();
 	    opts || (opts = {});
-	    config = copy(config);
+	    var payload = config.data;
+	    var cache = config.cache;
+	    var timeout = config.timeout;
+	    config = copy(config, null, null, null, ['data', 'cache', 'timeout']);
 	    config = deepMixIn(config, self.httpConfig);
+	    config.data = payload;
+	    config.cache = cache;
+	    config.timeout = timeout;
 	    if (self.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
 	      config.url += '/';
 	    }
@@ -1116,7 +1122,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  POST: function POST(url, data, config, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    config || (config = {});
 	    opts || (opts = {});
 	    config.url = url || config.url;
@@ -1155,7 +1161,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  PUT: function PUT(url, data, config, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    config || (config = {});
 	    opts || (opts = {});
 	    config.url = url || config.url;
@@ -1256,7 +1262,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  update: function update(mapper, id, props, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
@@ -1294,7 +1300,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  updateAll: function updateAll(mapper, props, query, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    query || (query = {});
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
@@ -1340,7 +1346,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  updateMany: function updateMany(mapper, records, opts) {
 	    var self = this;
-	    var op = undefined;
+	    var op = void 0;
 	    opts = opts ? copy(opts) : {};
 	    opts.params || (opts.params = {});
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
@@ -1519,12 +1525,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '3.0.0-alpha.4',
-	  major: parseInt('3', 10),
-	  minor: parseInt('0', 10),
-	  patch: parseInt('0', 10),
-	  alpha:  true ? '4' : false,
-	  beta:  true ? 'false' : false
+	  full: '<%= pkg.version %>',
+	  major: parseInt('<%= major %>', 10),
+	  minor: parseInt('<%= minor %>', 10),
+	  patch: parseInt('<%= patch %>', 10),
+	  alpha:  true ? '<%= alpha %>' : false,
+	  beta:  true ? '<%= beta %>' : false
 	};
 	
 	/**

@@ -9,13 +9,24 @@
 [![Coverage Status][cov_b]][cov_l]
 [![Codacy][cod_b]][cod_l]
 
-HTTP adapter for [js-data](http://www.js-data.io/).
+This repo contains HTTP adapters for [js-data](http://www.js-data.io/):
+
+- js-data-http - HTTP (XHR, includes [axios][axios]) adapter for js-data in the
+browser. Capable of using `window.fetch` instead of axios.
+- js-data-fetch - Same as js-data-http but doesn't include axios and will use
+`window.fetch` if available and if you don't provide your own http library.
+- js-data-http-node - Same as js-data-http but runs on Node.js. Depends on axios
+and will use axios unless you provide a different http library.
+
+Tested on IE9, Chrome 46, Firefox 41 & Safari 7.1 using
+<img src="https://raw.githubusercontent.com/js-data/js-data-localstorage/master/bs.jpg" alt="bs logo" title="browserstack" width="150" height="35" style="vertical-align: middle" />
 
 To get started, visit __[http://js-data.io](http://www.js-data.io)__.
 
 ## Table of contents
 
 * [Quick start](#quick-start)
+* [Dependencies](#dependencies)
 * [Guides and Tutorials](#guides-and-tutorials)
 * [API Reference Docs](#api-reference-docs)
 * [Community](#community)
@@ -47,6 +58,13 @@ container.find('school', 1).then(function (school) {
   // ...
 })
 ```
+
+## Dependencies
+
+`js-data-http` bundles axios and depends on `js-data`. `js-data-fetch` depends
+on `js-data`. `js-data-http-node` depends on `js-data` and optionally axios.
+
+See [JSData's dependencies](https://github.com/js-data/js-data/blob/master/README.md#dependencies).
 
 ## Guides and Tutorials
 
