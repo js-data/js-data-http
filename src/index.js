@@ -1,6 +1,8 @@
 /* global fetch:true Headers:true Request:true */
 const axios = require('axios')
 import {utils} from 'js-data'
+import Adapter from 'js-data-adapter'
+
 const {
   _,
   addHiddenPropsToTarget,
@@ -27,6 +29,20 @@ let hasFetch = false
 try {
   hasFetch = window && window.fetch
 } catch (e) {}
+
+const noop = function (...args) {
+  const self = this
+  const opts = args[args.length - 1]
+  self.dbg(opts.op, ...args)
+  return resolve()
+}
+
+const noop2 = function (...args) {
+  const self = this
+  const opts = args[args.length - 2]
+  self.dbg(opts.op, ...args)
+  return resolve()
+}
 
 function isValidString (value) {
   return (value != null && value !== '')
@@ -83,17 +99,7 @@ function buildUrl (url, params) {
   return url
 }
 
-const noop = function (...args) {
-  const self = this
-  const opts = args[args.length - 1]
-  self.dbg(opts.op, ...args)
-}
-
-const noop2 = function (...args) {
-  const self = this
-  const opts = args[args.length - 2]
-  self.dbg(opts.op, ...args)
-}
+const __super__ = Adapter.prototype
 
 const DEFAULTS = {
   // Default and user-defined settings
@@ -102,13 +108,6 @@ const DEFAULTS = {
    * @type {string}
    */
   basePath: '',
-
-  /**
-   * @name HttpAdapter#debug
-   * @type {boolean}
-   * @default false
-   */
-  debug: false,
 
   /**
    * @name HttpAdapter#forceTrailingSlash
@@ -158,35 +157,27 @@ const DEFAULTS = {
  */
 function HttpAdapter (opts) {
   const self = this
-
-  // Default values for arguments
   opts || (opts = {})
-
-  fillIn(self, opts)
-  fillIn(self, DEFAULTS)
+  fillIn(opts, DEFAULTS)
+  Adapter.call(self, opts)
 }
 
+// Setup prototype inheritance from Adapter
+HttpAdapter.prototype = Object.create(Adapter.prototype, {
+  constructor: {
+    value: HttpAdapter,
+    enumerable: false,
+    writable: true,
+    configurable: true
+  }
+})
+
+Object.defineProperty(HttpAdapter, '__super__', {
+  configurable: true,
+  value: Adapter
+})
+
 addHiddenPropsToTarget(HttpAdapter.prototype, {
-  /**
-   * @name HttpAdapter#afterCreate
-   * @method
-   * @param {Object} mapper
-   * @param {Object} props
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterCreate: noop2,
-
-  /**
-   * @name HttpAdapter#afterCreateMany
-   * @method
-   * @param {Object} mapper
-   * @param {Object} records
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterCreateMany: noop2,
-
   /**
    * @name HttpAdapter#afterDEL
    * @method
@@ -196,46 +187,6 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @param {Object} response
    */
   afterDEL: noop2,
-
-  /**
-   * @name HttpAdapter#afterDestroy
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterDestroy: noop2,
-
-  /**
-   * @name HttpAdapter#afterDestroyAll
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterDestroyAll: noop2,
-
-  /**
-   * @name HttpAdapter#afterFind
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterFind: noop2,
-
-  /**
-   * @name HttpAdapter#afterFindAll
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterFindAll: noop2,
 
   /**
    * @name HttpAdapter#afterGET
@@ -279,56 +230,6 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
   afterPUT: noop2,
 
   /**
-   * @name HttpAdapter#afterUpdate
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} props
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterUpdate: noop2,
-
-  /**
-   * @name HttpAdapter#afterUpdateAll
-   * @method
-   * @param {Object} mapper
-   * @param {Object} props
-   * @param {Object} query
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterUpdateAll: noop2,
-
-  /**
-   * @name HttpAdapter#afterUpdateMany
-   * @method
-   * @param {Object} mapper
-   * @param {Object} records
-   * @param {Object} opts
-   * @param {Object} data
-   */
-  afterUpdateMany: noop2,
-
-  /**
-   * @name HttpAdapter#beforeCreate
-   * @method
-   * @param {Object} mapper
-   * @param {Object} props
-   * @param {Object} opts
-   */
-  beforeCreate: noop,
-
-  /**
-   * @name HttpAdapter#beforeCreateMany
-   * @method
-   * @param {Object} mapper
-   * @param {Object} records
-   * @param {Object} opts
-   */
-  beforeCreateMany: noop,
-
-  /**
    * @name HttpAdapter#beforeDEL
    * @method
    * @param {Object} url
@@ -336,42 +237,6 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @param {Object} opts
    */
   beforeDEL: noop,
-
-  /**
-   * @name HttpAdapter#beforeDestroy
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} opts
-   */
-  beforeDestroy: noop,
-
-  /**
-   * @name HttpAdapter#beforeDestroyAll
-   * @method
-   * @param {Object} mapper
-   * @param {Object} query
-   * @param {Object} opts
-   */
-  beforeDestroyAll: noop,
-
-  /**
-   * @name HttpAdapter#beforeFind
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} opts
-   */
-  beforeFind: noop,
-
-  /**
-   * @name HttpAdapter#beforeFindAll
-   * @method
-   * @param {Object} mapper
-   * @param {Object} query
-   * @param {Object} opts
-   */
-  beforeFindAll: noop,
 
   /**
    * @name HttpAdapter#beforeGET
@@ -410,34 +275,104 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   beforePUT: noop,
 
-  /**
-   * @name HttpAdapter#beforeUpdate
-   * @method
-   * @param {Object} mapper
-   * @param {(string|number)} id
-   * @param {Object} props
-   * @param {Object} opts
-   */
-  beforeUpdate: noop,
+  _create (mapper, props, opts) {
+    const self = this
+    return self.POST(
+      self.getPath('create', mapper, props, opts),
+      self.serialize(mapper, props, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
 
-  /**
-   * @name HttpAdapter#beforeUpdateAll
-   * @method
-   * @param {Object} mapper
-   * @param {Object} props
-   * @param {Object} query
-   * @param {Object} opts
-   */
-  beforeUpdateAll: noop,
+  _createMany (mapper, props, opts) {
+    const self = this
+    return self.POST(
+      self.getPath('createMany', mapper, null, opts),
+      self.serialize(mapper, props, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
 
-  /**
-   * @name HttpAdapter#beforeUpdateMany
-   * @method
-   * @param {Object} mapper
-   * @param {Object} records
-   * @param {Object} opts
-   */
-  beforeUpdateMany: noop,
+  _destroy (mapper, id, opts) {
+    const self = this
+    return self.DEL(
+      self.getPath('destroy', mapper, id, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
+
+  _destroyAll (mapper, query, opts) {
+    const self = this
+    return self.DEL(
+      self.getPath('destroyAll', mapper, null, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
+
+  _end (mapper, opts, response) {
+    return [this.deserialize(mapper, response.data, opts), response]
+  },
+
+  _find (mapper, id, opts) {
+    const self = this
+    return self.GET(
+      self.getPath('find', mapper, id, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
+
+  _findAll (mapper, query, opts) {
+    const self = this
+    return self.GET(
+      self.getPath('findAll', mapper, opts.params, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
+
+  _update (mapper, id, props, opts) {
+    const self = this
+    return self.PUT(
+      self.getPath('update', mapper, id, opts),
+      self.serialize(mapper, props, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
+
+  _updateAll (mapper, props, query, opts) {
+    const self = this
+    return self.PUT(
+      self.getPath('updateAll', mapper, null, opts),
+      self.serialize(mapper, props, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
+
+  _updateMany (mapper, records, opts) {
+    const self = this
+    return self.PUT(
+      self.getPath('updateMany', mapper, null, opts),
+      self.serialize(mapper, records, opts),
+      opts
+    ).then(function (response) {
+      return self._end(mapper, opts, response)
+    })
+  },
 
   /**
    * Create a new the record from the provided `props`.
@@ -453,32 +388,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   create (mapper, props, opts) {
     const self = this
-    let op
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeCreate lifecycle hook
-    op = opts.op = 'beforeCreate'
-    return resolve(self[op](mapper, props, opts)).then(function () {
-      op = opts.op = 'create'
-      self.dbg(op, mapper, props, opts)
-      return self.POST(
-        self.getPath('create', mapper, props, opts),
-        self.serialize(mapper, props, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterCreate lifecycle hook
-      op = opts.op = 'afterCreate'
-      return resolve(self[op](mapper, props, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.create.call(self, mapper, props, opts)
   },
 
   /**
@@ -487,51 +402,20 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @name HttpAdapter#createMany
    * @method
    * @param {Object} mapper The mapper.
-   * @param {Array} records Array of property objects to send as the payload.
+   * @param {Array} props Array of property objects to send as the payload.
    * @param {Object} [opts] Configuration options.
    * @param {string} [opts.params] TODO
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
    * @return {Promise}
    */
-  createMany (mapper, records, opts) {
+  createMany (mapper, props, opts) {
     const self = this
-    let op
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeCreateMany lifecycle hook
-    op = opts.op = 'beforeCreateMany'
-    return resolve(self[op](mapper, records, opts)).then(function () {
-      op = opts.op = 'createMany'
-      self.dbg(op, mapper, records, opts)
-      return self.POST(
-        self.getPath('createMany', mapper, null, opts),
-        self.serialize(mapper, records, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterCreateMany lifecycle hook
-      op = opts.op = 'afterCreateMany'
-      return resolve(self[op](mapper, records, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
-  },
-
-  /**
-   * Call {@link HttpAdapter#log} at the "debug" level.
-   *
-   * @name HttpAdapter#dbg
-   * @method
-   * @param {...*} [args] Args passed to {@link HttpAdapter#log}.
-   */
-  dbg (...args) {
-    this.log('debug', ...args)
+    return __super__.createMany.call(self, mapper, props, opts)
   },
 
   /**
@@ -590,10 +474,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
     if (isFunction(mapper.deserialize)) {
       return mapper.deserialize(mapper, response, opts)
     }
-    if (opts.raw) {
-      return response
+    if (response) {
+      if (response.hasOwnProperty('data')) {
+        return response.data
+      }
     }
-    return response ? ('data' in response ? response.data : response) : response
+    return response
   },
 
   /**
@@ -610,31 +496,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   destroy (mapper, id, opts) {
     const self = this
-    let op
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeDestroy lifecycle hook
-    op = opts.op = 'beforeDestroy'
-    return resolve(self[op](mapper, id, opts)).then(function () {
-      op = opts.op = 'destroy'
-      self.dbg(op, mapper, id, opts)
-      return self.DEL(
-        self.getPath('destroy', mapper, id, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterDestroy lifecycle hook
-      op = opts.op = 'afterDestroy'
-      return resolve(self[op](mapper, id, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.destroy.call(self, mapper, id, opts)
   },
 
   /**
@@ -651,33 +518,14 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   destroyAll (mapper, query, opts) {
     const self = this
-    let op
     query || (query = {})
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     deepMixIn(opts.params, query)
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeDestroyAll lifecycle hook
-    op = opts.op = 'beforeDestroyAll'
-    return resolve(self.beforeDestroyAll(mapper, query, opts)).then(function () {
-      op = opts.op = 'destroyAll'
-      self.dbg(op, mapper, query, opts)
-      return self.DEL(
-        self.getPath('destroyAll', mapper, null, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterDestroyAll lifecycle hook
-      op = opts.op = 'afterDestroyAll'
-      return resolve(self[op](mapper, query, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.destroyAll.call(self, mapper, query, opts)
   },
 
   /**
@@ -743,31 +591,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   find (mapper, id, opts) {
     const self = this
-    let op
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeFind lifecycle hook
-    op = opts.op = 'beforeFind'
-    return resolve(self[op](mapper, id, opts)).then(function () {
-      op = opts.op = 'find'
-      self.dbg(op, mapper, id, opts)
-      return self.GET(
-        self.getPath('find', mapper, id, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterFind lifecycle hook
-      op = opts.op = 'afterFind'
-      return resolve(self[op](mapper, id, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.find.call(self, mapper, id, opts)
   },
 
   /**
@@ -784,33 +613,14 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   findAll (mapper, query, opts) {
     const self = this
-    let op
     query || (query = {})
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
     deepMixIn(opts.params, query)
     opts.params = self.queryTransform(mapper, opts.params, opts)
 
-    // beforeFindAll lifecycle hook
-    op = opts.op = 'beforeFindAll'
-    return resolve(self[op](mapper, query, opts)).then(function () {
-      op = opts.op = 'findAll'
-      self.dbg(op, mapper, query, opts)
-      return self.GET(
-        self.getPath('findAll', mapper, opts.params, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterFindAll lifecycle hook
-      op = opts.op = 'afterFindAll'
-      return resolve(self[op](mapper, query, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.findAll.call(self, mapper, query, opts)
   },
 
   /**
@@ -926,6 +736,17 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
     return makePath.apply(utils, args)
   },
 
+  getSuffix (mapper, opts) {
+    opts || (opts = {})
+    if (isUndefined(opts.suffix)) {
+      if (isUndefined(mapper.suffix)) {
+        return this.suffix
+      }
+      return mapper.suffix
+    }
+    return opts.suffix
+  },
+
   /**
    * Make an Http request.
    *
@@ -988,30 +809,6 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
         return _response || response
       })
     })
-  },
-
-  /**
-   * Log the provided arguments at the specified leve.
-   *
-   * @name HttpAdapter#log
-   * @method
-   * @param {string} level Log level.
-   * @param {...*} [args] Arguments to log.
-   */
-  log (level, ...args) {
-    if (level && !args.length) {
-      args.push(level)
-      level = 'debug'
-    }
-    if (level === 'debug' && !this.debug) {
-      return
-    }
-    const prefix = `${level.toUpperCase()}: (HttpAdapter)`
-    if (console[level]) {
-      console[level](prefix, ...args)
-    } else {
-      console.log(prefix, ...args)
-    }
   },
 
   /**
@@ -1162,32 +959,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   update (mapper, id, props, opts) {
     const self = this
-    let op
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeUpdate lifecycle hook
-    op = opts.op = 'beforeUpdate'
-    return resolve(self[op](mapper, id, props, opts)).then(function () {
-      op = opts.op = 'update'
-      self.dbg(op, mapper, id, props, opts)
-      return self.PUT(
-        self.getPath('update', mapper, id, opts),
-        self.serialize(mapper, props, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterUpdate lifecycle hook
-      op = opts.op = 'afterUpdate'
-      return resolve(self[op](mapper, id, props, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.update.call(self, mapper, id, props, opts)
   },
 
   /**
@@ -1203,34 +980,14 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   updateAll (mapper, props, query, opts) {
     const self = this
-    let op
     query || (query = {})
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     deepMixIn(opts.params, query)
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeUpdateAll lifecycle hook
-    op = opts.op = 'beforeUpdateAll'
-    return resolve(self[op](mapper, props, query, opts)).then(function () {
-      op = opts.op = 'updateAll'
-      self.dbg(op, mapper, props, query, opts)
-      return self.PUT(
-        self.getPath('updateAll', mapper, null, opts),
-        self.serialize(mapper, props, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterUpdateAll lifecycle hook
-      op = opts.op = 'afterUpdateAll'
-      return resolve(self[op](mapper, props, query, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.updateAll.call(self, mapper, props, query, opts)
   },
 
   /**
@@ -1252,32 +1009,12 @@ addHiddenPropsToTarget(HttpAdapter.prototype, {
    */
   updateMany (mapper, records, opts) {
     const self = this
-    let op
     opts = opts ? copy(opts) : {}
     opts.params || (opts.params = {})
     opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = isUndefined(opts.suffix) ? mapper.suffix : opts.suffix
+    opts.suffix = self.getSuffix(mapper, opts)
 
-    // beforeUpdateMany lifecycle hook
-    op = opts.op = 'beforeUpdateMany'
-    return resolve(self[op](mapper, records, opts)).then(function () {
-      op = opts.op = 'updateMany'
-      self.dbg(op, mapper, records, opts)
-      return self.PUT(
-        self.getPath('updateMany', mapper, null, opts),
-        self.serialize(mapper, records, opts),
-        opts
-      )
-    }).then(function (response) {
-      return self.deserialize(mapper, response, opts)
-    }).then(function (data) {
-      // afterUpdateMany lifecycle hook
-      op = opts.op = 'afterUpdateMany'
-      return resolve(self[op](mapper, records, opts, data)).then(function (_data) {
-        // Allow re-assignment from lifecycle hook
-        return isUndefined(_data) ? data : _data
-      })
-    })
+    return __super__.updateMany.call(self, mapper, records, opts)
   }
 })
 

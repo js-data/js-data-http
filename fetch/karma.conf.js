@@ -46,13 +46,12 @@ module.exports = function (config) {
       'karma-mocha',
       'karma-chai',
       'karma-phantomjs-launcher',
-      'karma-browserstack-launcher',
-      'karma-junit-reporter'
+      'karma-browserstack-launcher'
     ],
     autoWatch: false,
     browsers: browsers,
     files: [
-      'node_modules/es6-promise/dist/es6-promise.js',
+      'node_modules/babel-polyfill/dist/polyfill.js',
       'node_modules/js-data/dist/js-data.js',
       'fetch/dist/js-data-fetch.js',
       'fetch/karma.start.js',
@@ -63,7 +62,7 @@ module.exports = function (config) {
       accessKey: process.env.BROWSERSTACK_ACCESS_KEY
     },
     customLaunchers: customLaunchers,
-    reporters: ['dots', 'junit'],
+    reporters: ['dots'],
     junitReporter: {
       outputDir: process.env.CIRCLE_TEST_REPORTS || 'junit',
       outputFile: undefined,

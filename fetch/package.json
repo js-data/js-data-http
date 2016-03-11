@@ -1,7 +1,7 @@
 {
   "name": "js-data-fetch",
   "description": "HTTP adapter for js-data that uses the fetch API.",
-  "version": "3.0.0-alpha.6",
+  "version": "3.0.0-alpha.7",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
     "http",
     "fetch"
   ],
-  "dependencies": {
-    "js-data": "^3.0.0-alpha.15"
+  "peerDependencies": {
+    "js-data": "^3.0.0-alpha.16"
   }
 }

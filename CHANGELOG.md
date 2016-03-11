@@ -6,6 +6,12 @@
 - #46 - Sending large payloads takes huge amount of time - thanks @ivanvoznyakovsky
 - #47 - perf(http): speed up preparation of http config with large payload - thanks @ivanvoznyakovsky
 
+##### 3.0.0-alpha.7 - 10 March 2016
+
+###### Other
+- Now using js-data-repo-tools
+- Now using js-data-adapter
+
 ##### 3.0.0-alpha.6 - 23 February 2016
 
 - getEndpoint now works with multiple parents
