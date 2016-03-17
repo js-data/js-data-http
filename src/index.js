@@ -121,8 +121,11 @@ class DSHttpAdapter {
   HTTP (config) {
     let _this = this
     let start = new Date()
-    config = copy(config)
-    config = deepMixIn(config, _this.defaults.httpConfig)
+
+    // blacklist `data` as it can be large and will take a lot of time to copy
+    let payload = config.data
+    config = copy(config, null, null, null, ['data'])
+    config = deepMixIn(config, _this.defaults.httpConfig, {data: payload})
     if (!('verbsUseBasePath' in config)) {
       config.verbsUseBasePath = _this.defaults.verbsUseBasePath
     }
