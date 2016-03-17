@@ -124,8 +124,13 @@ class DSHttpAdapter {
 
     // blacklist `data` as it can be large and will take a lot of time to copy
     let payload = config.data
-    config = copy(config, null, null, null, ['data'])
-    config = deepMixIn(config, _this.defaults.httpConfig, {data: payload})
+    let cache = config.cache
+    let timeout = config.timeout
+    config = copy(config, null, null, null, ['data', 'cache', 'timeout'])
+    config = deepMixIn(config, _this.defaults.httpConfig)
+    config.data = payload
+    config.cache = cache
+    config.timeout = timeout
     if (!('verbsUseBasePath' in config)) {
       config.verbsUseBasePath = _this.defaults.verbsUseBasePath
     }

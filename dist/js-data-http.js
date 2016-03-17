@@ -1,6 +1,6 @@
 /*!
 * js-data-http
-* @version 2.2.0 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 2.2.1 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @copyright (c) 2014-2015 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -164,7 +164,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      DSUtils.forOwn(parents, function (parent, parentName) {
 	        var _this2 = this;
 	
-	        var item = undefined;
+	        var item = void 0;
 	        var parentKey = parent.key;
 	        var parentField = parent.field;
 	        var parentDef = resourceConfig.getResource(parentName);
@@ -223,8 +223,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	    value: function HTTP(config) {
 	      var _this = this;
 	      var start = new Date();
-	      config = copy(config);
+	
+	      // blacklist `data` as it can be large and will take a lot of time to copy
+	      var payload = config.data;
+	      var cache = config.cache;
+	      var timeout = config.timeout;
+	      config = copy(config, null, null, null, ['data', 'cache', 'timeout']);
 	      config = deepMixIn(config, _this.defaults.httpConfig);
+	      config.data = payload;
+	      config.cache = cache;
+	      config.timeout = timeout;
 	      if (!('verbsUseBasePath' in config)) {
 	        config.verbsUseBasePath = _this.defaults.verbsUseBasePath;
 	      }
@@ -418,10 +426,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	
 	DSHttpAdapter.version = {
-	  full: '2.2.0',
+	  full: '2.2.1',
 	  major: parseInt('2', 10),
 	  minor: parseInt('2', 10),
-	  patch: parseInt('0', 10),
+	  patch: parseInt('1', 10),
 	  alpha:  true ? 'false' : false,
 	  beta:  true ? 'false' : false
 	};
