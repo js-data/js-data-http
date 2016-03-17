@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-alpha.7",
+  "version": "3.0.0-alpha.8",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -56,7 +56,7 @@
     "ci": "npm test && cat ./coverage/lcov.info | coveralls || true"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-alpha.16"
+    "js-data": "^3.0.0-alpha.19"
   },
   "devDependencies": {
     "axios": "0.9.1",
@@ -70,7 +70,7 @@
     "chai": "3.5.0",
     "coveralls": "2.11.8",
     "istanbul": "0.4.2",
-    "js-data-adapter": "0.2.1",
+    "js-data-adapter": "0.2.2",
     "js-data-repo-tools": "0.2.0",
     "jsdoc": "3.4.0",
     "karma": "0.13.22",

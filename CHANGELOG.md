@@ -1,3 +1,7 @@
+##### 3.0.0-alpha.8 - 17 March 2016
+
+- Rebased master
+
 ##### 2.2.1 - 17 March 2016
 
 ###### Backwards compatible bug fixes

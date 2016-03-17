@@ -1,3 +1,12 @@
+/*!
+* js-data-http
+* @version 3.0.0-alpha.8 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @author Jason Dobry <jason.dobry@gmail.com>
+* @copyright (c) 2014-2015 Jason Dobry
+* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
+*
+* @overview HTTP adapter for js-data.
+*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-data"));
@@ -1238,12 +1247,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '<%= pkg.version %>',
-	  major: parseInt('<%= major %>', 10),
-	  minor: parseInt('<%= minor %>', 10),
-	  patch: parseInt('<%= patch %>', 10),
-	  alpha:  true ? '<%= alpha %>' : false,
-	  beta:  true ? '<%= beta %>' : false
+	  full: '3.0.0-alpha.8',
+	  major: parseInt('3', 10),
+	  minor: parseInt('0', 10),
+	  patch: parseInt('0', 10),
+	  alpha:  true ? '8' : false,
+	  beta:  true ? 'false' : false
 	};
 	
 	/**
