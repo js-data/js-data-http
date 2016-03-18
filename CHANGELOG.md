@@ -1,3 +1,10 @@
+##### 2.2.2 - 18 March 2016
+
+###### Backwards compatible bug fixes
+- #39 - Cannot override default suffix
+- Improved fix for #44
+- Removed rogue console.log statement
+
 ##### 2.2.1 - 17 March 2016
 
 ###### Backwards compatible bug fixes

@@ -8,6 +8,10 @@ try {
 let { DSUtils } = JSData
 let { deepMixIn, removeCircular, copy, makePath, isString, isNumber } = DSUtils
 
+function isUndefined (value) {
+  return value === undefined
+}
+
 class Defaults {
   queryTransform (resourceConfig, params) {
     return params
@@ -38,7 +42,7 @@ defaultsPrototype.verbsUseBasePath = false
 
 class DSHttpAdapter {
   constructor (options) {
-    options = options || {}
+    options || (options = {})
     this.defaults = new Defaults()
     if (console) {
       this.defaults.log = (a, b) => console[typeof console.info === 'function' ? 'info' : 'log'](a, b)
@@ -51,8 +55,8 @@ class DSHttpAdapter {
   }
 
   getEndpoint (resourceConfig, id, options) {
-    options = options || {}
-    options.params = options.params || {}
+    options || (options = {})
+    options.params = isUndefined(options.params) ? {} : options.params
 
     let endpoint = options.hasOwnProperty('endpoint') ? options.endpoint : resourceConfig.endpoint
     let parents = resourceConfig.parents || (resourceConfig.parent ? {
@@ -81,7 +85,6 @@ class DSHttpAdapter {
         } else if (DSUtils._o(id)) {
           item = id
         }
-        console.log('item', item)
 
         if (item) {
           parentId = parentId || item[parentKey] || (item[parentField] ? item[parentField][parentDef.idAttribute] : null)
@@ -103,7 +106,7 @@ class DSHttpAdapter {
 
   getPath (method, resourceConfig, id, options) {
     let _this = this
-    options = options || {}
+    options || (options = {})
     if (isString(options.urlPath)) {
       return makePath.apply(DSUtils, [options.basePath || _this.defaults.basePath || resourceConfig.basePath, options.urlPath])
     } else {
@@ -144,7 +147,7 @@ class DSHttpAdapter {
       config.data = removeCircular(config.data)
     }
     config.method = config.method.toUpperCase()
-    let suffix = config.suffix || _this.defaults.suffix
+    let suffix = isUndefined(config.suffix) ? _this.defaults.suffix : config.suffix
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix && !config.urlOverride) {
       config.url += suffix
     }
@@ -223,9 +226,9 @@ class DSHttpAdapter {
 
   find (resourceConfig, id, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     options.params = _this.defaults.queryTransform(resourceConfig, options.params)
     return _this.GET(
       _this.getPath('find', resourceConfig, id, options),
@@ -238,9 +241,9 @@ class DSHttpAdapter {
 
   findAll (resourceConfig, params, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     if (params) {
       params = _this.defaults.queryTransform(resourceConfig, params)
       deepMixIn(options.params, params)
@@ -253,9 +256,9 @@ class DSHttpAdapter {
 
   create (resourceConfig, attrs, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     options.params = _this.defaults.queryTransform(resourceConfig, options.params)
     return _this.POST(
       _this.getPath('create', resourceConfig, attrs, options),
@@ -266,9 +269,9 @@ class DSHttpAdapter {
 
   update (resourceConfig, id, attrs, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     options.params = _this.defaults.queryTransform(resourceConfig, options.params)
     return _this.PUT(
       _this.getPath('update', resourceConfig, id, options),
@@ -279,9 +282,9 @@ class DSHttpAdapter {
 
   updateAll (resourceConfig, attrs, params, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     if (params) {
       params = _this.defaults.queryTransform(resourceConfig, params)
       deepMixIn(options.params, params)
@@ -295,9 +298,9 @@ class DSHttpAdapter {
 
   destroy (resourceConfig, id, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     options.params = _this.defaults.queryTransform(resourceConfig, options.params)
     return _this.DEL(
       _this.getPath('destroy', resourceConfig, id, options),
@@ -307,9 +310,9 @@ class DSHttpAdapter {
 
   destroyAll (resourceConfig, params, options) {
     let _this = this
-    options = options ? copy(options) : {}
-    options.suffix = options.suffix || resourceConfig.suffix
-    options.params = options.params || {}
+    options || (options = {})
+    options.suffix = isUndefined(options.suffix) ? resourceConfig.suffix : options.suffix
+    options.params = isUndefined(options.params) ? {} : copy(options.params)
     if (params) {
       params = _this.defaults.queryTransform(resourceConfig, params)
       deepMixIn(options.params, params)
