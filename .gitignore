@@ -8,3 +8,4 @@ coverage/
 junit/
 doc/
 node_modules/
+*.log
