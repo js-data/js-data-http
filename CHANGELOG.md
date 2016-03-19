@@ -1,3 +1,11 @@
+##### 3.0.0-alpha.9 - 18 March 2016
+
+###### Backwards compatible API changes
+- Added sum and count methods
+
+###### Other
+- Cleaned up some things
+
 ##### 3.0.0-alpha.8 - 17 March 2016
 
 - Rebased master

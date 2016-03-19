@@ -1,6 +1,6 @@
 /*!
 * js-data-http
-* @version 3.0.0-alpha.8 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 3.0.0-alpha.9 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @copyright (c) 2014-2015 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -77,24 +77,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/* global fetch:true Headers:true Request:true */
 	var axios = __webpack_require__(3);
-	var _ = _jsData.utils._;
-	var addHiddenPropsToTarget = _jsData.utils.addHiddenPropsToTarget;
-	var copy = _jsData.utils.copy;
-	var deepMixIn = _jsData.utils.deepMixIn;
-	var extend = _jsData.utils.extend;
-	var fillIn = _jsData.utils.fillIn;
-	var forOwn = _jsData.utils.forOwn;
-	var get = _jsData.utils.get;
-	var isArray = _jsData.utils.isArray;
-	var isFunction = _jsData.utils.isFunction;
-	var isNumber = _jsData.utils.isNumber;
-	var isObject = _jsData.utils.isObject;
-	var isSorN = _jsData.utils.isSorN;
-	var isString = _jsData.utils.isString;
-	var isUndefined = _jsData.utils.isUndefined;
-	var resolve = _jsData.utils.resolve;
-	var reject = _jsData.utils.reject;
-	var toJson = _jsData.utils.toJson;
 	
 	
 	var hasFetch = false;
@@ -112,7 +94,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var opts = args[args.length - 1];
 	  self.dbg.apply(self, [opts.op].concat(args));
-	  return resolve();
+	  return _jsData.utils.resolve();
 	};
 	
 	var noop2 = function noop2() {
@@ -124,7 +106,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var opts = args[args.length - 2];
 	  self.dbg.apply(self, [opts.op].concat(args));
-	  return resolve();
+	  return _jsData.utils.resolve();
 	};
 	
 	function isValidString(value) {
@@ -154,19 +136,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  var parts = [];
 	
-	  forOwn(params, function (val, key) {
+	  _jsData.utils.forOwn(params, function (val, key) {
 	    if (val === null || typeof val === 'undefined') {
 	      return;
 	    }
-	    if (!isArray(val)) {
+	    if (!_jsData.utils.isArray(val)) {
 	      val = [val];
 	    }
 	
 	    val.forEach(function (v) {
 	      if (window.toString.call(v) === '[object Date]') {
 	        v = v.toISOString();
-	      } else if (isObject(v)) {
-	        v = toJson(v);
+	      } else if (_jsData.utils.isObject(v)) {
+	        v = _jsData.utils.toJson(v);
 	      }
 	      parts.push(encode(key) + '=' + encode(v));
 	    });
@@ -238,7 +220,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	function HttpAdapter(opts) {
 	  var self = this;
 	  opts || (opts = {});
-	  fillIn(opts, DEFAULTS);
+	  _jsData.utils.fillIn(opts, DEFAULTS);
 	  _jsDataAdapter2.default.call(self, opts);
 	}
 	
@@ -257,7 +239,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  value: _jsDataAdapter2.default
 	});
 	
-	addHiddenPropsToTarget(HttpAdapter.prototype, {
+	_jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 	  /**
 	   * @name HttpAdapter#afterDEL
 	   * @method
@@ -355,6 +337,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  beforePUT: noop,
 	
+	  _count: function _count(mapper, query, opts) {
+	    var self = this;
+	    return self.GET(self.getPath('count', mapper, opts.params, opts), opts).then(function (response) {
+	      return self._end(mapper, opts, response);
+	    });
+	  },
 	  _create: function _create(mapper, props, opts) {
 	    var self = this;
 	    return self.POST(self.getPath('create', mapper, props, opts), self.serialize(mapper, props, opts), opts).then(function (response) {
@@ -394,6 +382,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return self._end(mapper, opts, response);
 	    });
 	  },
+	  _sum: function _sum(mapper, field, query, opts) {
+	    var self = this;
+	    return self.GET(self.getPath('sum', mapper, opts.params, opts), opts).then(function (response) {
+	      return self._end(mapper, opts, response);
+	    });
+	  },
 	  _update: function _update(mapper, id, props, opts) {
 	    var self = this;
 	    return self.PUT(self.getPath('update', mapper, id, opts), self.serialize(mapper, props, opts), opts).then(function (response) {
@@ -415,6 +409,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	  /**
+	   * Retrieve the number of records that match the selection `query`.
+	   *
+	   * @name HttpAdapter#count
+	   * @method
+	   * @param {Object} mapper The mapper.
+	   * @param {Object} query Selection query.
+	   * @param {Object} [opts] Configuration options.
+	   * @param {string} [opts.params] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+	   * @return {Promise}
+	   */
+	  count: function count(mapper, query, opts) {
+	    var self = this;
+	    query || (query = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
+	    opts.params.count = true;
+	    opts.suffix = self.getSuffix(mapper, opts);
+	    _jsData.utils.deepMixIn(opts.params, query);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	
+	    return __super__.count.call(self, mapper, query, opts);
+	  },
+	
+	
+	  /**
 	   * Create a new the record from the provided `props`.
 	   *
 	   * @name HttpAdapter#create
@@ -428,8 +448,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  create: function create(mapper, props, opts) {
 	    var self = this;
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -451,8 +471,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  createMany: function createMany(mapper, props, opts) {
 	    var self = this;
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -481,18 +501,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // beforeDEL lifecycle hook
 	    op = opts.op = 'beforeDEL';
-	    return resolve(self[op](url, config, opts)).then(function (_config) {
+	    return _jsData.utils.resolve(self[op](url, config, opts)).then(function (_config) {
 	      // Allow re-assignment from lifecycle hook
-	      config = isUndefined(_config) ? config : _config;
+	      config = _jsData.utils.isUndefined(_config) ? config : _config;
 	      op = opts.op = 'DEL';
 	      self.dbg(op, url, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
 	      // afterDEL lifecycle hook
 	      op = opts.op = 'afterDEL';
-	      return resolve(self[op](url, config, opts, response)).then(function (_response) {
+	      return _jsData.utils.resolve(self[op](url, config, opts, response)).then(function (_response) {
 	        // Allow re-assignment from lifecycle hook
-	        return isUndefined(_response) ? response : _response;
+	        return _jsData.utils.isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
@@ -511,10 +531,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  deserialize: function deserialize(mapper, response, opts) {
 	    opts || (opts = {});
-	    if (isFunction(opts.deserialize)) {
+	    if (_jsData.utils.isFunction(opts.deserialize)) {
 	      return opts.deserialize(mapper, response, opts);
 	    }
-	    if (isFunction(mapper.deserialize)) {
+	    if (_jsData.utils.isFunction(mapper.deserialize)) {
 	      return mapper.deserialize(mapper, response, opts);
 	    }
 	    if (response) {
@@ -540,8 +560,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  destroy: function destroy(mapper, id, opts) {
 	    var self = this;
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -564,9 +584,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  destroyAll: function destroyAll(mapper, query, opts) {
 	    var self = this;
 	    query || (query = {});
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
-	    deepMixIn(opts.params, query);
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
+	    _jsData.utils.deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -621,7 +641,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	
 	    if (config.data) {
-	      requestConfig.body = toJson(config.data);
+	      requestConfig.body = _jsData.utils.toJson(config.data);
 	    }
 	
 	    return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
@@ -651,8 +671,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  find: function find(mapper, id, opts) {
 	    var self = this;
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -675,10 +695,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	  findAll: function findAll(mapper, query, opts) {
 	    var self = this;
 	    query || (query = {});
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
-	    deepMixIn(opts.params, query);
+	    _jsData.utils.deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	
 	    return __super__.findAll.call(self, mapper, query, opts);
@@ -705,18 +725,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // beforeGET lifecycle hook
 	    op = opts.op = 'beforeGET';
-	    return resolve(self[op](url, config, opts)).then(function (_config) {
+	    return _jsData.utils.resolve(self[op](url, config, opts)).then(function (_config) {
 	      // Allow re-assignment from lifecycle hook
-	      config = isUndefined(_config) ? config : _config;
+	      config = _jsData.utils.isUndefined(_config) ? config : _config;
 	      op = opts.op = 'GET';
 	      self.dbg(op, url, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
 	      // afterGET lifecycle hook
 	      op = opts.op = 'afterGET';
-	      return resolve(self[op](url, config, opts, response)).then(function (_response) {
+	      return _jsData.utils.resolve(self[op](url, config, opts, response)).then(function (_response) {
 	        // Allow re-assignment from lifecycle hook
-	        return isUndefined(_response) ? response : _response;
+	        return _jsData.utils.isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
@@ -733,9 +753,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getEndpoint: function getEndpoint(mapper, id, opts) {
 	    var self = this;
 	    opts || (opts = {});
-	    opts.params || (opts.params = {});
+	    opts.params = _jsData.utils.isUndefined(opts.params) ? {} : opts.params;
 	    var relationList = mapper.relationList || [];
-	    var endpoint = isUndefined(opts.endpoint) ? isUndefined(mapper.endpoint) ? mapper.name : mapper.endpoint : opts.endpoint;
+	    var endpoint = _jsData.utils.isUndefined(opts.endpoint) ? _jsData.utils.isUndefined(mapper.endpoint) ? mapper.name : mapper.endpoint : opts.endpoint;
 	
 	    relationList.forEach(function (def) {
 	      if (def.type !== 'belongsTo' || !def.parent) {
@@ -754,22 +774,22 @@ return /******/ (function(modules) { // webpackBootstrap
 	      } else {
 	        delete opts.params[parentKey];
 	
-	        if (isObject(id)) {
+	        if (_jsData.utils.isObject(id)) {
 	          item = id;
 	        }
 	
 	        if (item) {
-	          parentId = parentId || def.getForeignKey(item) || (def.getLocalField(item) ? get(def.getLocalField(item), parentDef.idAttribute) : null);
+	          parentId = parentId || def.getForeignKey(item) || (def.getLocalField(item) ? _jsData.utils.get(def.getLocalField(item), parentDef.idAttribute) : null);
 	        }
 	
 	        if (parentId) {
 	          var _ret = function () {
 	            delete opts.endpoint;
 	            var _opts = {};
-	            forOwn(opts, function (value, key) {
+	            _jsData.utils.forOwn(opts, function (value, key) {
 	              _opts[key] = value;
 	            });
-	            _(_opts, parentDef);
+	            _jsData.utils._(_opts, parentDef);
 	            endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts), parentId, endpoint);
 	            return {
 	              v: false
@@ -796,16 +816,23 @@ return /******/ (function(modules) { // webpackBootstrap
 	  getPath: function getPath(method, mapper, id, opts) {
 	    var self = this;
 	    opts || (opts = {});
-	    var args = [isUndefined(opts.basePath) ? isUndefined(mapper.basePath) ? self.basePath : mapper.basePath : opts.basePath, self.getEndpoint(mapper, isString(id) || isNumber(id) || method === 'create' ? id : null, opts)];
+	    var args = [_jsData.utils.isUndefined(opts.basePath) ? _jsData.utils.isUndefined(mapper.basePath) ? self.basePath : mapper.basePath : opts.basePath, self.getEndpoint(mapper, _jsData.utils.isString(id) || _jsData.utils.isNumber(id) || method === 'create' ? id : null, opts)];
 	    if (method === 'find' || method === 'update' || method === 'destroy') {
 	      args.push(id);
 	    }
 	    return makePath.apply(_jsData.utils, args);
 	  },
+	  getParams: function getParams(opts) {
+	    opts || (opts = {});
+	    if (_jsData.utils.isUndefined(opts.params)) {
+	      return {};
+	    }
+	    return _jsData.utils.copy(opts.params);
+	  },
 	  getSuffix: function getSuffix(mapper, opts) {
 	    opts || (opts = {});
-	    if (isUndefined(opts.suffix)) {
-	      if (isUndefined(mapper.suffix)) {
+	    if (_jsData.utils.isUndefined(opts.suffix)) {
+	      if (_jsData.utils.isUndefined(mapper.suffix)) {
 	        return this.suffix;
 	      }
 	      return mapper.suffix;
@@ -830,8 +857,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var payload = config.data;
 	    var cache = config.cache;
 	    var timeout = config.timeout;
-	    config = copy(config, null, null, null, ['data', 'cache', 'timeout']);
-	    config = deepMixIn(config, self.httpConfig);
+	    config = _jsData.utils.copy(config, null, null, null, ['data', 'cache', 'timeout']);
+	    config = _jsData.utils.deepMixIn(config, self.httpConfig);
 	    config.data = payload;
 	    config.cache = cache;
 	    config.timeout = timeout;
@@ -855,7 +882,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (self.error) {
 	          self.error('\'FAILED: ' + str, data);
 	        }
-	        return reject(data);
+	        return _jsData.utils.reject(data);
 	      }
 	    }
 	
@@ -863,7 +890,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      throw new Error('You have not configured this adapter with an http library!');
 	    }
 	
-	    return resolve(self.beforeHTTP(config, opts)).then(function (_config) {
+	    return _jsData.utils.resolve(self.beforeHTTP(config, opts)).then(function (_config) {
 	      config = _config || config;
 	      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
 	        return self.fetch(config, opts).then(logResponse, logResponse);
@@ -872,7 +899,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        return self.responseError(err, config, opts);
 	      });
 	    }).then(function (response) {
-	      return resolve(self.afterHTTP(config, opts, response)).then(function (_response) {
+	      return _jsData.utils.resolve(self.afterHTTP(config, opts, response)).then(function (_response) {
 	        return _response || response;
 	      });
 	    });
@@ -901,18 +928,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // beforePOST lifecycle hook
 	    op = opts.op = 'beforePOST';
-	    return resolve(self[op](url, data, config, opts)).then(function (_config) {
+	    return _jsData.utils.resolve(self[op](url, data, config, opts)).then(function (_config) {
 	      // Allow re-assignment from lifecycle hook
-	      config = isUndefined(_config) ? config : _config;
+	      config = _jsData.utils.isUndefined(_config) ? config : _config;
 	      op = opts.op = 'POST';
 	      self.dbg(op, url, data, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
 	      // afterPOST lifecycle hook
 	      op = opts.op = 'afterPOST';
-	      return resolve(self[op](url, data, config, opts, response)).then(function (_response) {
+	      return _jsData.utils.resolve(self[op](url, data, config, opts, response)).then(function (_response) {
 	        // Allow re-assignment from lifecycle hook
-	        return isUndefined(_response) ? response : _response;
+	        return _jsData.utils.isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
@@ -940,18 +967,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    // beforePUT lifecycle hook
 	    op = opts.op = 'beforePUT';
-	    return resolve(self[op](url, data, config, opts)).then(function (_config) {
+	    return _jsData.utils.resolve(self[op](url, data, config, opts)).then(function (_config) {
 	      // Allow re-assignment from lifecycle hook
-	      config = isUndefined(_config) ? config : _config;
+	      config = _jsData.utils.isUndefined(_config) ? config : _config;
 	      op = opts.op = 'PUT';
 	      self.dbg(op, url, data, config, opts);
 	      return self.HTTP(config, opts);
 	    }).then(function (response) {
 	      // afterPUT lifecycle hook
 	      op = opts.op = 'afterPUT';
-	      return resolve(self[op](url, data, config, opts, response)).then(function (_response) {
+	      return _jsData.utils.resolve(self[op](url, data, config, opts, response)).then(function (_response) {
 	        // Allow re-assignment from lifecycle hook
-	        return isUndefined(_response) ? response : _response;
+	        return _jsData.utils.isUndefined(_response) ? response : _response;
 	      });
 	    });
 	  },
@@ -969,10 +996,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  queryTransform: function queryTransform(mapper, params, opts) {
 	    opts || (opts = {});
-	    if (isFunction(opts.queryTransform)) {
+	    if (_jsData.utils.isFunction(opts.queryTransform)) {
 	      return opts.queryTransform(mapper, params, opts);
 	    }
-	    if (isFunction(mapper.queryTransform)) {
+	    if (_jsData.utils.isFunction(mapper.queryTransform)) {
 	      return mapper.queryTransform(mapper, params, opts);
 	    }
 	    return params;
@@ -993,7 +1020,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * @return {Promise}
 	   */
 	  responseError: function responseError(err, config, opts) {
-	    return reject(err);
+	    return _jsData.utils.reject(err);
 	  },
 	
 	
@@ -1009,13 +1036,43 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  serialize: function serialize(mapper, data, opts) {
 	    opts || (opts = {});
-	    if (isFunction(opts.serialize)) {
+	    if (_jsData.utils.isFunction(opts.serialize)) {
 	      return opts.serialize(mapper, data, opts);
 	    }
-	    if (isFunction(mapper.serialize)) {
+	    if (_jsData.utils.isFunction(mapper.serialize)) {
 	      return mapper.serialize(mapper, data, opts);
 	    }
 	    return data;
+	  },
+	
+	
+	  /**
+	   * Retrieve the sum of the field of the records that match the selection query.
+	   *
+	   * @name HttpAdapter#sum
+	   * @method
+	   * @param {Object} mapper The mapper.
+	   * @param {string} field The field to sum.
+	   * @param {Object} query Selection query.
+	   * @param {Object} [opts] Configuration options.
+	   * @param {string} [opts.params] TODO
+	   * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+	   * @return {Promise}
+	   */
+	  sum: function sum(mapper, field, query, opts) {
+	    var self = this;
+	    query || (query = {});
+	    opts || (opts = {});
+	    if (!_jsData.utils.utils.isString(field)) {
+	      throw new Error('field must be a string!');
+	    }
+	    opts.params = self.getParams(opts);
+	    opts.params.sum = field;
+	    opts.suffix = self.getSuffix(mapper, opts);
+	    _jsData.utils.deepMixIn(opts.params, query);
+	    opts.params = self.queryTransform(mapper, opts.params, opts);
+	
+	    return __super__.sum.call(self, mapper, field, query, opts);
 	  },
 	
 	
@@ -1032,8 +1089,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  update: function update(mapper, id, props, opts) {
 	    var self = this;
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -1055,9 +1112,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	  updateAll: function updateAll(mapper, props, query, opts) {
 	    var self = this;
 	    query || (query = {});
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
-	    deepMixIn(opts.params, query);
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
+	    _jsData.utils.deepMixIn(opts.params, query);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -1084,8 +1141,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	   */
 	  updateMany: function updateMany(mapper, records, opts) {
 	    var self = this;
-	    opts = opts ? copy(opts) : {};
-	    opts.params || (opts.params = {});
+	    opts || (opts = {});
+	    opts.params = self.getParams(opts);
 	    opts.params = self.queryTransform(mapper, opts.params, opts);
 	    opts.suffix = self.getSuffix(mapper, opts);
 	
@@ -1109,7 +1166,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * decorate when invoked.
 	 */
 	HttpAdapter.addAction = function (name, opts) {
-	  if (!name || !isString(name)) {
+	  if (!name || !_jsData.utils.isString(name)) {
 	    throw new TypeError('action(name[, opts]): Expected: string, Found: ' + (typeof name === 'undefined' ? 'undefined' : _typeof(name)));
 	  }
 	  return function (mapper) {
@@ -1123,25 +1180,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return response;
 	    };
 	    opts.responseError = opts.responseError || function (err) {
-	      return reject(err);
+	      return _jsData.utils.reject(err);
 	    };
 	    mapper[name] = function (id, _opts) {
 	      var self = this;
-	      if (isObject(id)) {
+	      if (_jsData.utils.isObject(id)) {
 	        _opts = id;
 	      }
 	      _opts = _opts || {};
 	      var adapter = self.getAdapter(opts.adapter || self.defaultAdapter || 'http');
 	      var config = {};
-	      fillIn(config, opts);
+	      _jsData.utils.fillIn(config, opts);
 	      if (!_opts.hasOwnProperty('endpoint') && config.endpoint) {
 	        _opts.endpoint = config.endpoint;
 	      }
 	      if (typeof _opts.getEndpoint === 'function') {
 	        config.url = _opts.getEndpoint(self, _opts);
 	      } else {
-	        var _args = [_opts.basePath || self.basePath || adapter.basePath, adapter.getEndpoint(self, isSorN(id) ? id : null, _opts)];
-	        if (isSorN(id)) {
+	        var _args = [_opts.basePath || self.basePath || adapter.basePath, adapter.getEndpoint(self, _jsData.utils.isSorN(id) ? id : null, _opts)];
+	        if (_jsData.utils.isSorN(id)) {
 	          _args.push(id);
 	        }
 	        _args.push(opts.pathname || name);
@@ -1149,8 +1206,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      config.method = config.method || 'GET';
 	      config.mapper = self.name;
-	      deepMixIn(config)(_opts);
-	      return resolve(config).then(_opts.request || opts.request).then(function (config) {
+	      _jsData.utils.deepMixIn(config)(_opts);
+	      return _jsData.utils.resolve(config).then(_opts.request || opts.request).then(function (config) {
 	        return adapter.HTTP(config);
 	      }).then(function (data) {
 	        if (data && data.config) {
@@ -1177,7 +1234,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	HttpAdapter.addActions = function (opts) {
 	  opts || (opts = {});
 	  return function (mapper) {
-	    forOwn(mapper, function (value, key) {
+	    _jsData.utils.forOwn(mapper, function (value, key) {
 	      HttpAdapter.addAction(key, value)(mapper);
 	    });
 	    return mapper;
@@ -1230,7 +1287,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * properties to the subclass itself.
 	 * @return {Object} Subclass of `HttpAdapter`.
 	 */
-	HttpAdapter.extend = extend;
+	HttpAdapter.extend = _jsData.utils.extend;
 	
 	/**
 	 * Details of the current version of the `js-data-http` module.
@@ -1247,11 +1304,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '3.0.0-alpha.8',
+	  full: '3.0.0-alpha.9',
 	  major: parseInt('3', 10),
 	  minor: parseInt('0', 10),
 	  patch: parseInt('0', 10),
-	  alpha:  true ? '8' : false,
+	  alpha:  true ? '9' : false,
 	  beta:  true ? 'false' : false
 	};
 	
