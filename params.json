@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "tagline": "Http adapter for js-data",
-  "body": "<img src=\"https://raw.githubusercontent.com/js-data/js-data/master/js-data.png\" alt=\"js-data logo\" title=\"js-data\" align=\"right\" width=\"96\" height=\"96\" />\r\n\r\n### js-data-http API Reference Docs\r\n\r\nTo get started visit __[http://js-data.io](http://www.js-data.io)__.\r\n\r\n[Back to api.js-data.io](http://api.js-data.io).\r\n\r\n* [3.0.0-alpha.8](http://api.js-data.io/js-data-http/3.0.0-alpha.8/index.html)\r\n* [3.0.0-alpha.4](http://api.js-data.io/js-data-http/3.0.0-alpha.4/index.html)\r\n* [3.0.0-alpha.3](http://api.js-data.io/js-data-http/3.0.0-alpha.3/index.html)\r\n* [2.x](http://js-data.io/v2.8/docs/home)\r\n",
+  "body": "<img src=\"https://raw.githubusercontent.com/js-data/js-data/master/js-data.png\" alt=\"js-data logo\" title=\"js-data\" align=\"right\" width=\"96\" height=\"96\" />\r\n\r\n### js-data-http API Reference Docs\r\n\r\nTo get started visit __[http://js-data.io](http://www.js-data.io)__.\r\n\r\n[Back to api.js-data.io](http://api.js-data.io).\r\n\r\n* [3.0.0-alpha.9](http://api.js-data.io/js-data-http/3.0.0-alpha.9/index.html)\r\n* [3.0.0-alpha.8](http://api.js-data.io/js-data-http/3.0.0-alpha.8/index.html)\r\n* [3.0.0-alpha.4](http://api.js-data.io/js-data-http/3.0.0-alpha.4/index.html)\r\n* [3.0.0-alpha.3](http://api.js-data.io/js-data-http/3.0.0-alpha.3/index.html)\r\n* [2.x](http://js-data.io/v2.8/docs/home)\r\n",
   "google": "UA-55528236-2",
   "note": "Don't delete this file! It's used internally to help with page regeneration."
 }
