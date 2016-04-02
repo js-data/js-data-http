@@ -1,3 +1,8 @@
+##### 3.0.0-alpha.10 - 02 April 2016
+
+###### Backwards compatible bug fixes
+- Fixed double deserialization of data in some cases
+
 ##### 3.0.0-alpha.9 - 18 March 2016
 
 ###### Backwards compatible API changes

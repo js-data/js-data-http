@@ -24,9 +24,10 @@
     "test/",
     "package.json",
     "karma.conf.js",
-    "karma.start.js"
+    "karma.start.js",
+    "webpack.config.js"
   ],
   "dependencies": {
-    "js-data": ">=3.0.0-alpha.15"
+    "js-data": ">=3.0.0-alpha.26"
   }
 }

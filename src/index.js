@@ -307,7 +307,7 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   },
 
   _end (mapper, opts, response) {
-    return [this.deserialize(mapper, response.data, opts), response]
+    return [this.deserialize(mapper, response, opts), response]
   },
 
   _find (mapper, id, opts) {
@@ -498,10 +498,8 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
     if (utils.isFunction(mapper.deserialize)) {
       return mapper.deserialize(mapper, response, opts)
     }
-    if (response) {
-      if (response.hasOwnProperty('data')) {
-        return response.data
-      }
+    if (response && response.hasOwnProperty('data')) {
+      return response.data
     }
     return response
   },

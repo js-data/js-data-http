@@ -1,6 +1,6 @@
 /*!
 * js-data-http
-* @version 3.0.0-alpha.9 - Homepage <http://www.js-data.io/docs/dshttpadapter>
+* @version 3.0.0-alpha.10 - Homepage <http://www.js-data.io/docs/dshttpadapter>
 * @author Jason Dobry <jason.dobry@gmail.com>
 * @copyright (c) 2014-2015 Jason Dobry
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
@@ -368,7 +368,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	  },
 	  _end: function _end(mapper, opts, response) {
-	    return [this.deserialize(mapper, response.data, opts), response];
+	    return [this.deserialize(mapper, response, opts), response];
 	  },
 	  _find: function _find(mapper, id, opts) {
 	    var self = this;
@@ -537,10 +537,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (_jsData.utils.isFunction(mapper.deserialize)) {
 	      return mapper.deserialize(mapper, response, opts);
 	    }
-	    if (response) {
-	      if (response.hasOwnProperty('data')) {
-	        return response.data;
-	      }
+	    if (response && response.hasOwnProperty('data')) {
+	      return response.data;
 	    }
 	    return response;
 	  },
@@ -1304,11 +1302,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '3.0.0-alpha.9',
+	  full: '3.0.0-alpha.10',
 	  major: parseInt('3', 10),
 	  minor: parseInt('0', 10),
 	  patch: parseInt('0', 10),
-	  alpha:  true ? '9' : false,
+	  alpha:  true ? '10' : false,
 	  beta:  true ? 'false' : false
 	};
 	
@@ -1418,20 +1416,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  babelHelpers;
 	
-	  var addHiddenPropsToTarget = jsData.utils.addHiddenPropsToTarget;
-	  var deepFillIn = jsData.utils.deepFillIn;
-	  var extend = jsData.utils.extend;
-	  var fillIn = jsData.utils.fillIn;
-	  var forEachRelation = jsData.utils.forEachRelation;
-	  var get = jsData.utils.get;
-	  var isArray = jsData.utils.isArray;
-	  var isObject = jsData.utils.isObject;
-	  var isUndefined = jsData.utils.isUndefined;
-	  var omit = jsData.utils.omit;
-	  var plainCopy = jsData.utils.plainCopy;
-	  var resolve = jsData.utils.resolve;
-	
-	
 	  var noop = function noop() {
 	    var self = this;
 	
@@ -1441,7 +1425,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var opts = args[args.length - 1];
 	    self.dbg.apply(self, [opts.op].concat(args));
-	    return resolve();
+	    return jsData.utils.resolve();
 	  };
 	
 	  var noop2 = function noop2() {
@@ -1453,7 +1437,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	    var opts = args[args.length - 2];
 	    self.dbg.apply(self, [opts.op].concat(args));
-	    return resolve();
+	    return jsData.utils.resolve();
 	  };
 	
 	  var unique = function unique(array) {
@@ -1470,7 +1454,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  var withoutRelations = function withoutRelations(mapper, props) {
-	    return omit(props, mapper.relationFields || []);
+	    return jsData.utils.omit(props, mapper.relationFields || []);
 	  };
 	
 	  var DEFAULTS = {
@@ -1506,8 +1490,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	  function Adapter(opts) {
 	    var self = this;
 	    opts || (opts = {});
-	    fillIn(opts, DEFAULTS);
-	    fillIn(self, opts);
+	    jsData.utils.fillIn(opts, DEFAULTS);
+	    jsData.utils.fillIn(self, opts);
 	  }
 	
 	  Adapter.reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
@@ -1524,7 +1508,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    var self = this;
 	    meta || (meta = {});
 	    self.data = data;
-	    fillIn(self, meta);
+	    jsData.utils.fillIn(self, meta);
 	    self.op = op;
 	  }
 	
@@ -1541,9 +1525,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	   * properties to the subclass itself.
 	   * @return {Object} Subclass of `Adapter`.
 	   */
-	  Adapter.extend = extend;
+	  Adapter.extend = jsData.utils.extend;
 	
-	  addHiddenPropsToTarget(Adapter.prototype, {
+	  jsData.utils.addHiddenPropsToTarget(Adapter.prototype, {
+	    /**
+	     * Lifecycle method method called by <a href="#count__anchor">count</a>.
+	     *
+	     * Override this method to add custom behavior for this lifecycle hook.
+	     *
+	     * Returning a Promise causes <a href="#count__anchor">count</a> to wait for the Promise to resolve before continuing.
+	     *
+	     * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the count.
+	     *
+	     * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+	     *
+	     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#count__anchor">count</a>.
+	     *
+	     * @name Adapter#afterCount
+	     * @method
+	     * @param {Object} mapper The `mapper` argument passed to <a href="#count__anchor">count</a>.
+	     * @param {Object} props The `props` argument passed to <a href="#count__anchor">count</a>.
+	     * @param {Object} opts The `opts` argument passed to <a href="#count__anchor">count</a>.
+	     * @property {string} opts.op `afterCount`
+	     * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
+	     */
+	    afterCount: noop2,
+	
 	    /**
 	     * Lifecycle method method called by <a href="#create__anchor">create</a>.
 	     *
@@ -1683,6 +1690,29 @@ return /******/ (function(modules) { // webpackBootstrap
 	    afterFindAll: noop2,
 	
 	    /**
+	     * Lifecycle method method called by <a href="#sum__anchor">sum</a>.
+	     *
+	     * Override this method to add custom behavior for this lifecycle hook.
+	     *
+	     * Returning a Promise causes <a href="#sum__anchor">sum</a> to wait for the Promise to resolve before continuing.
+	     *
+	     * If `opts.raw` is `true` then `response` will be a detailed response object, otherwise `response` will be the sum.
+	     *
+	     * `response` may be modified. You can also re-assign `response` to another value by returning a different value or a Promise that resolves to a different value.
+	     *
+	     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#sum__anchor">sum</a>.
+	     *
+	     * @name Adapter#afterSum
+	     * @method
+	     * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
+	     * @param {Object} props The `props` argument passed to <a href="#sum__anchor">sum</a>.
+	     * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
+	     * @property {string} opts.op `afterSum`
+	     * @param {Object|Response} response Count or {@link Response}, depending on the value of `opts.raw`.
+	     */
+	    afterSum: noop2,
+	
+	    /**
 	     * Lifecycle method method called by <a href="#update__anchor">update</a>.
 	     *
 	     * Override this method to add custom behavior for this lifecycle hook.
@@ -1752,6 +1782,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {Object[]|Response} response The updated records or {@link Response}, depending on the value of `opts.raw`.
 	     */
 	    afterUpdateMany: noop2,
+	
+	    /**
+	     * Lifecycle method method called by <a href="#count__anchor">count</a>.
+	     *
+	     * Override this method to add custom behavior for this lifecycle hook.
+	     *
+	     * Returning a Promise causes <a href="#count__anchor">count</a> to wait for the Promise to resolve before continuing.
+	     *
+	     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#count__anchor">count</a>.
+	     *
+	     * @name Adapter#beforeCount
+	     * @method
+	     * @param {Object} mapper The `mapper` argument passed to <a href="#count__anchor">count</a>.
+	     * @param {Object} query The `query` argument passed to <a href="#count__anchor">count</a>.
+	     * @param {Object} opts The `opts` argument passed to <a href="#count__anchor">count</a>.
+	     * @property {string} opts.op `beforeCount`
+	     */
+	    beforeCount: noop,
 	
 	    /**
 	     * Lifecycle method method called by <a href="#create__anchor">create</a>.
@@ -1866,6 +1914,24 @@ return /******/ (function(modules) { // webpackBootstrap
 	    beforeFindAll: noop,
 	
 	    /**
+	     * Lifecycle method method called by <a href="#sum__anchor">sum</a>.
+	     *
+	     * Override this method to add custom behavior for this lifecycle hook.
+	     *
+	     * Returning a Promise causes <a href="#sum__anchor">sum</a> to wait for the Promise to resolve before continuing.
+	     *
+	     * A thrown error or rejected Promise will bubble up and reject the Promise returned by <a href="#sum__anchor">sum</a>.
+	     *
+	     * @name Adapter#beforeSum
+	     * @method
+	     * @param {Object} mapper The `mapper` argument passed to <a href="#sum__anchor">sum</a>.
+	     * @param {Object} query The `query` argument passed to <a href="#sum__anchor">sum</a>.
+	     * @param {Object} opts The `opts` argument passed to <a href="#sum__anchor">sum</a>.
+	     * @property {string} opts.op `beforeSum`
+	     */
+	    beforeSum: noop,
+	
+	    /**
 	     * Lifecycle method method called by <a href="#update__anchor">update</a>.
 	     *
 	     * Override this method to add custom behavior for this lifecycle hook.
@@ -1943,6 +2009,58 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    /**
+	     * Retrieve the number of records that match the selection query. Called by
+	     * `Mapper#count`.
+	     *
+	     * @name Adapter#count
+	     * @method
+	     * @param {Object} mapper The mapper.
+	     * @param {Object} [query] Selection query.
+	     * @param {Object} [query.where] Filtering criteria.
+	     * @param {string|Array} [query.orderBy] Sorting criteria.
+	     * @param {string|Array} [query.sort] Same as `query.sort`.
+	     * @param {number} [query.limit] Limit results.
+	     * @param {number} [query.skip] Offset results.
+	     * @param {number} [query.offset] Same as `query.skip`.
+	     * @param {Object} [opts] Configuration options.
+	     * @param {boolean} [opts.raw=false] Whether to return a more detailed
+	     * response object.
+	     * @return {Promise}
+	     */
+	    count: function count(mapper, query, opts) {
+	      var self = this;
+	      var op = void 0;
+	      query || (query = {});
+	      opts || (opts = {});
+	
+	      // beforeCount lifecycle hook
+	      op = opts.op = 'beforeCount';
+	      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
+	        // Allow for re-assignment from lifecycle hook
+	        op = opts.op = 'count';
+	        self.dbg(op, mapper, query, opts);
+	        return jsData.utils.resolve(self._count(mapper, query, opts));
+	      }).then(function (results) {
+	        var _results = babelHelpers.slicedToArray(results, 2);
+	
+	        var data = _results[0];
+	        var result = _results[1];
+	
+	        result || (result = {});
+	        var response = new Response(data, result, op);
+	        response = self.respond(response, opts);
+	
+	        // afterCount lifecycle hook
+	        op = opts.op = 'afterCount';
+	        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+	          // Allow for re-assignment from lifecycle hook
+	          return jsData.utils.isUndefined(_response) ? response : _response;
+	        });
+	      });
+	    },
+	
+	
+	    /**
 	     * Create a new record. Called by `Mapper#create`.
 	     *
 	     * @name Adapter#create
@@ -1962,18 +2080,18 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeCreate lifecycle hook
 	      op = opts.op = 'beforeCreate';
-	      return resolve(self[op](mapper, props, opts)).then(function (_props) {
+	      return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
 	        // Allow for re-assignment from lifecycle hook
-	        props = isUndefined(_props) ? props : _props;
+	        props = jsData.utils.isUndefined(_props) ? props : _props;
 	        props = withoutRelations(mapper, props);
 	        op = opts.op = 'create';
 	        self.dbg(op, mapper, props, opts);
-	        return resolve(self._create(mapper, props, opts));
+	        return jsData.utils.resolve(self._create(mapper, props, opts));
 	      }).then(function (results) {
-	        var _results = babelHelpers.slicedToArray(results, 2);
+	        var _results2 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results[0];
-	        var result = _results[1];
+	        var data = _results2[0];
+	        var result = _results2[1];
 	
 	        result || (result = {});
 	        var response = new Response(data, result, 'create');
@@ -1982,9 +2100,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterCreate lifecycle hook
 	        op = opts.op = 'afterCreate';
-	        return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2010,20 +2128,20 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeCreateMany lifecycle hook
 	      op = opts.op = 'beforeCreateMany';
-	      return resolve(self[op](mapper, props, opts)).then(function (_props) {
+	      return jsData.utils.resolve(self[op](mapper, props, opts)).then(function (_props) {
 	        // Allow for re-assignment from lifecycle hook
-	        props = isUndefined(_props) ? props : _props;
+	        props = jsData.utils.isUndefined(_props) ? props : _props;
 	        props = props.map(function (record) {
 	          return withoutRelations(mapper, record);
 	        });
 	        op = opts.op = 'createMany';
 	        self.dbg(op, mapper, props, opts);
-	        return resolve(self._createMany(mapper, props, opts));
+	        return jsData.utils.resolve(self._createMany(mapper, props, opts));
 	      }).then(function (results) {
-	        var _results2 = babelHelpers.slicedToArray(results, 2);
+	        var _results3 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results2[0];
-	        var result = _results2[1];
+	        var data = _results3[0];
+	        var result = _results3[1];
 	
 	        data || (data = []);
 	        result || (result = {});
@@ -2033,9 +2151,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterCreateMany lifecycle hook
 	        op = opts.op = 'afterCreateMany';
-	        return resolve(self[op](mapper, props, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, props, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2061,15 +2179,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeDestroy lifecycle hook
 	      op = opts.op = 'beforeDestroy';
-	      return resolve(self[op](mapper, id, opts)).then(function () {
+	      return jsData.utils.resolve(self[op](mapper, id, opts)).then(function () {
 	        op = opts.op = 'destroy';
 	        self.dbg(op, mapper, id, opts);
-	        return resolve(self._destroy(mapper, id, opts));
+	        return jsData.utils.resolve(self._destroy(mapper, id, opts));
 	      }).then(function (results) {
-	        var _results3 = babelHelpers.slicedToArray(results, 2);
+	        var _results4 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results3[0];
-	        var result = _results3[1];
+	        var data = _results4[0];
+	        var result = _results4[1];
 	
 	        result || (result = {});
 	        var response = new Response(data, result, 'destroy');
@@ -2077,9 +2195,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterDestroy lifecycle hook
 	        op = opts.op = 'afterDestroy';
-	        return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2112,15 +2230,15 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeDestroyAll lifecycle hook
 	      op = opts.op = 'beforeDestroyAll';
-	      return resolve(self[op](mapper, query, opts)).then(function () {
+	      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
 	        op = opts.op = 'destroyAll';
 	        self.dbg(op, mapper, query, opts);
-	        return resolve(self._destroyAll(mapper, query, opts));
+	        return jsData.utils.resolve(self._destroyAll(mapper, query, opts));
 	      }).then(function (results) {
-	        var _results4 = babelHelpers.slicedToArray(results, 2);
+	        var _results5 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results4[0];
-	        var result = _results4[1];
+	        var data = _results5[0];
+	        var result = _results5[1];
 	
 	        result || (result = {});
 	        var response = new Response(data, result, 'destroyAll');
@@ -2128,9 +2246,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterDestroyAll lifecycle hook
 	        op = opts.op = 'afterDestroyAll';
-	        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2164,8 +2282,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    makeHasManyLocalKeys: function makeHasManyLocalKeys(mapper, def, record) {
 	      var localKeys = [];
-	      var itemKeys = get(record, def.localKeys) || [];
-	      itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+	      var itemKeys = jsData.utils.get(record, def.localKeys) || [];
+	      itemKeys = jsData.utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
 	      localKeys = localKeys.concat(itemKeys);
 	      return unique(localKeys).filter(function (x) {
 	        return x;
@@ -2183,7 +2301,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return {*}
 	     */
 	    makeHasManyForeignKeys: function makeHasManyForeignKeys(mapper, def, record) {
-	      return get(record, mapper.idAttribute);
+	      return jsData.utils.get(record, mapper.idAttribute);
 	    },
 	
 	
@@ -2200,7 +2318,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	      var singular = false;
 	
-	      if (isObject(records) && !isArray(records)) {
+	      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
 	        singular = true;
 	        records = [records];
 	      }
@@ -2227,7 +2345,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            attached = relatedItems;
 	          } else {
 	            relatedItems.forEach(function (relatedItem) {
-	              if (get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
+	              if (jsData.utils.get(relatedItem, def.foreignKey) === record[mapper.idAttribute]) {
 	                attached.push(relatedItem);
 	              }
 	            });
@@ -2241,7 +2359,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var record = void 0;
 	      var relatedMapper = def.getRelation();
 	
-	      if (isObject(records) && !isArray(records)) {
+	      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
 	        record = records;
 	      }
 	
@@ -2269,8 +2387,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            }, __opts).then(function (relatedItems) {
 	              records.forEach(function (item) {
 	                var attached = [];
-	                var itemKeys = get(item, def.localKeys) || [];
-	                itemKeys = isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
+	                var itemKeys = jsData.utils.get(item, def.localKeys) || [];
+	                itemKeys = jsData.utils.isArray(itemKeys) ? itemKeys : Object.keys(itemKeys);
 	                relatedItems.forEach(function (relatedItem) {
 	                  if (itemKeys && itemKeys.indexOf(relatedItem[relatedMapper.idAttribute]) !== -1) {
 	                    attached.push(relatedItem);
@@ -2292,7 +2410,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var idAttribute = mapper.idAttribute;
 	      var record = void 0;
 	
-	      if (isObject(records) && !isArray(records)) {
+	      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
 	        record = records;
 	      }
 	
@@ -2315,9 +2433,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	          var foreignKeysField = def.foreignKeys;
 	          records.forEach(function (record) {
 	            var _relatedItems = [];
-	            var id = get(record, idAttribute);
+	            var id = jsData.utils.get(record, idAttribute);
 	            relatedItems.forEach(function (relatedItem) {
-	              var foreignKeys = get(relatedItems, foreignKeysField) || [];
+	              var foreignKeys = jsData.utils.get(relatedItems, foreignKeysField) || [];
 	              if (foreignKeys.indexOf(id) !== -1) {
 	                _relatedItems.push(relatedItem);
 	              }
@@ -2339,13 +2457,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return {Promise}
 	     */
 	    loadHasOne: function loadHasOne(mapper, def, records, __opts) {
-	      if (isObject(records) && !isArray(records)) {
+	      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
 	        records = [records];
 	      }
 	      return this.loadHasMany(mapper, def, records, __opts).then(function () {
 	        records.forEach(function (record) {
 	          var relatedData = def.getLocalField(record);
-	          if (isArray(relatedData) && relatedData.length) {
+	          if (jsData.utils.isArray(relatedData) && relatedData.length) {
 	            def.setLocalField(record, relatedData[0]);
 	          }
 	        });
@@ -2380,7 +2498,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var self = this;
 	      var relationDef = def.getRelation();
 	
-	      if (isObject(records) && !isArray(records)) {
+	      if (jsData.utils.isObject(records) && !jsData.utils.isArray(records)) {
 	        var _ret2 = function () {
 	          var record = records;
 	          return {
@@ -2436,14 +2554,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeFind lifecycle hook
 	      op = opts.op = 'beforeFind';
-	      return resolve(self[op](mapper, id, opts)).then(function () {
+	      return jsData.utils.resolve(self[op](mapper, id, opts)).then(function () {
 	        op = opts.op = 'find';
 	        self.dbg(op, mapper, id, opts);
-	        return resolve(self._find(mapper, id, opts));
+	        return jsData.utils.resolve(self._find(mapper, id, opts));
 	      }).then(function (results) {
-	        var _results5 = babelHelpers.slicedToArray(results, 1);
+	        var _results6 = babelHelpers.slicedToArray(results, 1);
 	
-	        var _record = _results5[0];
+	        var _record = _results6[0];
 	
 	        if (!_record) {
 	          return;
@@ -2451,7 +2569,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        record = _record;
 	        var tasks = [];
 	
-	        forEachRelation(mapper, opts, function (def, __opts) {
+	        jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
 	          var task = void 0;
 	          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
 	            if (def.type === 'hasOne') {
@@ -2479,9 +2597,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterFind lifecycle hook
 	        op = opts.op = 'afterFind';
-	        return resolve(self[op](mapper, id, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, id, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2515,30 +2633,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var op = void 0;
 	      var activeWith = opts._activeWith;
 	
-	      if (isObject(activeWith)) {
+	      if (jsData.utils.isObject(activeWith)) {
 	        var activeQuery = activeWith.query || {};
 	        if (activeWith.replace) {
 	          query = activeQuery;
 	        } else {
-	          deepFillIn(query, activeQuery);
+	          jsData.utils.deepFillIn(query, activeQuery);
 	        }
 	      }
 	
 	      // beforeFindAll lifecycle hook
 	      op = opts.op = 'beforeFindAll';
-	      return resolve(self[op](mapper, query, opts)).then(function () {
+	      return jsData.utils.resolve(self[op](mapper, query, opts)).then(function () {
 	        op = opts.op = 'findAll';
 	        self.dbg(op, mapper, query, opts);
-	        return resolve(self._findAll(mapper, query, opts));
+	        return jsData.utils.resolve(self._findAll(mapper, query, opts));
 	      }).then(function (results) {
-	        var _results6 = babelHelpers.slicedToArray(results, 1);
+	        var _results7 = babelHelpers.slicedToArray(results, 1);
 	
-	        var _records = _results6[0];
+	        var _records = _results7[0];
 	
 	        _records || (_records = []);
 	        records = _records;
 	        var tasks = [];
-	        forEachRelation(mapper, opts, function (def, __opts) {
+	        jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
 	          var task = void 0;
 	          if (def.foreignKey && (def.type === 'hasOne' || def.type === 'hasMany')) {
 	            if (def.type === 'hasMany') {
@@ -2565,9 +2683,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterFindAll lifecycle hook
 	        op = opts.op = 'afterFindAll';
-	        return resolve(self[op](mapper, query, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, query, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2585,7 +2703,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    getOpt: function getOpt(opt, opts) {
 	      opts || (opts = {});
-	      return isUndefined(opts[opt]) ? plainCopy(this[opt]) : plainCopy(opts[opt]);
+	      return jsData.utils.isUndefined(opts[opt]) ? jsData.utils.plainCopy(this[opt]) : jsData.utils.plainCopy(opts[opt]);
 	    },
 	
 	
@@ -2624,6 +2742,62 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	
 	    /**
+	     * Retrieve sum of the specified field of the records that match the selection
+	     * query. Called by `Mapper#sum`.
+	     *
+	     * @name Adapter#sum
+	     * @method
+	     * @param {Object} mapper The mapper.
+	     * @param {string} field By to sum.
+	     * @param {Object} [query] Selection query.
+	     * @param {Object} [query.where] Filtering criteria.
+	     * @param {string|Array} [query.orderBy] Sorting criteria.
+	     * @param {string|Array} [query.sort] Same as `query.sort`.
+	     * @param {number} [query.limit] Limit results.
+	     * @param {number} [query.skip] Offset results.
+	     * @param {number} [query.offset] Same as `query.skip`.
+	     * @param {Object} [opts] Configuration options.
+	     * @param {boolean} [opts.raw=false] Whether to return a more detailed
+	     * response object.
+	     * @return {Promise}
+	     */
+	    sum: function sum(mapper, field, query, opts) {
+	      var self = this;
+	      var op = void 0;
+	      if (!jsData.utils.isString(field)) {
+	        throw new Error('field must be a string!');
+	      }
+	      query || (query = {});
+	      opts || (opts = {});
+	
+	      // beforeSum lifecycle hook
+	      op = opts.op = 'beforeSum';
+	      return jsData.utils.resolve(self[op](mapper, field, query, opts)).then(function () {
+	        // Allow for re-assignment from lifecycle hook
+	        op = opts.op = 'sum';
+	        self.dbg(op, mapper, field, query, opts);
+	        return jsData.utils.resolve(self._sum(mapper, field, query, opts));
+	      }).then(function (results) {
+	        var _results8 = babelHelpers.slicedToArray(results, 2);
+	
+	        var data = _results8[0];
+	        var result = _results8[1];
+	
+	        result || (result = {});
+	        var response = new Response(data, result, op);
+	        response = self.respond(response, opts);
+	
+	        // afterSum lifecycle hook
+	        op = opts.op = 'afterSum';
+	        return jsData.utils.resolve(self[op](mapper, field, query, opts, response)).then(function (_response) {
+	          // Allow for re-assignment from lifecycle hook
+	          return jsData.utils.isUndefined(_response) ? response : _response;
+	        });
+	      });
+	    },
+	
+	
+	    /**
 	     * @name Adapter#respond
 	     * @method
 	     * @param {Object} response Response object.
@@ -2658,17 +2832,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeUpdate lifecycle hook
 	      op = opts.op = 'beforeUpdate';
-	      return resolve(self[op](mapper, id, props, opts)).then(function (_props) {
+	      return jsData.utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
 	        // Allow for re-assignment from lifecycle hook
-	        props = isUndefined(_props) ? props : _props;
+	        props = jsData.utils.isUndefined(_props) ? props : _props;
 	        op = opts.op = 'update';
 	        self.dbg(op, mapper, id, props, opts);
-	        return resolve(self._update(mapper, id, props, opts));
+	        return jsData.utils.resolve(self._update(mapper, id, props, opts));
 	      }).then(function (results) {
-	        var _results7 = babelHelpers.slicedToArray(results, 2);
+	        var _results9 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results7[0];
-	        var result = _results7[1];
+	        var data = _results9[0];
+	        var result = _results9[1];
 	
 	        result || (result = {});
 	        var response = new Response(data, result, 'update');
@@ -2677,9 +2851,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterUpdate lifecycle hook
 	        op = opts.op = 'afterUpdate';
-	        return resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, id, props, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2714,17 +2888,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	      // beforeUpdateAll lifecycle hook
 	      op = opts.op = 'beforeUpdateAll';
-	      return resolve(self[op](mapper, props, query, opts)).then(function (_props) {
+	      return jsData.utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
 	        // Allow for re-assignment from lifecycle hook
-	        props = isUndefined(_props) ? props : _props;
+	        props = jsData.utils.isUndefined(_props) ? props : _props;
 	        op = opts.op = 'updateAll';
 	        self.dbg(op, mapper, props, query, opts);
-	        return resolve(self._updateAll(mapper, props, query, opts));
+	        return jsData.utils.resolve(self._updateAll(mapper, props, query, opts));
 	      }).then(function (results) {
-	        var _results8 = babelHelpers.slicedToArray(results, 2);
+	        var _results10 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results8[0];
-	        var result = _results8[1];
+	        var data = _results10[0];
+	        var result = _results10[1];
 	
 	        data || (data = []);
 	        result || (result = {});
@@ -2734,9 +2908,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterUpdateAll lifecycle hook
 	        op = opts.op = 'afterUpdateAll';
-	        return resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, props, query, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    },
@@ -2762,25 +2936,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var idAttribute = mapper.idAttribute;
 	
 	      records = records.filter(function (record) {
-	        return get(record, idAttribute);
+	        return jsData.utils.get(record, idAttribute);
 	      });
 	
 	      // beforeUpdateMany lifecycle hook
 	      op = opts.op = 'beforeUpdateMany';
-	      return resolve(self[op](mapper, records, opts)).then(function (_records) {
+	      return jsData.utils.resolve(self[op](mapper, records, opts)).then(function (_records) {
 	        // Allow for re-assignment from lifecycle hook
-	        records = isUndefined(_records) ? records : _records;
+	        records = jsData.utils.isUndefined(_records) ? records : _records;
 	        records = records.map(function (record) {
 	          return withoutRelations(mapper, record);
 	        });
 	        op = opts.op = 'updateMany';
 	        self.dbg(op, mapper, records, opts);
-	        return resolve(self._updateMany(mapper, records, opts));
+	        return jsData.utils.resolve(self._updateMany(mapper, records, opts));
 	      }).then(function (results) {
-	        var _results9 = babelHelpers.slicedToArray(results, 2);
+	        var _results11 = babelHelpers.slicedToArray(results, 2);
 	
-	        var data = _results9[0];
-	        var result = _results9[1];
+	        var data = _results11[0];
+	        var result = _results11[1];
 	
 	        data || (data = []);
 	        result || (result = {});
@@ -2790,9 +2964,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	        // afterUpdateMany lifecycle hook
 	        op = opts.op = 'afterUpdateMany';
-	        return resolve(self[op](mapper, records, opts, response)).then(function (_response) {
+	        return jsData.utils.resolve(self[op](mapper, records, opts, response)).then(function (_response) {
 	          // Allow for re-assignment from lifecycle hook
-	          return isUndefined(_response) ? response : _response;
+	          return jsData.utils.isUndefined(_response) ? response : _response;
 	        });
 	      });
 	    }
