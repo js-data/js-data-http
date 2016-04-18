@@ -127,6 +127,10 @@ describe('find', function () {
           post: {
             foreignKey: 'userId',
             localField: 'posts'
+          },
+          comment: {
+            foreignKey: 'userId',
+            localField: 'comments'
           }
         }
       }
@@ -139,6 +143,12 @@ describe('find', function () {
             parent: true,
             foreignKey: 'userId',
             localField: 'user'
+          }
+        },
+        hasMany: {
+          comment: {
+            localField: 'comments',
+            foreignKey: 'postId'
           }
         }
       }

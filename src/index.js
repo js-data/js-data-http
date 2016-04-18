@@ -1229,14 +1229,7 @@ HttpAdapter.extend = utils.extend
  * @property {(string|boolean)} version.beta The beta version value,
  * otherwise `false` if the current version is not beta.
  */
-HttpAdapter.version = {
-  full: '<%= pkg.version %>',
-  major: parseInt('<%= major %>', 10),
-  minor: parseInt('<%= minor %>', 10),
-  patch: parseInt('<%= patch %>', 10),
-  alpha: '<%= alpha %>' !== 'false' ? '<%= alpha %>' : false,
-  beta: '<%= beta %>' !== 'false' ? '<%= beta %>' : false
-}
+HttpAdapter.version = '<%= version %>'
 
 /**
  * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`

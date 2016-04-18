@@ -1,12 +1,11 @@
-# People who have contributed to the js-data-http project.
+# This is the official list of js-data-http project contributors.
 #
-# This file is controlled by scripts/authors.js
+# Names are formatted as:
+#   Name <email address>
 #
-# Names should be added to this file as:
-#   [commit count] Name <email address>
-     1	InternalFX <bryan@internalfx.com>
-     1	Ivan Voznyakovsky <ivan.voznyakovsky@gmail.com>
-    69	Jason Dobry <jason.dobry@gmail.com>
-     1	Josh Drake <m0nikr@gmail.com>
-     1	RobertHerhold <reherhold@gmail.com>
-     3	Tomás Fox <tomas.c.fox@gmail.com>
+InternalFX <bryan@internalfx.com>
+Ivan Voznyakovsky <ivan.voznyakovsky@gmail.com>
+Jason Dobry <jason.dobry@gmail.com>
+Josh Drake <m0nikr@gmail.com>
+RobertHerhold <reherhold@gmail.com>
+Tomás Fox <tomas.c.fox@gmail.com>

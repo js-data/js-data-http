@@ -1,3 +1,11 @@
+/*!
+* js-data-fetch
+* @version 3.0.0-beta.2 - Homepage <https://github.com/js-data/js-data-http>
+* @copyright (c) 2014-2016 js-data-http project authors
+* @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
+*
+* @overview HTTP adapter for js-data that uses the fetch API.
+*/
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory(require("js-data"), require("undefined"));
@@ -1293,13 +1301,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '<%= pkg.version %>',
-	  major: parseInt('<%= major %>', 10),
-	  minor: parseInt('<%= minor %>', 10),
-	  patch: parseInt('<%= patch %>', 10),
-	  alpha:  true ? '<%= alpha %>' : false,
-	  beta:  true ? '<%= beta %>' : false
-	};
+  beta: 2,
+  full: '3.0.0-beta.2',
+  major: 3,
+  minor: 0,
+  patch: 0
+};
 	
 	/**
 	 * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`

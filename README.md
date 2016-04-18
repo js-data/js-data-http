@@ -21,70 +21,16 @@ and will use axios unless you provide a different http library.
 Tested on IE9, Chrome 46, Firefox 41 & Safari 7.1 using
 <img src="https://raw.githubusercontent.com/js-data/js-data-localstorage/master/bs.jpg" alt="bs logo" title="browserstack" width="150" height="35" style="vertical-align: middle" />
 
-To get started, visit __[http://js-data.io](http://www.js-data.io)__.
+To get started, visit the main website at __[http://js-data.io](http://www.js-data.io/v3.0/docs/js-data-http)__.
 
-## Table of contents
+## Links
 
-* [Quick start](#quick-start)
-* [Dependencies](#dependencies)
-* [Guides and Tutorials](#guides-and-tutorials)
-* [API Reference Docs](#api-reference-docs)
-* [Community](#community)
-* [Support](#support)
-* [Contributing](#contributing)
-* [License](#license)
-
-## Quick Start
-`npm install --save js-data js-data-http` or `bower install --save js-data js-data-http`.
-
-`npm install --save axios js-data js-data-http-node`
-
-__ES6__
-
-```js
-// Doesn't make much sense to use DataStore on the server
-import {Container} from 'js-data'
-import HttpAdapter from 'js-data-http-node'
-
-const adapter = new HttpAdapter()
-const container = new Container()
-
-container.registerAdapter('http', adapter, { default: true })
-
-container.defineMapper('school')
-container.defineMapper('student')
-
-container.find('school', 1).then(function (school) {
-  // ...
-})
-```
-
-## Dependencies
-
-`js-data-http` bundles axios and depends on `js-data`. `js-data-fetch` depends
-on `js-data`. `js-data-http-node` depends on `js-data` and optionally axios.
-
-See [JSData's dependencies](https://github.com/js-data/js-data/blob/master/README.md#dependencies).
-
-## Guides and Tutorials
-
-[Get started at http://js-data.io](http://js-data.io)
-
-## API Reference Docs
-
-[Visit http://api.js-data.io](http://api.js-data.io).
-
-## Community
-
-[Explore the Community](http://js-data.io/docs/community).
-
-## Support
-
-[Find out how to Get Support](http://js-data.io/docs/support).
-
-## Contributing
-
-[Read the Contributing Guide](http://js-data.io/docs/contributing).
+* [Quick start](http://www.js-data.io/v3.0/docs/js-data-http)
+* [Guides and Tutorials](http://www.js-data.io/v3.0/docs/home)
+* [API Reference Docs](http://api.js-data.io/js-data-http)
+* [Community](http://js-data.io/docs/community)
+* [Support](http://js-data.io/docs/support)
+* [Contributing](http://js-data.io/docs/contributing)
 
 ## License
 
@@ -105,7 +51,7 @@ Copyright (c) 2014-2016 js-data-http project authors
 [circle_l]: https://circleci.com/gh/js-data/js-data-http/tree/master
 [dn_b]: https://img.shields.io/npm/dm/js-data-http.svg?style=flat
 [dn_l]: https://www.npmjs.org/package/js-data-http
-[cov_b]: https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat
-[cov_l]: https://coveralls.io/github/js-data/js-data-http?branch=master
+[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-http/3.0.svg?style=flat
+[cov_l]: https://codecov.io/github/js-data/js-data-http
 [cod_b]: https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg
 [cod_l]: https://www.codacy.com/app/jasondobry/js-data-http/dashboard

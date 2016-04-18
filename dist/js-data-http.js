@@ -1,11 +1,10 @@
 /*!
 * js-data-http
-* @version 3.0.0-alpha.10 - Homepage <http://www.js-data.io/docs/dshttpadapter>
-* @author Jason Dobry <jason.dobry@gmail.com>
-* @copyright (c) 2014-2015 Jason Dobry
+* @version 3.0.0-beta.2 - Homepage <https://github.com/js-data/js-data-http>
+* @copyright (c) 2014-2016 js-data-http project authors
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
-* @overview HTTP adapter for js-data.
+* @overview HTTP (XHR) adapter for js-data in the browser.
 */
 (function webpackUniversalModuleDefinition(root, factory) {
 	if(typeof exports === 'object' && typeof module === 'object')
@@ -1302,13 +1301,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '3.0.0-alpha.10',
-	  major: parseInt('3', 10),
-	  minor: parseInt('0', 10),
-	  patch: parseInt('0', 10),
-	  alpha:  true ? '10' : false,
-	  beta:  true ? 'false' : false
-	};
+  beta: 2,
+  full: '3.0.0-beta.2',
+  major: 3,
+  minor: 0,
+  patch: 0
+};
 	
 	/**
 	 * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`

@@ -1293,13 +1293,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	HttpAdapter.version = {
-	  full: '<%= pkg.version %>',
-	  major: parseInt('<%= major %>', 10),
-	  minor: parseInt('<%= minor %>', 10),
-	  patch: parseInt('<%= patch %>', 10),
-	  alpha:  true ? '<%= alpha %>' : false,
-	  beta:  true ? '<%= beta %>' : false
-	};
+  beta: 2,
+  full: '3.0.0-beta.2',
+  major: 3,
+  minor: 0,
+  patch: 0
+};
 	
 	/**
 	 * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`

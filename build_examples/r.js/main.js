@@ -1,7 +1,7 @@
 require.config({
   paths: {
-    // customize these ass needed
-    'js-data-http': '../../node/dist/js-data-http-node',
+    // customize these as needed
+    'js-data-http': '../../node/dist/js-data-http',
     'js-data': '../../node_modules/js-data/dist/js-data',
   }
 });

@@ -1,3 +1,10 @@
+##### 3.0.0-beta.2 - 17 April 2016
+
+Official v3 beta release
+
+###### Other
+- Upgraded some devDependencies
+
 ##### 3.0.0-alpha.10 - 02 April 2016
 
 ###### Backwards compatible bug fixes
