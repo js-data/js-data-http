@@ -170,18 +170,18 @@ describe('find', function () {
       }
     })
 
-    const post = {
+    var post = {
       id: 1,
       userId: 10
     }
 
-    const comment = {
+    var comment = {
       id: 3,
       postId: 1,
       userId: 13
     }
 
-    const comment2 = {
+    var comment2 = {
       id: 4,
       userId: 7
     }
