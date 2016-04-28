@@ -1,3 +1,41 @@
+##### 3.0.0-beta.3 - 28 April 2016
+
+###### Breaking changes
+- js-data-http.js no longer exports a default module, you must now do:
+  - `import {HttpAdapter} from 'js-data-http'
+  - `var HttpAdapter = require('js-data-http').HttpAdapter
+  - `var adapter = new window.JSDataHttp.HttpAdapter()`
+  - `define(['js-data-http'], function (JSDataHttp) { var adapter = new window.JSDataHttp.HttpAdapter(); })
+
+###### Backwards compatible changes
+- Added `typings` field to `package.json`
+- Added `typings.json`
+- Added `dist/js-data-http.d.ts`
+
+##### 3.0.0-beta.2 - 17 April 2016
+
+Official v3 beta release
+
+###### Other
+- Upgraded some devDependencies
+
+##### 3.0.0-alpha.10 - 02 April 2016
+
+###### Backwards compatible bug fixes
+- Fixed double deserialization of data in some cases
+
+##### 3.0.0-alpha.9 - 18 March 2016
+
+###### Backwards compatible API changes
+- Added sum and count methods
+
+###### Other
+- Cleaned up some things
+
+##### 3.0.0-alpha.8 - 17 March 2016
+
+- Rebased master
+
 ##### 2.2.1 - 17 March 2016
 
 ###### Backwards compatible bug fixes
@@ -5,6 +43,20 @@
 - #45 - Map file path in js-data-http.min.js is incorrect.
 - #46 - Sending large payloads takes huge amount of time - thanks @ivanvoznyakovsky
 - #47 - perf(http): speed up preparation of http config with large payload - thanks @ivanvoznyakovsky
+
+##### 3.0.0-alpha.7 - 10 March 2016
+
+###### Other
+- Now using js-data-repo-tools
+- Now using js-data-adapter
+
+##### 3.0.0-alpha.6 - 23 February 2016
+
+- getEndpoint now works with multiple parents
+
+##### 3.0.0-alpha.5 - 23 February 2016
+
+- Rebased master
 
 ##### 2.2.0 - 23 February 2016
 
@@ -16,7 +68,47 @@
 - Added AUTHORS and CONTRIBUTORS files
 - Updated Readme
 
+##### 3.0.0-alpha.4 - 12 February 2016
+
+###### Backwards compatible API changes
+- Better debugging/logging
+- Updates for the newest js-data alpha
+
+##### 3.0.0-alpha.3 - 10 January 2016
+
+###### Backwards compatible API changes
+- Added updateMany, createMany, and responseError methods.
+
+##### 3.0.0-alpha.2 - 09 January 2016
+
+###### Breaking API changes
+- All options that could be found at `DSHttpAdapter#defaults` will now be on
+the actual instances of `DSHttpAdapter`. e.g. `DSHttpAdapter#defaults.deserialize`
+is now at `DSHttpAdapter#deserialize`. This makes it easier to extend the
+`DSHttpAdapter` class and override its methods.
+
+###### Backwards compatible API changes
+- Added lifecycle methods: beforeFind, afterPOST, etc.
+- Added support for the `raw` option
+
+##### 3.0.0-alpha.1 - 12 December 2015
+
+###### Breaking API changes
+- Actions are now part of js-data-http, rather than js-data
+- Now requires js-data 3.x or greater
+
+###### Backwards compatible API changes
+- Added option to support use of `window.fetch`
+- Added option to supply custom http implementation
+
+###### Other
+- Published the js-data-http-node package, a build of js-data-http that works in Node.js
+
 ##### 2.1.2 - 28 October 2015
+
+###### Backwards compatible API changes
+- Added option to support use of `window.fetch`
+- Added option to supply custom http implementation
 
 ###### Other
 - Dropped Grunt

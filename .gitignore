@@ -1,4 +1,3 @@
-node_modules/
 bower_components/
 
 .idea/
@@ -7,3 +6,7 @@ bower_components/
 
 coverage/
 junit/
+doc/
+node_modules/
+*.log
+typings

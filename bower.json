@@ -1,34 +1,33 @@
 {
   "name": "js-data-http",
-  "description": "HTTP adapter for js-data.",
-  "homepage": "http://www.js-data.io/docs/dshttpadapter",
+  "description": "HTTP (XHR) adapter for js-data in the browser.",
+  "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
     "url": "https://github.com/js-data/js-data-http.git"
   },
-  "author": {
-    "name": "Jason Dobry",
-    "url": "http://www.pseudobry.com",
-    "email": "jason.dobry@gmail.com"
-  },
+  "author": "js-data-http project authors",
   "main": "./dist/js-data-http.js",
   "ignore": [
     ".idea/",
     ".*",
     "*.iml",
     "src/",
-    "lib/",
     "doc/",
-    "guide/",
+    "build_examples/",
     "coverage/",
-    "Gruntfile.js",
+    "scripts/",
+    "junit/",
     "node_modules/",
+    "fetch/",
+    "node/",
     "test/",
     "package.json",
     "karma.conf.js",
-    "karma.start.js"
+    "karma.start.js",
+    "webpack.config.js"
   ],
   "dependencies": {
-    "js-data": ">=2.0.0"
+    "js-data": ">=3.0.0-alpha.26"
   }
 }

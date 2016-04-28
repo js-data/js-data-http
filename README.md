@@ -9,53 +9,28 @@
 [![Coverage Status][cov_b]][cov_l]
 [![Codacy][cod_b]][cod_l]
 
-HTTP adapter for [js-data](http://www.js-data.io/).
+This repo contains HTTP adapters for [js-data](http://www.js-data.io/):
 
-To get started, visit __[http://js-data.io](http://www.js-data.io)__.
+- js-data-http - HTTP (XHR, includes [axios][axios]) adapter for js-data in the
+browser. Capable of using `window.fetch` instead of axios.
+- js-data-fetch - Same as js-data-http but doesn't include axios and will use
+`window.fetch` if available and if you don't provide your own http library.
+- js-data-http-node - Same as js-data-http but runs on Node.js. Depends on axios
+and will use axios unless you provide a different http library.
 
-## Table of contents
+Tested on IE9, Chrome 46, Firefox 41 & Safari 7.1 using
+<img src="https://raw.githubusercontent.com/js-data/js-data-localstorage/master/bs.jpg" alt="bs logo" title="browserstack" width="150" height="35" style="vertical-align: middle" />
 
-* [Quick start](#quick-start)
-* [Guides and Tutorials](#guides-and-tutorials)
-* [API Reference Docs](#api-reference-docs)
-* [Community](#community)
-* [Support](#support)
-* [Contributing](#contributing)
-* [License](#license)
+To get started, visit the main website at __[http://js-data.io](http://www.js-data.io/v3.0/docs/js-data-http)__.
 
-## Quick Start
-`npm install --save js-data js-data-http` or `bower install --save js-data js-data-http`.
+## Links
 
-Load `js-data-http.js` after `js-data.js`.
-
-```js
-var adapter = new DSHttpAdapter();
-
-var store = new JSData.DS();
-store.registerAdapter('http', adapter, { default: true });
-
-// "store" will now use the http adapter for all async operations
-```
-
-## Guides and Tutorials
-
-[Get started at http://js-data.io](http://js-data.io)
-
-## API Reference Docs
-
-[Visit http://api.js-data.io](http://api.js-data.io).
-
-## Community
-
-[Explore the Community](http://js-data.io/docs/community).
-
-## Support
-
-[Find out how to Get Support](http://js-data.io/docs/support).
-
-## Contributing
-
-[Read the Contributing Guide](http://js-data.io/docs/contributing).
+* [Quick start](http://www.js-data.io/v3.0/docs/js-data-http)
+* [Guides and Tutorials](http://www.js-data.io/v3.0/docs/home)
+* [API Reference Docs](http://api.js-data.io/js-data-http)
+* [Community](http://js-data.io/docs/community)
+* [Support](http://js-data.io/docs/support)
+* [Contributing](http://js-data.io/docs/contributing)
 
 ## License
 
@@ -69,13 +44,14 @@ Copyright (c) 2014-2016 js-data-http project authors
 
 [sl_b]: http://slack.js-data.io/badge.svg
 [sl_l]: http://slack.js-data.io
+[so]: http://stackoverflow.com/questions/tagged/jsdata
 [npm_b]: https://img.shields.io/npm/v/js-data-http.svg?style=flat
 [npm_l]: https://www.npmjs.org/package/js-data-http
 [circle_b]: https://img.shields.io/circleci/project/js-data/js-data-http/master.svg?style=flat
 [circle_l]: https://circleci.com/gh/js-data/js-data-http/tree/master
 [dn_b]: https://img.shields.io/npm/dm/js-data-http.svg?style=flat
 [dn_l]: https://www.npmjs.org/package/js-data-http
-[cov_b]: https://img.shields.io/coveralls/js-data/js-data-http/master.svg?style=flat
-[cov_l]: https://coveralls.io/github/js-data/js-data-http?branch=master
+[cov_b]: https://img.shields.io/codecov/c/github/js-data/js-data-http/3.0.svg?style=flat
+[cov_l]: https://codecov.io/github/js-data/js-data-http
 [cod_b]: https://img.shields.io/codacy/3931bbd8d838463297f70640aa78251b.svg
 [cod_l]: https://www.codacy.com/app/jasondobry/js-data-http/dashboard

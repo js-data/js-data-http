@@ -1,0 +1,10 @@
+{
+  "name": "js-data-http",
+  "version": false,
+  "main": "./dist/js-data-http.d.ts",
+  "ambientDependencies": {
+    "js-data": "npm:js-data",
+    "js-data-adapter": "npm:js-data-adapter",
+    "es6-shim": "registry:dt/es6-shim#0.31.2+20160317120654"
+  }
+}

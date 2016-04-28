@@ -1,0 +1,31 @@
+{
+  "name": "js-data-http-node",
+  "description": "Node.js HTTP adapter for js-data.",
+  "version": "3.0.0-beta.3",
+  "homepage": "https://github.com/js-data/js-data-http",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/js-data/js-data-http.git"
+  },
+  "author": "js-data-http project authors",
+  "license": "MIT",
+  "main": "./dist/js-data-http-node.js",
+  "files": [
+    "dist/"
+  ],
+  "keywords": [
+    "ajax",
+    "axios",
+    "rest",
+    "adapter",
+    "http",
+    "node.js"
+  ],
+  "dependencies": {
+    "js-data-adapter": "~0.3.0"
+  },
+  "peerDependencies": {
+    "axios": "^0.11.0",
+    "js-data": "^3.0.0-beta.2"
+  }
+}

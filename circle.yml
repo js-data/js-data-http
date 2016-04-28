@@ -1,12 +1,11 @@
-dependencies:
-  pre:
-    - bower install
-  cache_directories:
-    - "bower_components"
+machine:
+  node:
+    version: 4.1.0
 test:
   override:
     - npm run ci
 general:
   artifacts:
     - "dist"
+    - "fetch/dist"
     - "coverage"
