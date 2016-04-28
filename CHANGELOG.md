@@ -1,3 +1,17 @@
+##### 3.0.0-beta.3 - 28 April 2016
+
+###### Breaking changes
+- js-data-http.js no longer exports a default module, you must now do:
+  - `import {HttpAdapter} from 'js-data-http'
+  - `var HttpAdapter = require('js-data-http').HttpAdapter
+  - `var adapter = new window.JSDataHttp.HttpAdapter()`
+  - `define(['js-data-http'], function (JSDataHttp) { var adapter = new window.JSDataHttp.HttpAdapter(); })
+
+###### Backwards compatible changes
+- Added `typings` field to `package.json`
+- Added `typings.json`
+- Added `dist/js-data-http.d.ts`
+
 ##### 3.0.0-beta.2 - 17 April 2016
 
 Official v3 beta release

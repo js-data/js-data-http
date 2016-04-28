@@ -1,4 +1,4 @@
-/* global JSData:true, HttpAdapter:true, sinon:true, chai:true */
+/* global JSData:true, JSDataHttp:true, sinon:true, chai:true */
 before(function () {
   var Test = this
   Test.fail = function (msg) {
@@ -14,7 +14,7 @@ before(function () {
   }
   Test.sinon = sinon
   Test.JSData = JSData
-  Test.HttpAdapter = HttpAdapter
+  Test.HttpAdapter = JSDataHttp.HttpAdapter
   Test.User = new JSData.Mapper({
     name: 'user'
   })
@@ -29,7 +29,7 @@ before(function () {
 
 beforeEach(function () {
   var Test = this
-  Test.adapter = new HttpAdapter()
+  Test.adapter = new JSDataHttp.HttpAdapter()
   Test.User.registerAdapter('http', Test.adapter, { default: true })
   Test.Post.registerAdapter('http', Test.adapter, { default: true })
 

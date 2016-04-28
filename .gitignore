@@ -9,3 +9,4 @@ junit/
 doc/
 node_modules/
 *.log
+typings

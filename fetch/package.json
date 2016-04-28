@@ -1,7 +1,7 @@
 {
   "name": "js-data-fetch",
   "description": "HTTP adapter for js-data that uses the fetch API.",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.3",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -10,6 +10,9 @@
   "author": "js-data-http project authors",
   "license": "MIT",
   "main": "./dist/js-data-fetch.js",
+  "files": [
+    "dist/"
+  ],
   "keywords": [
     "ajax",
     "axios",
@@ -19,6 +22,6 @@
     "fetch"
   ],
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.1"
+    "js-data": "^3.0.0-beta.2"
   }
 }

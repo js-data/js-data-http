@@ -1,27 +1,44 @@
 /* global fetch:true Headers:true Request:true */
+
+/**
+ * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
+ * that works on Node.js is registered in NPM as `js-data-http-node`. The build
+ * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
+ * as `js-data-fetch`.
+ *
+ * __Script tag__:
+ * ```javascript
+ * window.HttpAdapter
+ * ```
+ * __CommonJS__:
+ * ```javascript
+ * var HttpAdapter = require('js-data-http')
+ * ```
+ * __ES6 Modules__:
+ * ```javascript
+ * import HttpAdapter from 'js-data-http'
+ * ```
+ * __AMD__:
+ * ```javascript
+ * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
+ * ```
+ *
+ * @module js-data-http
+ */
+
 const axios = require('axios')
 import {utils} from 'js-data'
-import Adapter from 'js-data-adapter'
+import {
+  Adapter,
+  noop,
+  noop2
+} from 'js-data-adapter'
 
 let hasFetch = false
 
 try {
   hasFetch = window && window.fetch
 } catch (e) {}
-
-const noop = function (...args) {
-  const self = this
-  const opts = args[args.length - 1]
-  self.dbg(opts.op, ...args)
-  return utils.resolve()
-}
-
-const noop2 = function (...args) {
-  const self = this
-  const opts = args[args.length - 2]
-  self.dbg(opts.op, ...args)
-  return utils.resolve()
-}
 
 function isValidString (value) {
   return (value != null && value !== '')
@@ -125,6 +142,7 @@ const DEFAULTS = {
  * HttpAdapter class.
  *
  * @class HttpAdapter
+ * @extends Adapter
  * @param {Object} [opts] Configuration options.
  * @param {string} [opts.basePath=''] TODO
  * @param {boolean} [opts.debug=false] TODO
@@ -141,6 +159,12 @@ function HttpAdapter (opts) {
   Adapter.call(self, opts)
 }
 
+/**
+ * @name module:js-data-http.HttpAdapter
+ * @see HttpAdapter
+ */
+exports.HttpAdapter = HttpAdapter
+
 // Setup prototype inheritance from Adapter
 HttpAdapter.prototype = Object.create(Adapter.prototype, {
   constructor: {
@@ -155,6 +179,54 @@ Object.defineProperty(HttpAdapter, '__super__', {
   configurable: true,
   value: Adapter
 })
+
+/**
+ * Alternative to ES6 class syntax for extending `HttpAdapter`.
+ *
+ * __ES6__:
+ * ```javascript
+ * class MyHttpAdapter extends HttpAdapter {
+ *   deserialize (Model, data, opts) {
+ *     const data = super.deserialize(Model, data, opts)
+ *     data.foo = 'bar'
+ *     return data
+ *   }
+ * }
+ * ```
+ *
+ * __ES5__:
+ * ```javascript
+ * var instanceProps = {
+ *   // override deserialize
+ *   deserialize: function (Model, data, opts) {
+ *     var Ctor = this.constructor
+ *     var superDeserialize = (Ctor.__super__ || Object.getPrototypeOf(Ctor)).deserialize
+ *     // call the super deserialize
+ *     var data = superDeserialize(Model, data, opts)
+ *     data.foo = 'bar'
+ *     return data
+ *   },
+ *   say: function () { return 'hi' }
+ * }
+ * var classProps = {
+ *   yell: function () { return 'HI' }
+ * }
+ *
+ * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
+ * var adapter = new MyHttpAdapter()
+ * adapter.say() // "hi"
+ * MyHttpAdapter.yell() // "HI"
+ * ```
+ *
+ * @name HttpAdapter.extend
+ * @method
+ * @param {Object} [instanceProps] Properties that will be added to the
+ * prototype of the subclass.
+ * @param {Object} [classProps] Properties that will be added as static
+ * properties to the subclass itself.
+ * @return {Object} Subclass of `HttpAdapter`.
+ */
+HttpAdapter.extend = utils.extend
 
 utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   /**
@@ -1080,7 +1152,7 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 /**
  * Add an Http actions to a mapper.
  *
- * @name HttpAdapter.addAction
+ * @name module:js-data-http.addAction
  * @method
  * @param {string} name Name of the new action.
  * @param {Object} [opts] Action configuration
@@ -1092,7 +1164,7 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
  * @return {Function} Decoration function, which should be passed the mapper to
  * decorate when invoked.
  */
-HttpAdapter.addAction = function (name, opts) {
+exports.addAction = function addAction (name, opts) {
   if (!name || !utils.isString(name)) {
     throw new TypeError('action(name[, opts]): Expected: string, Found: ' + typeof name)
   }
@@ -1150,75 +1222,27 @@ HttpAdapter.addAction = function (name, opts) {
  * Add multiple Http actions to a mapper. See {@link HttpAdapter.addAction} for
  * action configuration options.
  *
- * @name HttpAdapter.addActions
+ * @name module:js-data-http.addActions
  * @method
  * @param {Object.<string, Object>} opts Object where the key is an action name
  * and the value is the configuration for the action.
  * @return {Function} Decoration function, which should be passed the mapper to
  * decorate when invoked.
  */
-HttpAdapter.addActions = function (opts) {
+exports.addActions = function addActions (opts) {
   opts || (opts = {})
   return function (mapper) {
     utils.forOwn(mapper, function (value, key) {
-      HttpAdapter.addAction(key, value)(mapper)
+      exports.addAction(key, value)(mapper)
     })
     return mapper
   }
 }
 
 /**
- * Alternative to ES6 class syntax for extending `HttpAdapter`.
- *
- * __ES6__:
- * ```javascript
- * class MyHttpAdapter extends HttpAdapter {
- *   deserialize (Model, data, opts) {
- *     const data = super.deserialize(Model, data, opts)
- *     data.foo = 'bar'
- *     return data
- *   }
- * }
- * ```
- *
- * __ES5__:
- * ```javascript
- * var instanceProps = {
- *   // override deserialize
- *   deserialize: function (Model, data, opts) {
- *     var Ctor = this.constructor
- *     var superDeserialize = (Ctor.__super__ || Object.getPrototypeOf(Ctor)).deserialize
- *     // call the super deserialize
- *     var data = superDeserialize(Model, data, opts)
- *     data.foo = 'bar'
- *     return data
- *   },
- *   say: function () { return 'hi' }
- * }
- * var classProps = {
- *   yell: function () { return 'HI' }
- * }
- *
- * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
- * var adapter = new MyHttpAdapter()
- * adapter.say() // "hi"
- * MyHttpAdapter.yell() // "HI"
- * ```
- *
- * @name HttpAdapter.extend
- * @method
- * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the subclass.
- * @param {Object} [classProps] Properties that will be added as static
- * properties to the subclass itself.
- * @return {Object} Subclass of `HttpAdapter`.
- */
-HttpAdapter.extend = utils.extend
-
-/**
  * Details of the current version of the `js-data-http` module.
  *
- * @name HttpAdapter.version
+ * @name module:js-data-http.version
  * @type {Object}
  * @property {string} version.full The full semver value.
  * @property {number} version.major The major version number.
@@ -1229,32 +1253,4 @@ HttpAdapter.extend = utils.extend
  * @property {(string|boolean)} version.beta The beta version value,
  * otherwise `false` if the current version is not beta.
  */
-HttpAdapter.version = '<%= version %>'
-
-/**
- * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
- * that works on Node.js is registered in NPM as `js-data-http-node`. The build
- * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
- * as `js-data-fetch`.
- *
- * __Script tag__:
- * ```javascript
- * window.HttpAdapter
- * ```
- * __CommonJS__:
- * ```javascript
- * var HttpAdapter = require('js-data-http')
- * ```
- * __ES6 Modules__:
- * ```javascript
- * import HttpAdapter from 'js-data-http'
- * ```
- * __AMD__:
- * ```javascript
- * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
- * ```
- *
- * @module js-data-http
- */
-
-module.exports = HttpAdapter
+exports.version = '<%= version %>'

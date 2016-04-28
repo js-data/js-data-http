@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-beta.2",
+  "version": "3.0.0-beta.3",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -10,6 +10,14 @@
   "author": "js-data-http project authors",
   "license": "MIT",
   "main": "./dist/js-data-http.js",
+  "typings": "./dist/js-data-http.d.ts",
+  "files": [
+    "dist/",
+    "src/",
+    "AUTHORS",
+    "CONTRIBUTORS",
+    "typings.json"
+  ],
   "keywords": [
     "ajax",
     "axios",
@@ -55,12 +63,15 @@
     "release": "npm test && npm run doc && npm run repo-tools",
     "ci": "npm test && cat ./coverage/lcov.info | codecov"
   },
+  "dependencies": {
+    "js-data-adapter": "0.5.0"
+  },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.1"
+    "js-data": "^3.0.0-beta.3"
   },
   "devDependencies": {
-    "axios": "0.9.1",
-    "babel-core": "6.7.6",
+    "axios": "0.11.0",
+    "babel-core": "6.7.7",
     "babel-loader": "6.2.4",
     "babel-plugin-syntax-async-functions": "6.5.0",
     "babel-plugin-transform-regenerator": "6.6.5",
@@ -70,7 +81,6 @@
     "chai": "3.5.0",
     "codecov": "1.0.1",
     "istanbul": "0.4.3",
-    "js-data-adapter": "0.3.0",
     "js-data-repo-tools": "0.3.0",
     "jsdoc": "3.4.0",
     "karma": "0.13.22",
