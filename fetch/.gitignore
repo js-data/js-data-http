@@ -1,2 +1,4 @@
+dist/*.js
+dist/*.map
 node_modules/
 junit/
