@@ -29,7 +29,7 @@ before(function () {
 
 beforeEach(function () {
   var Test = this
-  Test.adapter = new JSDataHttp.HttpAdapter()
+  Test.adapter = new Test.HttpAdapter()
   Test.User.registerAdapter('http', Test.adapter, { default: true })
   Test.Post.registerAdapter('http', Test.adapter, { default: true })
 

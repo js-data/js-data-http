@@ -17,7 +17,7 @@ before(function () {
   }
   Test.sinon = require('sinon')
   Test.JSData = require('js-data')
-  Test.HttpAdapter = require('./dist/js-data-http-node')
+  Test.HttpAdapter = require('./dist/js-data-http-node').HttpAdapter
   Test.User = new Test.JSData.Mapper({
     name: 'user'
   })

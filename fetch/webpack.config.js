@@ -8,7 +8,7 @@ module.exports = {
   output: {
     filename: '[name]',
     libraryTarget: 'umd',
-    library: 'HttpAdapter'
+    library: 'JSDataHttp'
   },
   externals: [
     {
