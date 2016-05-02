@@ -1,6 +1,6 @@
 /*!
 * js-data-fetch
-* @version 3.0.0-beta.4 - Homepage <https://github.com/js-data/js-data-http>
+* @version 3.0.0-beta.5 - Homepage <https://github.com/js-data/js-data-http>
 * @copyright (c) 2014-2016 js-data-http project authors
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -1154,6 +1154,34 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Add an Http actions to a mapper.
 	 *
+	 * @example
+	 * // CommonJS
+	 * var JSData = require('js-data')
+	 * // It is recommended to use DataStore in the browser
+	 * var DataStore = JSData.DataStore
+	 *
+	 * var JSDataHttp = require('js-data-http')
+	 * var HttpAdapter = JSDataHttp.HttpAdapter
+	 * var addAction = JSDataHttp.addAction
+	 *
+	 * var adapter = new HttpAdapter()
+	 * var store = new DataStore()
+	 *
+	 * store.registerAdapter('http', adapter, { default: true })
+	 * store.defineMapper('school')
+	 *
+	 * // GET /reports/schools/:school_id/teachers
+	 * addAction('getTeacherReports', {
+	 *   basePath: 'reports/schools',
+	 *   pathname: 'teachers',
+	 *   method: 'GET'
+	 * })(store.getMapper('school'))
+	 *
+	 * // /reports/schools/1234/teachers
+	 * store.getMapper('school').getTeacherReports(1234).then(function (response) {
+	 *   // ...
+	 * })
+	 *
 	 * @name module:js-data-http.addAction
 	 * @method
 	 * @param {string} name Name of the new action.
@@ -1207,7 +1235,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }
 	      config.method = config.method || 'GET';
 	      config.mapper = self.name;
-	      _jsData.utils.deepMixIn(config)(_opts);
+	      _jsData.utils.deepMixIn(config, _opts);
 	      return _jsData.utils.resolve(config).then(_opts.request || opts.request).then(function (config) {
 	        return adapter.HTTP(config);
 	      }).then(function (data) {
@@ -1225,6 +1253,36 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * Add multiple Http actions to a mapper. See {@link HttpAdapter.addAction} for
 	 * action configuration options.
 	 *
+	 * @example
+	 * // CommonJS
+	 * var JSData = require('js-data')
+	 * // It is recommended to use DataStore in the browser
+	 * var DataStore = JSData.DataStore
+	 *
+	 * var JSDataHttp = require('js-data-http')
+	 * var HttpAdapter = JSDataHttp.HttpAdapter
+	 * var addActions = JSDataHttp.addActions
+	 *
+	 * var adapter = new HttpAdapter()
+	 * var store = new DataStore()
+	 *
+	 * store.registerAdapter('http', adapter, { default: true })
+	 * store.defineMapper('school')
+	 *
+	 * addActions({
+	 *   // GET /reports/schools/:school_id/teachers
+	 *   getTeacherReports: {
+	 *     basePath: 'reports/schools',
+	 *     pathname: 'teachers',
+	 *     method: 'GET'
+	 *   }
+	 * })(store.getMapper('school'))
+	 *
+	 * // /reports/schools/1234/teachers
+	 * store.getMapper('school').getTeacherReports(1234).then(function (response) {
+	 *   // ...
+	 * })
+	 *
 	 * @name module:js-data-http.addActions
 	 * @method
 	 * @param {Object.<string, Object>} opts Object where the key is an action name
@@ -1235,7 +1293,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.addActions = function addActions(opts) {
 	  opts || (opts = {});
 	  return function (mapper) {
-	    _jsData.utils.forOwn(mapper, function (value, key) {
+	    _jsData.utils.forOwn(opts, function (value, key) {
 	      exports.addAction(key, value)(mapper);
 	    });
 	    return mapper;
@@ -1257,8 +1315,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	exports.version = {
-  beta: 4,
-  full: '3.0.0-beta.4',
+  beta: 5,
+  full: '3.0.0-beta.5',
   major: 3,
   minor: 0,
   patch: 0
@@ -1270,22 +1328,25 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
 	 * as `js-data-fetch`.
 	 *
-	 * __Script tag__:
-	 * ```javascript
-	 * window.HttpAdapter
-	 * ```
-	 * __CommonJS__:
-	 * ```javascript
-	 * var HttpAdapter = require('js-data-http')
-	 * ```
-	 * __ES6 Modules__:
-	 * ```javascript
-	 * import HttpAdapter from 'js-data-http'
-	 * ```
-	 * __AMD__:
-	 * ```javascript
-	 * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
-	 * ```
+	 * @example <caption>Script tag</caption>
+	 * var HttpAdapter = window.JSDataHttp.HttpAdapter
+	 * var adapter = new HttpAdapter()
+	 *
+	 * @example <caption>CommonJS</caption>
+	 * var HttpAdapter = require('js-data-Http').HttpAdapter
+	 * var adapter = new HttpAdapter()
+	 *
+	 * @example <caption>ES2015 Modules</caption>
+	 * import {HttpAdapter} from 'js-data-Http'
+	 * const adapter = new HttpAdapter()
+	 *
+	 * @example <caption>AMD</caption>
+	 * define('myApp', ['js-data-Http'], function (JSDataHttp) {
+	 *   var HttpAdapter = JSDataHttp.HttpAdapter
+	 *   var adapter = new HttpAdapter()
+	 *
+	 *   // ...
+	 * })
 	 *
 	 * @module js-data-http
 	 */
