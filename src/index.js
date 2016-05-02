@@ -1102,6 +1102,34 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 /**
  * Add an Http actions to a mapper.
  *
+ * @example
+ * // CommonJS
+ * var JSData = require('js-data')
+ * // It is recommended to use DataStore in the browser
+ * var DataStore = JSData.DataStore
+ *
+ * var JSDataHttp = require('js-data-http')
+ * var HttpAdapter = JSDataHttp.HttpAdapter
+ * var addAction = JSDataHttp.addAction
+ *
+ * var adapter = new HttpAdapter()
+ * var store = new DataStore()
+ *
+ * store.registerAdapter('http', adapter, { default: true })
+ * store.defineMapper('school')
+ *
+ * // GET /reports/schools/:school_id/teachers
+ * addAction('getTeacherReports', {
+ *   basePath: 'reports/schools',
+ *   pathname: 'teachers',
+ *   method: 'GET'
+ * })(store.getMapper('school'))
+ *
+ * // /reports/schools/1234/teachers
+ * store.getMapper('school').getTeacherReports(1234).then(function (response) {
+ *   // ...
+ * })
+ *
  * @name module:js-data-http.addAction
  * @method
  * @param {string} name Name of the new action.
@@ -1152,7 +1180,7 @@ exports.addAction = function addAction (name, opts) {
       }
       config.method = config.method || 'GET'
       config.mapper = self.name
-      utils.deepMixIn(config)(_opts)
+      utils.deepMixIn(config, _opts)
       return utils.resolve(config)
         .then(_opts.request || opts.request)
         .then(function (config) { return adapter.HTTP(config) })
@@ -1172,6 +1200,36 @@ exports.addAction = function addAction (name, opts) {
  * Add multiple Http actions to a mapper. See {@link HttpAdapter.addAction} for
  * action configuration options.
  *
+ * @example
+ * // CommonJS
+ * var JSData = require('js-data')
+ * // It is recommended to use DataStore in the browser
+ * var DataStore = JSData.DataStore
+ *
+ * var JSDataHttp = require('js-data-http')
+ * var HttpAdapter = JSDataHttp.HttpAdapter
+ * var addActions = JSDataHttp.addActions
+ *
+ * var adapter = new HttpAdapter()
+ * var store = new DataStore()
+ *
+ * store.registerAdapter('http', adapter, { default: true })
+ * store.defineMapper('school')
+ *
+ * addActions({
+ *   // GET /reports/schools/:school_id/teachers
+ *   getTeacherReports: {
+ *     basePath: 'reports/schools',
+ *     pathname: 'teachers',
+ *     method: 'GET'
+ *   }
+ * })(store.getMapper('school'))
+ *
+ * // /reports/schools/1234/teachers
+ * store.getMapper('school').getTeacherReports(1234).then(function (response) {
+ *   // ...
+ * })
+ *
  * @name module:js-data-http.addActions
  * @method
  * @param {Object.<string, Object>} opts Object where the key is an action name
@@ -1182,7 +1240,7 @@ exports.addAction = function addAction (name, opts) {
 exports.addActions = function addActions (opts) {
   opts || (opts = {})
   return function (mapper) {
-    utils.forOwn(mapper, function (value, key) {
+    utils.forOwn(opts, function (value, key) {
       exports.addAction(key, value)(mapper)
     })
     return mapper
@@ -1211,22 +1269,25 @@ exports.version = '<%= version %>'
  * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
  * as `js-data-fetch`.
  *
- * __Script tag__:
- * ```javascript
- * window.HttpAdapter
- * ```
- * __CommonJS__:
- * ```javascript
- * var HttpAdapter = require('js-data-http')
- * ```
- * __ES6 Modules__:
- * ```javascript
- * import HttpAdapter from 'js-data-http'
- * ```
- * __AMD__:
- * ```javascript
- * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
- * ```
+ * @example <caption>Script tag</caption>
+ * var HttpAdapter = window.JSDataHttp.HttpAdapter
+ * var adapter = new HttpAdapter()
+ *
+ * @example <caption>CommonJS</caption>
+ * var HttpAdapter = require('js-data-Http').HttpAdapter
+ * var adapter = new HttpAdapter()
+ *
+ * @example <caption>ES2015 Modules</caption>
+ * import {HttpAdapter} from 'js-data-Http'
+ * const adapter = new HttpAdapter()
+ *
+ * @example <caption>AMD</caption>
+ * define('myApp', ['js-data-Http'], function (JSDataHttp) {
+ *   var HttpAdapter = JSDataHttp.HttpAdapter
+ *   var adapter = new HttpAdapter()
+ *
+ *   // ...
+ * })
  *
  * @module js-data-http
  */
