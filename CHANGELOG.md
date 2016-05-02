@@ -1,3 +1,9 @@
+##### 3.0.0-beta.4 - 01 May 2016
+
+###### Other
+- Couple of JSDoc fixes
+- Upgraded dependencies
+
 ##### 3.0.0-beta.3 - 28 April 2016
 
 ###### Breaking changes

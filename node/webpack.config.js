@@ -1,9 +1,9 @@
-var path= require('path')
+var path = require('path')
 
 module.exports = {
   devtool: 'source-map',
   entry: {
-    './node/dist/js-data-http-node.js': './src/index.js',
+    './node/dist/js-data-http-node.js': './src/index.js'
   },
   output: {
     filename: '[name]',
