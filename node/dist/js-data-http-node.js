@@ -64,32 +64,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	/* global fetch:true Headers:true Request:true */
 	
-	/**
-	 * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
-	 * that works on Node.js is registered in NPM as `js-data-http-node`. The build
-	 * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
-	 * as `js-data-fetch`.
-	 *
-	 * __Script tag__:
-	 * ```javascript
-	 * window.HttpAdapter
-	 * ```
-	 * __CommonJS__:
-	 * ```javascript
-	 * var HttpAdapter = require('js-data-http')
-	 * ```
-	 * __ES6 Modules__:
-	 * ```javascript
-	 * import HttpAdapter from 'js-data-http'
-	 * ```
-	 * __AMD__:
-	 * ```javascript
-	 * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
-	 * ```
-	 *
-	 * @module js-data-http
-	 */
-	
 	var axios = __webpack_require__(3);
 	
 	
@@ -239,40 +213,16 @@ return /******/ (function(modules) { // webpackBootstrap
 	/**
 	 * Alternative to ES6 class syntax for extending `HttpAdapter`.
 	 *
-	 * __ES6__:
-	 * ```javascript
-	 * class MyHttpAdapter extends HttpAdapter {
-	 *   deserialize (Model, data, opts) {
-	 *     const data = super.deserialize(Model, data, opts)
-	 *     data.foo = 'bar'
-	 *     return data
-	 *   }
-	 * }
-	 * ```
+	 * @example <caption>Using the ES2015 class syntax.</caption>
+	 * class MyHttpAdapter extends HttpAdapter {...}
+	 * const adapter = new MyHttpAdapter()
 	 *
-	 * __ES5__:
-	 * ```javascript
-	 * var instanceProps = {
-	 *   // override deserialize
-	 *   deserialize: function (Model, data, opts) {
-	 *     var Ctor = this.constructor
-	 *     var superDeserialize = (Ctor.__super__ || Object.getPrototypeOf(Ctor)).deserialize
-	 *     // call the super deserialize
-	 *     var data = superDeserialize(Model, data, opts)
-	 *     data.foo = 'bar'
-	 *     return data
-	 *   },
-	 *   say: function () { return 'hi' }
-	 * }
-	 * var classProps = {
-	 *   yell: function () { return 'HI' }
-	 * }
+	 * @example <caption>Using {@link HttpAdapter.extend}.</caption>
+	 * var instanceProps = {...}
+	 * var classProps = {...}
 	 *
 	 * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
 	 * var adapter = new MyHttpAdapter()
-	 * adapter.say() // "hi"
-	 * MyHttpAdapter.yell() // "HI"
-	 * ```
 	 *
 	 * @name HttpAdapter.extend
 	 * @method
@@ -1299,12 +1249,39 @@ return /******/ (function(modules) { // webpackBootstrap
 	 * otherwise `false` if the current version is not beta.
 	 */
 	exports.version = {
-  beta: 3,
-  full: '3.0.0-beta.3',
+  beta: 4,
+  full: '3.0.0-beta.4',
   major: 3,
   minor: 0,
   patch: 0
 };
+	
+	/**
+	 * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
+	 * that works on Node.js is registered in NPM as `js-data-http-node`. The build
+	 * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
+	 * as `js-data-fetch`.
+	 *
+	 * __Script tag__:
+	 * ```javascript
+	 * window.HttpAdapter
+	 * ```
+	 * __CommonJS__:
+	 * ```javascript
+	 * var HttpAdapter = require('js-data-http')
+	 * ```
+	 * __ES6 Modules__:
+	 * ```javascript
+	 * import HttpAdapter from 'js-data-http'
+	 * ```
+	 * __AMD__:
+	 * ```javascript
+	 * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
+	 * ```
+	 *
+	 * @module js-data-http
+	 */
+	exports.default = HttpAdapter;
 
 /***/ },
 /* 1 */
@@ -1384,9 +1361,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	
 	  babelHelpers;
 	
-	  /**
-	   * @name module:js-data-adapter.noop
-	   */
 	  var noop = function noop() {
 	    var self = this;
 	
@@ -1399,9 +1373,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return jsData.utils.resolve();
 	  };
 	
-	  /**
-	   * @name module:js-data-adapter.noop2
-	   */
 	  var noop2 = function noop2() {
 	    var self = this;
 	
@@ -1414,9 +1385,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return jsData.utils.resolve();
 	  };
 	
-	  /**
-	   * @name module:js-data-adapter.unique
-	   */
 	  var unique = function unique(array) {
 	    var seen = {};
 	    var final = [];
@@ -1430,9 +1398,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	    return final;
 	  };
 	
-	  /**
-	   * @name module:js-data-adapter.withoutRelations
-	   */
 	  var withoutRelations = function withoutRelations(mapper, props) {
 	    return jsData.utils.omit(props, mapper.relationFields || []);
 	  };
@@ -1458,12 +1423,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	  };
 	
 	  /**
-	   * {@link Adapter} class.
-	   *
-	   * @name module:js-data-adapter.Adapter
-	   * @see Adapter
-	   */
-	  /**
 	   * Abstract class meant to be extended by adapters.
 	   *
 	   * @class Adapter
@@ -1480,17 +1439,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	    jsData.utils.fillIn(self, opts);
 	  }
 	
-	  /**
-	   * @name module:js-data-adapter.reserved
-	   */
 	  var reserved = ['orderBy', 'sort', 'limit', 'offset', 'skip', 'where'];
 	
-	  /**
-	   * {@link Response} class.
-	   *
-	   * @name module:js-data-adapter.Response
-	   * @see Response
-	   */
 	  /**
 	   * Response object used when `raw` is `true`. May contain other fields in
 	   * addition to `data`.
@@ -2842,6 +2792,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return jsData.utils.resolve(self[op](mapper, id, props, opts)).then(function (_props) {
 	        // Allow for re-assignment from lifecycle hook
 	        props = jsData.utils.isUndefined(_props) ? props : _props;
+	        props = withoutRelations(mapper, props);
 	        op = opts.op = 'update';
 	        self.dbg(op, mapper, id, props, opts);
 	        return jsData.utils.resolve(self._update(mapper, id, props, opts));
@@ -2898,6 +2849,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	      return jsData.utils.resolve(self[op](mapper, props, query, opts)).then(function (_props) {
 	        // Allow for re-assignment from lifecycle hook
 	        props = jsData.utils.isUndefined(_props) ? props : _props;
+	        props = withoutRelations(mapper, props);
 	        op = opts.op = 'updateAll';
 	        self.dbg(op, mapper, props, query, opts);
 	        return jsData.utils.resolve(self._updateAll(mapper, props, query, opts));
