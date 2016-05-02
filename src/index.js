@@ -1,31 +1,5 @@
 /* global fetch:true Headers:true Request:true */
 
-/**
- * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
- * that works on Node.js is registered in NPM as `js-data-http-node`. The build
- * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
- * as `js-data-fetch`.
- *
- * __Script tag__:
- * ```javascript
- * window.HttpAdapter
- * ```
- * __CommonJS__:
- * ```javascript
- * var HttpAdapter = require('js-data-http')
- * ```
- * __ES6 Modules__:
- * ```javascript
- * import HttpAdapter from 'js-data-http'
- * ```
- * __AMD__:
- * ```javascript
- * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
- * ```
- *
- * @module js-data-http
- */
-
 const axios = require('axios')
 import {utils} from 'js-data'
 import {
@@ -183,40 +157,16 @@ Object.defineProperty(HttpAdapter, '__super__', {
 /**
  * Alternative to ES6 class syntax for extending `HttpAdapter`.
  *
- * __ES6__:
- * ```javascript
- * class MyHttpAdapter extends HttpAdapter {
- *   deserialize (Model, data, opts) {
- *     const data = super.deserialize(Model, data, opts)
- *     data.foo = 'bar'
- *     return data
- *   }
- * }
- * ```
+ * @example <caption>Using the ES2015 class syntax.</caption>
+ * class MyHttpAdapter extends HttpAdapter {...}
+ * const adapter = new MyHttpAdapter()
  *
- * __ES5__:
- * ```javascript
- * var instanceProps = {
- *   // override deserialize
- *   deserialize: function (Model, data, opts) {
- *     var Ctor = this.constructor
- *     var superDeserialize = (Ctor.__super__ || Object.getPrototypeOf(Ctor)).deserialize
- *     // call the super deserialize
- *     var data = superDeserialize(Model, data, opts)
- *     data.foo = 'bar'
- *     return data
- *   },
- *   say: function () { return 'hi' }
- * }
- * var classProps = {
- *   yell: function () { return 'HI' }
- * }
+ * @example <caption>Using {@link HttpAdapter.extend}.</caption>
+ * var instanceProps = {...}
+ * var classProps = {...}
  *
  * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
  * var adapter = new MyHttpAdapter()
- * adapter.say() // "hi"
- * MyHttpAdapter.yell() // "HI"
- * ```
  *
  * @name HttpAdapter.extend
  * @method
@@ -1254,3 +1204,30 @@ exports.addActions = function addActions (opts) {
  * otherwise `false` if the current version is not beta.
  */
 exports.version = '<%= version %>'
+
+/**
+ * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
+ * that works on Node.js is registered in NPM as `js-data-http-node`. The build
+ * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
+ * as `js-data-fetch`.
+ *
+ * __Script tag__:
+ * ```javascript
+ * window.HttpAdapter
+ * ```
+ * __CommonJS__:
+ * ```javascript
+ * var HttpAdapter = require('js-data-http')
+ * ```
+ * __ES6 Modules__:
+ * ```javascript
+ * import HttpAdapter from 'js-data-http'
+ * ```
+ * __AMD__:
+ * ```javascript
+ * define('myApp', ['js-data-http'], function (HttpAdapter) { ... })
+ * ```
+ *
+ * @module js-data-http
+ */
+exports.default = HttpAdapter
