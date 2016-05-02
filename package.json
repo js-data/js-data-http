@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-beta.4",
+  "version": "3.0.0-beta.5",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -85,7 +85,7 @@
     "karma": "0.13.22",
     "karma-browserstack-launcher": "0.1.11",
     "karma-chai": "0.1.0",
-    "karma-mocha": "0.2.2",
+    "karma-mocha": "1.0.1",
     "karma-phantomjs-launcher": "1.0.0",
     "karma-sinon": "1.0.4",
     "phantomjs-prebuilt": "2.1.7",

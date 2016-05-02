@@ -1,3 +1,8 @@
+##### 3.0.0-beta.5 - 02 May 2016
+
+###### Bug fixes
+- Fixed typos in the code for `addAction` and `addActions`
+
 ##### 3.0.0-beta.4 - 01 May 2016
 
 ###### Other
