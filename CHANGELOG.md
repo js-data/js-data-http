@@ -1,3 +1,9 @@
+##### 3.0.0-beta.6 - 17 May 2016
+
+###### Other
+- Switch from webpack to rollup
+- Upgraded dependencies
+
 ##### 3.0.0-beta.5 - 02 May 2016
 
 ###### Bug fixes

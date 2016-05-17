@@ -12,3 +12,4 @@ doc/
 node_modules/
 *.log
 typings
+.nyc_output

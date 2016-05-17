@@ -1,12 +1,12 @@
 /* global fetch:true Headers:true Request:true */
 
-const axios = require('axios')
 import {utils} from 'js-data'
+import axios from '../node_modules/axios/dist/axios'
 import {
   Adapter,
   noop,
   noop2
-} from 'js-data-adapter'
+} from '../node_modules/js-data-adapter/src/index'
 
 let hasFetch = false
 
@@ -126,7 +126,7 @@ const DEFAULTS = {
  * @param {string} [opts.suffix=''] TODO
  * @param {boolean} [opts.useFetch=false] TODO
  */
-function HttpAdapter (opts) {
+export function HttpAdapter (opts) {
   const self = this
   opts || (opts = {})
   utils.fillIn(opts, DEFAULTS)
@@ -137,7 +137,6 @@ function HttpAdapter (opts) {
  * @name module:js-data-http.HttpAdapter
  * @see HttpAdapter
  */
-exports.HttpAdapter = HttpAdapter
 
 // Setup prototype inheritance from Adapter
 HttpAdapter.prototype = Object.create(Adapter.prototype, {
@@ -1142,7 +1141,7 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
  * @return {Function} Decoration function, which should be passed the mapper to
  * decorate when invoked.
  */
-exports.addAction = function addAction (name, opts) {
+export function addAction (name, opts) {
   if (!name || !utils.isString(name)) {
     throw new TypeError('action(name[, opts]): Expected: string, Found: ' + typeof name)
   }
@@ -1237,11 +1236,11 @@ exports.addAction = function addAction (name, opts) {
  * @return {Function} Decoration function, which should be passed the mapper to
  * decorate when invoked.
  */
-exports.addActions = function addActions (opts) {
+export function addActions (opts) {
   opts || (opts = {})
   return function (mapper) {
     utils.forOwn(opts, function (value, key) {
-      exports.addAction(key, value)(mapper)
+      addAction(key, value)(mapper)
     })
     return mapper
   }
@@ -1261,7 +1260,7 @@ exports.addActions = function addActions (opts) {
  * @property {(string|boolean)} version.beta The beta version value,
  * otherwise `false` if the current version is not beta.
  */
-exports.version = '<%= version %>'
+export const version = '<%= version %>'
 
 /**
  * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
@@ -1291,4 +1290,3 @@ exports.version = '<%= version %>'
  *
  * @module js-data-http
  */
-exports.default = HttpAdapter

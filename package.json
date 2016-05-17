@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-beta.5",
+  "version": "3.0.0-beta.6",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -47,50 +47,54 @@
       "dist/"
     ]
   },
+  "babel": {
+    "presets": [
+      "es2015"
+    ]
+  },
   "scripts": {
     "lint": "repo-tools lint \"**/*.js\"",
     "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src && node scripts/cleanup.js",
     "version": "repo-tools write-version dist/js-data-http.js fetch/dist/js-data-fetch.js node/dist/js-data-http-node.js",
-    "webpack": "webpack --config webpack.config.js && webpack --config node/webpack.config.js && webpack --config fetch/webpack.config.js && npm run version",
+    "bundle_http": "rollup -c rollup.config.js -f umd -o dist/js-data-http.js -m dist/js-data-http.js.map src/index.js",
+    "bundle_fetch": "rollup -c fetch/rollup.config.js -f umd -o fetch/dist/js-data-fetch.js -m fetch/dist/js-data-fetch.js.map src/index.js",
+    "bundle_node": "rollup -c node/rollup.config.js -f cjs -o node/dist/js-data-http-node.js -m node/dist/js-data-http-node.js.map src/index.js",
+    "bundle": "npm run bundle_http && npm run bundle_fetch && npm run bundle_node && npm run version",
     "min": "uglifyjs dist/js-data-http.js -o dist/js-data-http.min.js --source-map dist/js-data-http.min.map --source-map-url js-data-http.min.map -v -m -c --screw-ie8",
     "min_fetch": "uglifyjs fetch/dist/js-data-fetch.js -o fetch/dist/js-data-fetch.min.js --source-map fetch/dist/js-data-fetch.min.map --source-map-url js-data-fetch.min.map -v -m -c --screw-ie8",
     "banner": "node scripts/banner.js",
     "gzip": "echo js-data-http gzipped size: $(cat dist/js-data-http.min.js | gzip -f9 | wc -c)kb",
     "gzip_fetch": "echo js-data-fetch gzipped size: $(cat fetch/dist/js-data-fetch.min.js | gzip -f9 | wc -c)kb",
-    "build": "npm run lint && npm run webpack && npm run min && npm run min_fetch && npm run banner",
+    "build": "npm run lint && npm run bundle && npm run min && npm run min_fetch && npm run banner",
     "karma": "karma start",
     "karma_fetch": "karma start fetch/karma.conf.js",
     "mocha": "mocha -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
     "cover": "istanbul cover -x node/dist/js-data-http-node-tests.js --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
     "test": "npm run build && npm run karma && npm run karma_fetch && npm run cover",
-    "repo-tools": "repo-tools updates && repo-tools changelog && repo-tools authors",
-    "release": "npm test && npm run doc && npm run repo-tools",
-    "ci": "npm test && cat ./coverage/lcov.info | codecov"
+    "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "dependencies": {
-    "js-data-adapter": "0.6.1"
+    "js-data-adapter": "0.7.2"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.3"
+    "js-data": "^3.0.0-beta.6"
   },
   "devDependencies": {
-    "axios": "0.11.0",
-    "babel-loader": "6.2.4",
-    "babel-plugin-syntax-async-functions": "6.5.0",
-    "babel-plugin-transform-regenerator": "6.6.5",
-    "babel-polyfill": "6.7.4",
+    "axios": "0.11.1",
+    "babel-plugin-syntax-async-functions": "6.8.0",
+    "babel-plugin-transform-regenerator": "6.9.0",
     "babel-preset-stage-0": "6.5.0",
     "istanbul": "0.4.3",
-    "js-data-repo-tools": "0.5.0",
+    "js-data-repo-tools": "0.5.2",
     "karma": "0.13.22",
-    "karma-browserstack-launcher": "0.1.11",
+    "karma-browserstack-launcher": "1.0.0",
     "karma-chai": "0.1.0",
     "karma-mocha": "1.0.1",
     "karma-phantomjs-launcher": "1.0.0",
-    "karma-sinon": "1.0.4",
+    "karma-sinon": "1.0.5",
     "phantomjs-prebuilt": "2.1.7",
-    "source-map-support": "0.4.0",
-    "uglify-js": "2.6.2",
-    "webpack": "1.13.0"
+    "rollup-plugin-commonjs": "2.2.1",
+    "rollup-plugin-replace": "1.1.0",
+    "uglify-js": "2.6.2"
   }
 }
