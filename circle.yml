@@ -1,11 +1,19 @@
+general:
+  branches:
+    ignore:
+      - gh-pages
 machine:
   node:
-    version: 4.1.0
+    version: 5.7.0
+dependencies:
+  pre:
+    - npm i -g npm
+    - npm i -g codecov
+    - npm i js-data@beta
 test:
-  override:
-    - npm run ci
+  post:
+    - cat ./coverage/lcov.info | codecov
 general:
   artifacts:
     - "dist"
     - "fetch/dist"
-    - "coverage"

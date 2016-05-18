@@ -28,6 +28,6 @@
     "webpack.config.js"
   ],
   "dependencies": {
-    "js-data": ">=3.0.0-alpha.26"
+    "js-data": ">=3.0.0-beta.6"
   }
 }
