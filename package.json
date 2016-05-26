@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-beta.6",
+  "version": "3.0.0-beta.7",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -74,7 +74,7 @@
     "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "dependencies": {
-    "js-data-adapter": "0.7.2"
+    "js-data-adapter": "0.7.3"
   },
   "peerDependencies": {
     "js-data": "^3.0.0-beta.6"

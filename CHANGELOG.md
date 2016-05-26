@@ -1,3 +1,8 @@
+##### 3.0.0-beta.7 - 25 May 2016
+
+###### Backwards compatible changes
+- Upgraded to js-data-adapter 0.7.3
+
 ##### 3.0.0-beta.6 - 17 May 2016
 
 ###### Other
