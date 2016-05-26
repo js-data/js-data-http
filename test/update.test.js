@@ -28,4 +28,95 @@ describe('update', function () {
         Test.assert.deepEqual(data, Test.p1, 'post 5 should have been updated')
       })
   })
+  it('should send nested relations', function () {
+    var Test = this
+    var JSData = Test.JSData
+    var store = new JSData.Container()
+    store.registerAdapter('http', Test.adapter, { default: true })
+    store.defineMapper('user', {
+      relations: {
+        hasMany: {
+          post: {
+            localField: 'posts',
+            foreignKey: 'userId'
+          },
+          address: {
+            localField: 'addresses',
+            foreignKey: 'userId'
+          }
+        }
+      }
+    })
+    store.defineMapper('post', {
+      relations: {
+        belongsTo: {
+          user: {
+            localField: 'user',
+            foreignKey: 'userId'
+          }
+        }
+      }
+    })
+    store.defineMapper('address', {
+      relations: {
+        belongsTo: {
+          user: {
+            localField: 'user',
+            foreignKey: 'userId'
+          }
+        }
+      }
+    })
+
+    setTimeout(function () {
+      Test.requests[0].respond(200, { 'Content-Type': 'application/json' }, JSON.stringify({
+        id: 1,
+        posts: [
+          {
+            id: 2,
+            userId: 1
+          }
+        ]
+      }))
+    }, 30)
+
+    return store.update('user', 1, {
+      id: 1,
+      posts: [
+        {
+          id: 2,
+          userId: 1
+        }
+      ],
+      addresses: [
+        {
+          id: 3,
+          userId: 1
+        }
+      ]
+    }, { with: ['posts'] })
+      .then(function (data) {
+        Test.assert.equal(1, Test.requests.length)
+        Test.assert.equal(Test.requests[0].url, 'user/1')
+        Test.assert.equal(Test.requests[0].method, 'PUT')
+        Test.assert.equal(Test.requests[0].requestBody, JSON.stringify({
+          id: 1,
+          posts: [
+            {
+              id: 2,
+              userId: 1
+            }
+          ]
+        }))
+        Test.assert.deepEqual(data, {
+          id: 1,
+          posts: [
+            {
+              id: 2,
+              userId: 1
+            }
+          ]
+        })
+      })
+  })
 })
