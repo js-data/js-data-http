@@ -1251,8 +1251,8 @@ function addActions(opts) {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 6,
-  full: '3.0.0-beta.6',
+  beta: 7,
+  full: '3.0.0-beta.7',
   major: 3,
   minor: 0,
   patch: 0
