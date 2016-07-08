@@ -1,6 +1,7 @@
 'use strict'
 
 var querystring = require('querystring')
+require('source-map-support').install()
 
 before(function () {
   var Test = this

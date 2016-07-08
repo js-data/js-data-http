@@ -1,3 +1,9 @@
+##### 3.0.0-beta.8 - 08 July 2016
+
+###### Backwards compatible changes
+- Upgraded dependencies
+- Adapter now extends `Component`
+
 ##### 3.0.0-beta.7 - 25 May 2016
 
 ###### Backwards compatible changes
