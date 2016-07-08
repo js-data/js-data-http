@@ -54,7 +54,7 @@
   },
   "scripts": {
     "lint": "repo-tools lint \"**/*.js\"",
-    "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src",
+    "doc": "jsdoc -c conf.json src node_modules/js-data-adapter/src node_modules/js-data/src/Component.js",
     "version": "repo-tools write-version dist/js-data-http.js fetch/dist/js-data-fetch.js node/dist/js-data-http-node.js",
     "bundle_http": "rollup -c rollup.config.js -f umd -o dist/js-data-http.js -m dist/js-data-http.js.map src/index.js",
     "bundle_fetch": "rollup -c fetch/rollup.config.js -f umd -o fetch/dist/js-data-fetch.js -m fetch/dist/js-data-fetch.js.map src/index.js",
