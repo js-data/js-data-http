@@ -10,7 +10,7 @@
 	<script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
 	<link type="text/css" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.3.0/styles/googlecode.min.css">
-	<link type="text/css" rel="stylesheet" href="styles/site.lumen.css">
+	<link type="text/css" rel="stylesheet" href="styles/site.jsdata.css">
   <style>
     a {
       text-decoration: none !important;
@@ -73,7 +73,8 @@
 <div class="navbar navbar-default navbar-fixed-top ">
 <div class="container">
 	<div class="navbar-header">
-		<a class="navbar-brand" href="index.html">js-data-http</a>
+		<a class="navbar-brand" href="index.html"><img class="branding-logo" src="https://raw.githubusercontent.com/js-data/js-data/master/js-data-64.png"
+		alt="logo"/>js-data-http</a>
 		<button class="navbar-toggle" type="button" data-toggle="collapse" data-target="#topNavigation">
 			<span class="icon-bar"></span>
 			<span class="icon-bar"></span>
@@ -93,7 +94,7 @@
 			<li class="dropdown">
 				<a href="classes.list.html" class="dropdown-toggle" data-toggle="dropdown">Classes<b class="caret"></b></a>
 				<ul class="dropdown-menu ">
-					<li><a href="Adapter.html">Adapter</a></li><li><a href="HttpAdapter.html">HttpAdapter</a></li><li><a href="Response.html">Response</a></li>
+					<li><a href="Adapter.html">Adapter</a></li><li><a href="Component.html">Component</a></li><li><a href="HttpAdapter.html">HttpAdapter</a></li><li><a href="Response.html">Response</a></li>
 				</ul>
 			</li>
 			
@@ -419,7 +420,7 @@ object.</p></td>
         
 
 
-    This class extends the Component class.
+    This class extends the <a href="Component.html">Component</a> class.
 
 
     
@@ -436,6 +437,108 @@ object.</p></td>
         <h3 class="subsection-title">Members</h3>
 
         <dl>
+            
+<hr>
+<dt class="name" id="_listeners">
+    <h4><strong><span class="type-signature"></span>_listeners</strong></h4>
+
+    
+</dt>
+<dd>
+    
+    <div class="description">
+        <p>Event listeners attached to this Component. <strong>Do not modify.</strong> Use
+<a href="Component.html#on">Component#on</a> and <a href="Component.html#off">Component#off</a> instead.</p>
+    </div>
+    
+
+    
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+          <th>Type</th>
+        
+        
+        
+          <th>Since</th>
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+          <td>
+            
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object" target="_blank">Object</a></span>
+
+
+
+          </td>
+        
+        
+        
+          <td>3.0.0</td>
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data_src_Component.js.html">node_modules/js-data/src/Component.js</a>,
+             <a href="node_modules_js-data_src_Component.js.html#sunlight-1-line-52">line 52</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Component.html#_listeners">Component#_listeners</a>
+      </li>
+    </ul>
+  </dd>
+  
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+    
+</dd>
+
+        
             
 <hr>
 <dt class="name" id="debug">
@@ -468,6 +571,8 @@ object.</p></td>
           <th>Source</th>
         
         
+          <th>Overrides</th>
+        
         
         
         
@@ -495,6 +600,10 @@ object.</p></td>
              <a href="node_modules_js-data-adapter_src_index.js.html#sunlight-1-line-74">line 74</a>
           </td>
         
+        
+          <td>
+            <a href="Component.html#debug">Component#debug</a>
+          </td>
         
         
         
@@ -8322,6 +8431,186 @@ response object.</p></td>
             
 <hr>
 <dt>
+  <h4 class="name" id="dbg"><span class="type-signature"></span>dbg(<span class="optional">args</span>)</h4>
+
+  
+</dt>
+<dd>
+
+  
+  <div class="description">
+    <p>Log the provided values at the &quot;debug&quot; level. Debug-level logs are only
+logged if <a href="Component.html#debug">Component#debug</a> is <code>true</code>.</p>
+<p><code>.dbg(...)</code> is shorthand for <code>.log('debug', ...)</code>.</p>
+  </div>
+  
+
+  
+
+  
+
+  
+  
+    <div class="panel panel-success">
+      <!-- Default panel contents -->
+      <div class="panel-heading"><strong>Method parameters:</strong></div>
+      
+
+<table class="params table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Values to log.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+        
+        
+          <th>Since</th>
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+        
+        
+          <td>3.0.0</td>
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data_src_Component.js.html">node_modules/js-data/src/Component.js</a>,
+             <a href="node_modules_js-data_src_Component.js.html#sunlight-1-line-123">line 123</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Component.html#dbg">Component#dbg</a>
+      </li>
+    </ul>
+  </dd>
+  
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+  
+</dd>
+
+        
+            
+<hr>
+<dt>
   <h4 class="name" id="destroy"><span class="type-signature"></span>destroy(mapper, id, <span class="optional">opts</span>)</h4>
 
   
@@ -9214,6 +9503,263 @@ response object.</p></td>
 </dl>
 
 
+  
+</dd>
+
+        
+            
+<hr>
+<dt>
+  <h4 class="name" id="emit"><span class="type-signature"></span>emit(event, <span class="optional">args</span>)</h4>
+
+  
+</dt>
+<dd>
+
+  
+  <div class="description">
+    <p>Trigger an event on this Component.</p>
+  </div>
+  
+
+  
+
+  
+
+  
+  
+    <div class="panel panel-success">
+      <!-- Default panel contents -->
+      <div class="panel-heading"><strong>Method parameters:</strong></div>
+      
+
+<table class="params table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Name of event to emit.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Arguments to pass to any listeners.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+        
+        
+          <th>Since</th>
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+        
+        
+          <td>3.0.0</td>
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data_src_Component.js.html">node_modules/js-data/src/Component.js</a>,
+             <a href="node_modules_js-data_src_Component.js.html#sunlight-1-line-201">line 201</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Component.html#emit">Component#emit</a>
+      </li>
+    </ul>
+  </dd>
+  
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+  
+    <div class="code-panel panel panel-warning">
+      <div class="panel-heading">
+        <strong>Example</strong>
+      </div>
+      <div class="panel-body">
+        
+        <p class="code-caption" id="btn-Component#emit">
+          <button class="btn btn-primary" onclick="loadTonic('Component#emit')">Try it out</button>
+        </p>
+    
+    <pre id="pre-Component#emit"><code class="javascript">// import {Collection, DataStore} from &#x27;js-data&#x27;
+const JSData = require(&#x27;js-data@3.0.0-beta.7&#x27;)
+const {Collection, DataStore} = JSData
+
+const collection = new Collection()
+collection.on(&#x27;foo&#x27;, function (msg) {
+  console.log(msg)
+})
+collection.emit(&#x27;foo&#x27;, &#x27;bar&#x27;)
+
+const store = new DataStore()
+store.on(&#x27;beep&#x27;, function (msg) {
+  console.log(msg)
+})
+store.emit(&#x27;beep&#x27;, &#x27;boop&#x27;)</code></pre>
+    <div class="tonic" id="tonic-Component#emit" style="display: none;">
+      // import {Collection, DataStore} from &#x27;js-data&#x27;
+const JSData = require(&#x27;js-data@3.0.0-beta.7&#x27;)
+const {Collection, DataStore} = JSData
+
+const collection = new Collection()
+collection.on(&#x27;foo&#x27;, function (msg) {
+  console.log(msg)
+})
+collection.emit(&#x27;foo&#x27;, &#x27;bar&#x27;)
+
+const store = new DataStore()
+store.on(&#x27;beep&#x27;, function (msg) {
+  console.log(msg)
+})
+store.emit(&#x27;beep&#x27;, &#x27;boop&#x27;)
+    </div>
+
+
+      </div>
+    </div>
   
 </dd>
 
@@ -10807,6 +11353,218 @@ this adapter's settings. Override with care.</p>
             
 <hr>
 <dt>
+  <h4 class="name" id="log"><span class="type-signature"></span>log(level, <span class="optional">args</span>)</h4>
+
+  
+</dt>
+<dd>
+
+  
+  <div class="description">
+    <p>Log the provided values. By default sends values to <code>console[level]</code>.
+Debug-level logs are only logged if <a href="Component.html#debug">Component#debug</a> is <code>true</code>.</p>
+<p>Will attempt to use appropriate <code>console</code> methods if they are available.</p>
+  </div>
+  
+
+  
+
+  
+
+  
+  
+    <div class="panel panel-success">
+      <!-- Default panel contents -->
+      <div class="panel-heading"><strong>Method parameters:</strong></div>
+      
+
+<table class="params table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>level</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Log level.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Values to log.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+        
+        
+          <th>Since</th>
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+        
+        
+          <td>3.0.0</td>
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data_src_Component.js.html">node_modules/js-data/src/Component.js</a>,
+             <a href="node_modules_js-data_src_Component.js.html#sunlight-1-line-133">line 133</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Component.html#log">Component#log</a>
+      </li>
+    </ul>
+  </dd>
+  
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+  
+</dd>
+
+        
+            
+<hr>
+<dt>
   <h4 class="name" id="makeBelongsToForeignKey"><span class="type-signature"></span>makeBelongsToForeignKey()</h4>
 
   
@@ -11314,6 +12072,544 @@ the id of the parent doesn't exactly match up to the key on the child.</p>
 </dl>
 
 
+  
+</dd>
+
+        
+            
+<hr>
+<dt>
+  <h4 class="name" id="off"><span class="type-signature"></span>off(<span class="optional">event</span>, <span class="optional">listener</span>)</h4>
+
+  
+</dt>
+<dd>
+
+  
+  <div class="description">
+    <p>Remove an event listener from this Component. If no listener is provided,
+then all listeners for the specified event will be removed. If no event is
+specified then all listeners for all events will be removed.</p>
+  </div>
+  
+
+  
+
+  
+
+  
+  
+    <div class="panel panel-success">
+      <!-- Default panel contents -->
+      <div class="panel-heading"><strong>Method parameters:</strong></div>
+      
+
+<table class="params table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Name of event to unsubsribe to.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" target="_blank">Function</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Listener to remove.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+        
+        
+          <th>Since</th>
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+        
+        
+          <td>3.0.0</td>
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data_src_Component.js.html">node_modules/js-data/src/Component.js</a>,
+             <a href="node_modules_js-data_src_Component.js.html#sunlight-1-line-179">line 179</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Component.html#off">Component#off</a>
+      </li>
+    </ul>
+  </dd>
+  
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+  
+    <div class="code-panel panel panel-warning">
+      <div class="panel-heading">
+        <strong>Examples</strong>
+      </div>
+      <div class="panel-body">
+        
+    <pre id="pre-"><code class="javascript">// Remove a particular listener for a particular event
+collection.off(&#x27;add&#x27;, handler)</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Remove a particular listener for a particular event
+collection.off(&#x27;add&#x27;, handler)
+    </div>
+
+    <pre id="pre-"><code class="javascript">// Remove all listeners for a particular event
+record.off(&#x27;change&#x27;)</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Remove all listeners for a particular event
+record.off(&#x27;change&#x27;)
+    </div>
+
+    <pre id="pre-"><code class="javascript">// Remove all listeners to all events
+store.off()</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Remove all listeners to all events
+store.off()
+    </div>
+
+
+      </div>
+    </div>
+  
+</dd>
+
+        
+            
+<hr>
+<dt>
+  <h4 class="name" id="on"><span class="type-signature"></span>on(event, listener, <span class="optional">ctx</span>)</h4>
+
+  
+</dt>
+<dd>
+
+  
+  <div class="description">
+    <p>Register a new event listener on this Component.</p>
+  </div>
+  
+
+  
+
+  
+
+  
+  
+    <div class="panel panel-success">
+      <!-- Default panel contents -->
+      <div class="panel-heading"><strong>Method parameters:</strong></div>
+      
+
+<table class="params table table-striped table-bordered">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Argument</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>event</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String" target="_blank">String</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Name of event to subsribe to.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>listener</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function" target="_blank">Function</a></span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Listener function to handle the event.</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>ctx</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Optional content in which to invoke the listener.</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+    </div>
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+<div class="panel panel-default">
+  <div class="panel-heading"><strong>Details</strong></div>
+  <table class="table table-striped table-bordered">
+    <thead>
+      <tr>
+        
+        
+        
+          <th>Since</th>
+        
+        
+        
+          <th>Source</th>
+        
+        
+        
+        
+        
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        
+        
+        
+          <td>3.0.0</td>
+        
+        
+        
+          <td>
+            <a href="node_modules_js-data_src_Component.js.html">node_modules/js-data/src/Component.js</a>,
+             <a href="node_modules_js-data_src_Component.js.html#sunlight-1-line-146">line 146</a>
+          </td>
+        
+        
+        
+        
+        
+      </tr>
+    </tbody>
+  </table>
+</div>
+<dl class="details">
+    
+
+  
+  <dt class="inherited-from method-doc-label method-doc-details-label">Inherited From:</dt>
+  <dd class="inherited-from">
+    <ul class="dummy">
+      <li>
+        <a href="Component.html#on">Component#on</a>
+      </li>
+    </ul>
+  </dd>
+  
+
+    
+
+    
+
+    
+
+  
+
+  
+
+  
+
+  
+</dl>
+
+
+  
+    <div class="code-panel panel panel-warning">
+      <div class="panel-heading">
+        <strong>Examples</strong>
+      </div>
+      <div class="panel-body">
+        
+    <pre id="pre-"><code class="javascript">// Listen for all &quot;afterCreate&quot; events in a DataStore
+store.on(&#x27;afterCreate&#x27;, (mapperName, props, opts, result) =&gt; {
+  console.log(mapperName) // &quot;post&quot;
+  console.log(props.id) // undefined
+  console.log(result.id) // 1234
+})
+store.create(&#x27;post&#x27;, { title: &#x27;Modeling your data&#x27; }).then((post) =&gt; {
+  console.log(post.id) // 1234
+})</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Listen for all &quot;afterCreate&quot; events in a DataStore
+store.on(&#x27;afterCreate&#x27;, (mapperName, props, opts, result) =&gt; {
+  console.log(mapperName) // &quot;post&quot;
+  console.log(props.id) // undefined
+  console.log(result.id) // 1234
+})
+store.create(&#x27;post&#x27;, { title: &#x27;Modeling your data&#x27; }).then((post) =&gt; {
+  console.log(post.id) // 1234
+})
+    </div>
+
+    <pre id="pre-"><code class="javascript">// Listen for the &quot;add&quot; event on a collection
+collection.on(&#x27;add&#x27;, (records) =&gt; {
+  console.log(records) // [...]
+})</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Listen for the &quot;add&quot; event on a collection
+collection.on(&#x27;add&#x27;, (records) =&gt; {
+  console.log(records) // [...]
+})
+    </div>
+
+    <pre id="pre-"><code class="javascript">// Listen for &quot;change&quot; events on a record
+post.on(&#x27;change&#x27;, (record, changes) =&gt; {
+  console.log(changes) // { changed: { title: &#x27;Modeling your data&#x27; } }
+})
+post.title = &#x27;Modeling your data&#x27;</code></pre>
+    <div class="tonic" id="tonic-" style="display: none;">
+      // Listen for &quot;change&quot; events on a record
+post.on(&#x27;change&#x27;, (record, changes) =&gt; {
+  console.log(changes) // { changed: { title: &#x27;Modeling your data&#x27; } }
+})
+post.title = &#x27;Modeling your data&#x27;
+    </div>
+
+
+      </div>
+    </div>
   
 </dd>
 
@@ -13416,7 +14712,7 @@ response object.</p></td>
 
 <footer>
 
-	<div style="text-align:center">Back to <a href="http://js-data.io">js-data.io</a></div>
+	<div style="text-align:center"><a href="/">api.js-data.io</a>&nbsp;&#8226;&nbsp;<a href="http://js-data.io">js-data.io</a></div>
 
 
 	<span class="copyright">
@@ -13426,7 +14722,7 @@ response object.</p></td>
 <span class="jsdoc-message">
 	Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a>
 	
-		on 2016-07-08T01:16:13-07:00
+		on 2016-07-08T01:26:09-07:00
 	
 	using the <a href="https://github.com/docstrap/docstrap">DocStrap template</a>.
 </span>
