@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-beta.7",
+  "version": "3.0.0-beta.8",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -68,33 +68,33 @@
     "build": "npm run lint && npm run bundle && npm run min && npm run min_fetch && npm run banner",
     "karma": "karma start",
     "karma_fetch": "karma start fetch/karma.conf.js",
-    "mocha": "mocha -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
-    "cover": "istanbul cover -x node/dist/js-data-http-node-tests.js --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot -r source-map-support/register node/mocha.start.js test/*.test.js",
+    "mocha": "mocha -t 20000 -R dot node/mocha.start.js test/*.test.js",
+    "cover": "istanbul cover -x node/dist/js-data-http-node-tests.js --hook-run-in-context node_modules/mocha/bin/_mocha -- -t 20000 -R dot node/mocha.start.js test/*.test.js",
     "test": "npm run build && npm run karma && npm run karma_fetch && npm run cover",
     "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "dependencies": {
-    "js-data-adapter": "0.7.3"
+    "js-data-adapter": "0.7.4"
   },
   "peerDependencies": {
-    "js-data": "^3.0.0-beta.6"
+    "js-data": "^3.0.0-beta.10"
   },
   "devDependencies": {
-    "axios": "0.11.1",
+    "axios": "0.12.0",
     "babel-plugin-syntax-async-functions": "6.8.0",
     "babel-plugin-transform-regenerator": "6.9.0",
     "babel-preset-stage-0": "6.5.0",
-    "istanbul": "0.4.3",
-    "js-data-repo-tools": "0.5.2",
-    "karma": "0.13.22",
-    "karma-browserstack-launcher": "1.0.0",
+    "istanbul": "0.4.4",
+    "js-data-repo-tools": "0.5.5",
+    "karma": "1.1.1",
+    "karma-browserstack-launcher": "1.0.1",
     "karma-chai": "0.1.0",
-    "karma-mocha": "1.0.1",
-    "karma-phantomjs-launcher": "1.0.0",
+    "karma-mocha": "1.1.1",
+    "karma-phantomjs-launcher": "1.0.1",
     "karma-sinon": "1.0.5",
     "phantomjs-prebuilt": "2.1.7",
-    "rollup-plugin-commonjs": "2.2.1",
-    "rollup-plugin-replace": "1.1.0",
-    "uglify-js": "2.6.2"
+    "rollup-plugin-commonjs": "3.1.0",
+    "rollup-plugin-replace": "1.1.1",
+    "uglify-js": "2.7.0"
   }
 }

@@ -69,8 +69,6 @@ function buildUrl (url, params) {
   return url
 }
 
-const __super__ = Adapter.prototype
-
 const DEFAULTS = {
   // Default and user-defined settings
   /**
@@ -127,10 +125,12 @@ const DEFAULTS = {
  * @param {boolean} [opts.useFetch=false] TODO
  */
 export function HttpAdapter (opts) {
-  const self = this
+  utils.classCallCheck(this, HttpAdapter)
+
   opts || (opts = {})
+  // Fill in any missing options with the defaults
   utils.fillIn(opts, DEFAULTS)
-  Adapter.call(self, opts)
+  Adapter.call(this, opts)
 }
 
 /**
@@ -138,46 +138,9 @@ export function HttpAdapter (opts) {
  * @see HttpAdapter
  */
 
-// Setup prototype inheritance from Adapter
-HttpAdapter.prototype = Object.create(Adapter.prototype, {
-  constructor: {
-    value: HttpAdapter,
-    enumerable: false,
-    writable: true,
-    configurable: true
-  }
-})
+Adapter.extend({
+  constructor: HttpAdapter,
 
-Object.defineProperty(HttpAdapter, '__super__', {
-  configurable: true,
-  value: Adapter
-})
-
-/**
- * Alternative to ES6 class syntax for extending `HttpAdapter`.
- *
- * @example <caption>Using the ES2015 class syntax.</caption>
- * class MyHttpAdapter extends HttpAdapter {...}
- * const adapter = new MyHttpAdapter()
- *
- * @example <caption>Using {@link HttpAdapter.extend}.</caption>
- * var instanceProps = {...}
- * var classProps = {...}
- *
- * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
- * var adapter = new MyHttpAdapter()
- *
- * @name HttpAdapter.extend
- * @method
- * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the subclass.
- * @param {Object} [classProps] Properties that will be added as static
- * properties to the subclass itself.
- * @return {Object} Subclass of `HttpAdapter`.
- */
-HttpAdapter.extend = utils.extend
-
-utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   /**
    * @name HttpAdapter#afterDEL
    * @method
@@ -276,55 +239,40 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   beforePUT: noop,
 
   _count (mapper, query, opts) {
-    const self = this
-    return self.GET(
-      self.getPath('count', mapper, opts.params, opts),
+    return this.GET(
+      this.getPath('count', mapper, opts.params, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _create (mapper, props, opts) {
-    const self = this
-    return self.POST(
-      self.getPath('create', mapper, props, opts),
-      self.serialize(mapper, props, opts),
+    return this.POST(
+      this.getPath('create', mapper, props, opts),
+      this.serialize(mapper, props, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _createMany (mapper, props, opts) {
-    const self = this
-    return self.POST(
-      self.getPath('createMany', mapper, null, opts),
-      self.serialize(mapper, props, opts),
+    return this.POST(
+      this.getPath('createMany', mapper, null, opts),
+      this.serialize(mapper, props, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _destroy (mapper, id, opts) {
-    const self = this
-    return self.DEL(
-      self.getPath('destroy', mapper, id, opts),
+    return this.DEL(
+      this.getPath('destroy', mapper, id, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _destroyAll (mapper, query, opts) {
-    const self = this
-    return self.DEL(
-      self.getPath('destroyAll', mapper, null, opts),
+    return this.DEL(
+      this.getPath('destroyAll', mapper, null, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _end (mapper, opts, response) {
@@ -332,66 +280,48 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   },
 
   _find (mapper, id, opts) {
-    const self = this
-    return self.GET(
-      self.getPath('find', mapper, id, opts),
+    return this.GET(
+      this.getPath('find', mapper, id, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _findAll (mapper, query, opts) {
-    const self = this
-    return self.GET(
-      self.getPath('findAll', mapper, opts.params, opts),
+    return this.GET(
+      this.getPath('findAll', mapper, opts.params, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _sum (mapper, field, query, opts) {
-    const self = this
-    return self.GET(
-      self.getPath('sum', mapper, opts.params, opts),
+    return this.GET(
+      this.getPath('sum', mapper, opts.params, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _update (mapper, id, props, opts) {
-    const self = this
-    return self.PUT(
-      self.getPath('update', mapper, id, opts),
-      self.serialize(mapper, props, opts),
+    return this.PUT(
+      this.getPath('update', mapper, id, opts),
+      this.serialize(mapper, props, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _updateAll (mapper, props, query, opts) {
-    const self = this
-    return self.PUT(
-      self.getPath('updateAll', mapper, null, opts),
-      self.serialize(mapper, props, opts),
+    return this.PUT(
+      this.getPath('updateAll', mapper, null, opts),
+      this.serialize(mapper, props, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   _updateMany (mapper, records, opts) {
-    const self = this
-    return self.PUT(
-      self.getPath('updateMany', mapper, null, opts),
-      self.serialize(mapper, records, opts),
+    return this.PUT(
+      this.getPath('updateMany', mapper, null, opts),
+      this.serialize(mapper, records, opts),
       opts
-    ).then(function (response) {
-      return self._end(mapper, opts, response)
-    })
+    ).then((response) => this._end(mapper, opts, response))
   },
 
   /**
@@ -407,16 +337,14 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   count (mapper, query, opts) {
-    const self = this
     query || (query = {})
     opts || (opts = {})
-    opts.params = self.getParams(opts)
+    opts.params = this.getParams(opts)
     opts.params.count = true
-    opts.suffix = self.getSuffix(mapper, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
     utils.deepMixIn(opts.params, query)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-
-    return __super__.count.call(self, mapper, query, opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    return Adapter.prototype.count.call(this, mapper, query, opts)
   },
 
   /**
@@ -432,13 +360,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   create (mapper, props, opts) {
-    const self = this
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.create.call(self, mapper, props, opts)
+    opts.params = this.getParams(opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.create.call(this, mapper, props, opts)
   },
 
   /**
@@ -454,13 +380,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   createMany (mapper, props, opts) {
-    const self = this
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.createMany.call(self, mapper, props, opts)
+    opts.params = this.getParams(opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.createMany.call(this, mapper, props, opts)
   },
 
   /**
@@ -475,7 +399,6 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   DEL (url, config, opts) {
-    const self = this
     let op
     config || (config = {})
     opts || (opts = {})
@@ -484,20 +407,20 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforeDEL lifecycle hook
     op = opts.op = 'beforeDEL'
-    return utils.resolve(self[op](url, config, opts)).then(function (_config) {
-      // Allow re-assignment from lifecycle hook
-      config = utils.isUndefined(_config) ? config : _config
-      op = opts.op = 'DEL'
-      self.dbg(op, url, config, opts)
-      return self.HTTP(config, opts)
-    }).then(function (response) {
-      // afterDEL lifecycle hook
-      op = opts.op = 'afterDEL'
-      return utils.resolve(self[op](url, config, opts, response)).then(function (_response) {
+    return utils.resolve(this[op](url, config, opts))
+      .then((_config) => {
         // Allow re-assignment from lifecycle hook
-        return utils.isUndefined(_response) ? response : _response
+        config = _config === undefined ? config : _config
+        op = opts.op = 'DEL'
+        this.dbg(op, url, config, opts)
+        return this.HTTP(config, opts)
       })
-    })
+      .then((response) => {
+        // afterDEL lifecycle hook
+        op = opts.op = 'afterDEL'
+        return utils.resolve(this[op](url, config, opts, response))
+          .then((_response) => _response === undefined ? response : _response)
+      })
   },
 
   /**
@@ -538,13 +461,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   destroy (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.destroy.call(self, mapper, id, opts)
+    opts.params = this.getParams(opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.destroy.call(this, mapper, id, opts)
   },
 
   /**
@@ -560,15 +481,13 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   destroyAll (mapper, query, opts) {
-    const self = this
     query || (query = {})
     opts || (opts = {})
-    opts.params = self.getParams(opts)
+    opts.params = this.getParams(opts)
     utils.deepMixIn(opts.params, query)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.destroyAll.call(self, mapper, query, opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.destroyAll.call(this, mapper, query, opts)
   },
 
   /**
@@ -608,16 +527,18 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
       requestConfig.body = utils.toJson(config.data)
     }
 
-    return fetch(new Request(buildUrl(config.url, config.params), requestConfig)).then(function (response) {
-      response.config = {
-        method: config.method,
-        url: config.url
-      }
-      return response.json().then(function (data) {
-        response.data = data
-        return response
+    return fetch(new Request(buildUrl(config.url, config.params), requestConfig))
+      .then((response) => {
+        response.config = {
+          method: config.method,
+          url: config.url
+        }
+        return response.json()
+          .then((data) => {
+            response.data = data
+            return response
+          })
       })
-    })
   },
 
   /**
@@ -633,13 +554,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   find (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.find.call(self, mapper, id, opts)
+    opts.params = this.getParams(opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.find.call(this, mapper, id, opts)
   },
 
   /**
@@ -655,15 +574,13 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   findAll (mapper, query, opts) {
-    const self = this
     query || (query = {})
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.suffix = self.getSuffix(mapper, opts)
+    opts.params = this.getParams(opts)
+    opts.suffix = this.getSuffix(mapper, opts)
     utils.deepMixIn(opts.params, query)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-
-    return __super__.findAll.call(self, mapper, query, opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    return Adapter.prototype.findAll.call(this, mapper, query, opts)
   },
 
   /**
@@ -677,7 +594,6 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   GET (url, config, opts) {
-    const self = this
     let op
     config || (config = {})
     opts || (opts = {})
@@ -686,20 +602,20 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforeGET lifecycle hook
     op = opts.op = 'beforeGET'
-    return utils.resolve(self[op](url, config, opts)).then(function (_config) {
-      // Allow re-assignment from lifecycle hook
-      config = utils.isUndefined(_config) ? config : _config
-      op = opts.op = 'GET'
-      self.dbg(op, url, config, opts)
-      return self.HTTP(config, opts)
-    }).then(function (response) {
-      // afterGET lifecycle hook
-      op = opts.op = 'afterGET'
-      return utils.resolve(self[op](url, config, opts, response)).then(function (_response) {
+    return utils.resolve(this[op](url, config, opts))
+      .then((_config) => {
         // Allow re-assignment from lifecycle hook
-        return utils.isUndefined(_response) ? response : _response
+        config = _config === undefined ? config : _config
+        op = opts.op = 'GET'
+        this.dbg(op, url, config, opts)
+        return this.HTTP(config, opts)
       })
-    })
+      .then((response) => {
+        // afterGET lifecycle hook
+        op = opts.op = 'afterGET'
+        return utils.resolve(this[op](url, config, opts, response))
+          .then((_response) => _response === undefined ? response : _response)
+      })
   },
 
   /**
@@ -711,13 +627,12 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {string} Full path.
    */
   getEndpoint (mapper, id, opts) {
-    const self = this
     opts || (opts = {})
     opts.params = utils.isUndefined(opts.params) ? {} : opts.params
     const relationList = mapper.relationList || []
     let endpoint = utils.isUndefined(opts.endpoint) ? (utils.isUndefined(mapper.endpoint) ? mapper.name : mapper.endpoint) : opts.endpoint
 
-    relationList.forEach(function (def) {
+    relationList.forEach((def) => {
       if (def.type !== 'belongsTo' || !def.parent) {
         return
       }
@@ -745,11 +660,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
         if (parentId) {
           delete opts.endpoint
           const _opts = {}
-          utils.forOwn(opts, function (value, key) {
+          utils.forOwn(opts, (value, key) => {
             _opts[key] = value
           })
           utils._(_opts, parentDef)
-          endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts), parentId, endpoint)
+          endpoint = makePath(this.getEndpoint(parentDef, parentId, _opts), parentId, endpoint)
           return false
         }
       }
@@ -767,11 +682,10 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @param {Object} opts Configuration options.
    */
   getPath (method, mapper, id, opts) {
-    const self = this
     opts || (opts = {})
     const args = [
-      utils.isUndefined(opts.basePath) ? (utils.isUndefined(mapper.basePath) ? self.basePath : mapper.basePath) : opts.basePath,
-      self.getEndpoint(mapper, (utils.isString(id) || utils.isNumber(id) || method === 'create') ? id : null, opts)
+      opts.basePath === undefined ? (mapper.basePath === undefined ? this.basePath : mapper.basePath) : opts.basePath,
+      this.getEndpoint(mapper, (utils.isString(id) || utils.isNumber(id) || method === 'create') ? id : null, opts)
     ]
     if (method === 'find' || method === 'update' || method === 'destroy') {
       args.push(id)
@@ -781,7 +695,7 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
   getParams (opts) {
     opts || (opts = {})
-    if (utils.isUndefined(opts.params)) {
+    if (opts.params === undefined) {
       return {}
     }
     return utils.copy(opts.params)
@@ -789,8 +703,8 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
   getSuffix (mapper, opts) {
     opts || (opts = {})
-    if (utils.isUndefined(opts.suffix)) {
-      if (utils.isUndefined(mapper.suffix)) {
+    if (opts.suffix === undefined) {
+      if (mapper.suffix === undefined) {
         return this.suffix
       }
       return mapper.suffix
@@ -808,58 +722,57 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   HTTP (config, opts) {
-    const self = this
     const start = new Date()
     opts || (opts = {})
     const payload = config.data
     const cache = config.cache
     const timeout = config.timeout
     config = utils.copy(config, null, null, null, ['data', 'cache', 'timeout'])
-    config = utils.deepMixIn(config, self.httpConfig)
+    config = utils.deepMixIn(config, this.httpConfig)
     config.data = payload
     config.cache = cache
     config.timeout = timeout
-    if (self.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
+    if (this.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
       config.url += '/'
     }
     config.method = config.method.toUpperCase()
-    const suffix = config.suffix || opts.suffix || self.suffix
+    const suffix = config.suffix || opts.suffix || this.suffix
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
       config.url += suffix
     }
 
-    function logResponse (data) {
+    const logResponse = (data) => {
       const str = `${start.toUTCString()} - ${config.method.toUpperCase()} ${config.url} - ${data.status} ${(new Date().getTime() - start.getTime())}ms`
       if (data.status >= 200 && data.status < 300) {
-        if (self.log) {
-          self.dbg('debug', str, data)
+        if (this.log) {
+          this.dbg('debug', str, data)
         }
         return data
       } else {
-        if (self.error) {
-          self.error(`'FAILED: ${str}`, data)
+        if (this.error) {
+          this.error(`'FAILED: ${str}`, data)
         }
         return utils.reject(data)
       }
     }
 
-    if (!self.http) {
+    if (!this.http) {
       throw new Error('You have not configured this adapter with an http library!')
     }
 
-    return utils.resolve(self.beforeHTTP(config, opts)).then(function (_config) {
-      config = _config || config
-      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
-        return self.fetch(config, opts).then(logResponse, logResponse)
-      }
-      return self.http(config).then(logResponse, logResponse).catch(function (err) {
-        return self.responseError(err, config, opts)
+    return utils.resolve(this.beforeHTTP(config, opts))
+      .then((_config) => {
+        config = _config || config
+        if (hasFetch && (this.useFetch || opts.useFetch || !this.http)) {
+          return this.fetch(config, opts).then(logResponse, logResponse)
+        }
+        return this.http(config).then(logResponse, logResponse)
+          .catch((err) => this.responseError(err, config, opts))
       })
-    }).then(function (response) {
-      return utils.resolve(self.afterHTTP(config, opts, response)).then(function (_response) {
-        return _response || response
+      .then((response) => {
+        return utils.resolve(this.afterHTTP(config, opts, response))
+          .then((_response) => _response === undefined ? response : _response)
       })
-    })
   },
 
   /**
@@ -874,7 +787,6 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   POST (url, data, config, opts) {
-    const self = this
     let op
     config || (config = {})
     opts || (opts = {})
@@ -884,20 +796,20 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforePOST lifecycle hook
     op = opts.op = 'beforePOST'
-    return utils.resolve(self[op](url, data, config, opts)).then(function (_config) {
-      // Allow re-assignment from lifecycle hook
-      config = utils.isUndefined(_config) ? config : _config
-      op = opts.op = 'POST'
-      self.dbg(op, url, data, config, opts)
-      return self.HTTP(config, opts)
-    }).then(function (response) {
-      // afterPOST lifecycle hook
-      op = opts.op = 'afterPOST'
-      return utils.resolve(self[op](url, data, config, opts, response)).then(function (_response) {
+    return utils.resolve(this[op](url, data, config, opts))
+      .then((_config) => {
         // Allow re-assignment from lifecycle hook
-        return utils.isUndefined(_response) ? response : _response
+        config = _config === undefined ? config : _config
+        op = opts.op = 'POST'
+        this.dbg(op, url, data, config, opts)
+        return this.HTTP(config, opts)
       })
-    })
+      .then((response) => {
+        // afterPOST lifecycle hook
+        op = opts.op = 'afterPOST'
+        return utils.resolve(this[op](url, data, config, opts, response))
+          .then((_response) => _response === undefined ? response : _response)
+      })
   },
 
   /**
@@ -912,7 +824,6 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   PUT (url, data, config, opts) {
-    const self = this
     let op
     config || (config = {})
     opts || (opts = {})
@@ -922,20 +833,20 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforePUT lifecycle hook
     op = opts.op = 'beforePUT'
-    return utils.resolve(self[op](url, data, config, opts)).then(function (_config) {
-      // Allow re-assignment from lifecycle hook
-      config = utils.isUndefined(_config) ? config : _config
-      op = opts.op = 'PUT'
-      self.dbg(op, url, data, config, opts)
-      return self.HTTP(config, opts)
-    }).then(function (response) {
-      // afterPUT lifecycle hook
-      op = opts.op = 'afterPUT'
-      return utils.resolve(self[op](url, data, config, opts, response)).then(function (_response) {
+    return utils.resolve(this[op](url, data, config, opts))
+      .then((_config) => {
         // Allow re-assignment from lifecycle hook
-        return utils.isUndefined(_response) ? response : _response
+        config = _config === undefined ? config : _config
+        op = opts.op = 'PUT'
+        this.dbg(op, url, data, config, opts)
+        return this.HTTP(config, opts)
       })
-    })
+      .then((response) => {
+        // afterPUT lifecycle hook
+        op = opts.op = 'afterPUT'
+        return utils.resolve(this[op](url, data, config, opts, response))
+          .then((_response) => _response === undefined ? response : _response)
+      })
   },
 
   /**
@@ -1011,19 +922,17 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   sum (mapper, field, query, opts) {
-    const self = this
     query || (query = {})
     opts || (opts = {})
     if (!utils.utils.isString(field)) {
       throw new Error('field must be a string!')
     }
-    opts.params = self.getParams(opts)
+    opts.params = this.getParams(opts)
     opts.params.sum = field
-    opts.suffix = self.getSuffix(mapper, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
     utils.deepMixIn(opts.params, query)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-
-    return __super__.sum.call(self, mapper, field, query, opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    return Adapter.prototype.sum.call(this, mapper, field, query, opts)
   },
 
   /**
@@ -1038,13 +947,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   update (mapper, id, props, opts) {
-    const self = this
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.update.call(self, mapper, id, props, opts)
+    opts.params = this.getParams(opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.update.call(this, mapper, id, props, opts)
   },
 
   /**
@@ -1059,15 +966,13 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   updateAll (mapper, props, query, opts) {
-    const self = this
     query || (query = {})
     opts || (opts = {})
-    opts.params = self.getParams(opts)
+    opts.params = this.getParams(opts)
     utils.deepMixIn(opts.params, query)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.updateAll.call(self, mapper, props, query, opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.updateAll.call(this, mapper, props, query, opts)
   },
 
   /**
@@ -1088,13 +993,11 @@ utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   updateMany (mapper, records, opts) {
-    const self = this
     opts || (opts = {})
-    opts.params = self.getParams(opts)
-    opts.params = self.queryTransform(mapper, opts.params, opts)
-    opts.suffix = self.getSuffix(mapper, opts)
-
-    return __super__.updateMany.call(self, mapper, records, opts)
+    opts.params = this.getParams(opts)
+    opts.params = this.queryTransform(mapper, opts.params, opts)
+    opts.suffix = this.getSuffix(mapper, opts)
+    return Adapter.prototype.updateMany.call(this, mapper, records, opts)
   }
 })
 
@@ -1153,23 +1056,22 @@ export function addAction (name, opts) {
     opts.response = opts.response || function (response) { return response }
     opts.responseError = opts.responseError || function (err) { return utils.reject(err) }
     mapper[name] = function (id, _opts) {
-      const self = this
       if (utils.isObject(id)) {
         _opts = id
       }
       _opts = _opts || {}
-      let adapter = self.getAdapter(opts.adapter || self.defaultAdapter || 'http')
+      let adapter = this.getAdapter(opts.adapter || this.defaultAdapter || 'http')
       let config = {}
       utils.fillIn(config, opts)
       if (!_opts.hasOwnProperty('endpoint') && config.endpoint) {
         _opts.endpoint = config.endpoint
       }
       if (typeof _opts.getEndpoint === 'function') {
-        config.url = _opts.getEndpoint(self, _opts)
+        config.url = _opts.getEndpoint(this, _opts)
       } else {
         let args = [
-          _opts.basePath || self.basePath || adapter.basePath,
-          adapter.getEndpoint(self, utils.isSorN(id) ? id : null, _opts)
+          _opts.basePath || this.basePath || adapter.basePath,
+          adapter.getEndpoint(this, utils.isSorN(id) ? id : null, _opts)
         ]
         if (utils.isSorN(id)) {
           args.push(id)
@@ -1178,14 +1080,14 @@ export function addAction (name, opts) {
         config.url = makePath.apply(null, args)
       }
       config.method = config.method || 'GET'
-      config.mapper = self.name
+      config.mapper = this.name
       utils.deepMixIn(config, _opts)
       return utils.resolve(config)
         .then(_opts.request || opts.request)
-        .then(function (config) { return adapter.HTTP(config) })
-        .then(function (data) {
+        .then((config) => adapter.HTTP(config))
+        .then((data) => {
           if (data && data.config) {
-            data.config.mapper = self.name
+            data.config.mapper = this.name
           }
           return data
         })
@@ -1289,4 +1191,58 @@ export const version = '<%= version %>'
  * })
  *
  * @module js-data-http
+ */
+
+/**
+ * Create a subclass of this HttpAdapter:
+ * @example <caption>HttpAdapter.extend</caption>
+ * // Normally you would do: import {HttpAdapter} from 'js-data-http'
+ * // or: import {HttpAdapter} from 'js-data-http-node'
+ * const JSDataHttp = require('js-data-http-node@3.0.0-beta.8')
+ * const {HttpAdapter} = JSDataHttp
+ * console.log('Using JSDataHttp v' + JSDataHttp.version.full)
+ *
+ * // Extend the class using ES2015 class syntax.
+ * class CustomHttpAdapterClass extends HttpAdapter {
+ *   foo () { return 'bar' }
+ *   static beep () { return 'boop' }
+ * }
+ * const customHttpAdapter = new CustomHttpAdapterClass()
+ * console.log(customHttpAdapter.foo())
+ * console.log(CustomHttpAdapterClass.beep())
+ *
+ * // Extend the class using alternate method.
+ * const OtherHttpAdapterClass = HttpAdapter.extend({
+ *   foo () { return 'bar' }
+ * }, {
+ *   beep () { return 'boop' }
+ * })
+ * const otherHttpAdapter = new OtherHttpAdapterClass()
+ * console.log(otherHttpAdapter.foo())
+ * console.log(OtherHttpAdapterClass.beep())
+ *
+ * // Extend the class, providing a custom constructor.
+ * function AnotherHttpAdapterClass () {
+ *   HttpAdapter.call(this)
+ *   this.created_at = new Date().getTime()
+ * }
+ * HttpAdapter.extend({
+ *   constructor: AnotherHttpAdapterClass,
+ *   foo () { return 'bar' }
+ * }, {
+ *   beep () { return 'boop' }
+ * })
+ * const anotherHttpAdapter = new AnotherHttpAdapterClass()
+ * console.log(anotherHttpAdapter.created_at)
+ * console.log(anotherHttpAdapter.foo())
+ * console.log(AnotherHttpAdapterClass.beep())
+ *
+ * @method HttpAdapter.extend
+ * @param {Object} [props={}] Properties to add to the prototype of the
+ * subclass.
+ * @param {Object} [props.constructor] Provide a custom constructor function
+ * to be used as the subclass itself.
+ * @param {Object} [classProps={}] Static properties to add to the subclass.
+ * @returns {Constructor} Subclass of this HttpAdapter class.
+ * @since 3.0.0
  */
