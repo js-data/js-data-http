@@ -1,15 +1,15 @@
 'use strict';
 
+Object.defineProperty(exports, '__esModule', { value: true });
+
 var jsData = require('js-data');
 var jsDataAdapter = require('js-data-adapter');
 
-var babelHelpers = {};
-babelHelpers.typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
   return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
 };
-babelHelpers;
 
 var axios = require('axios');
 var hasFetch = false;
@@ -70,8 +70,6 @@ function buildUrl(url, params) {
   return url;
 }
 
-var __super__ = jsDataAdapter.Adapter.prototype;
-
 var DEFAULTS = {
   // Default and user-defined settings
   /**
@@ -128,10 +126,12 @@ var DEFAULTS = {
  * @param {boolean} [opts.useFetch=false] TODO
  */
 function HttpAdapter(opts) {
-  var self = this;
+  jsData.utils.classCallCheck(this, HttpAdapter);
+
   opts || (opts = {});
+  // Fill in any missing options with the defaults
   jsData.utils.fillIn(opts, DEFAULTS);
-  jsDataAdapter.Adapter.call(self, opts);
+  jsDataAdapter.Adapter.call(this, opts);
 }
 
 /**
@@ -139,46 +139,9 @@ function HttpAdapter(opts) {
  * @see HttpAdapter
  */
 
-// Setup prototype inheritance from Adapter
-HttpAdapter.prototype = Object.create(jsDataAdapter.Adapter.prototype, {
-  constructor: {
-    value: HttpAdapter,
-    enumerable: false,
-    writable: true,
-    configurable: true
-  }
-});
+jsDataAdapter.Adapter.extend({
+  constructor: HttpAdapter,
 
-Object.defineProperty(HttpAdapter, '__super__', {
-  configurable: true,
-  value: jsDataAdapter.Adapter
-});
-
-/**
- * Alternative to ES6 class syntax for extending `HttpAdapter`.
- *
- * @example <caption>Using the ES2015 class syntax.</caption>
- * class MyHttpAdapter extends HttpAdapter {...}
- * const adapter = new MyHttpAdapter()
- *
- * @example <caption>Using {@link HttpAdapter.extend}.</caption>
- * var instanceProps = {...}
- * var classProps = {...}
- *
- * var MyHttpAdapter = HttpAdapter.extend(instanceProps, classProps)
- * var adapter = new MyHttpAdapter()
- *
- * @name HttpAdapter.extend
- * @method
- * @param {Object} [instanceProps] Properties that will be added to the
- * prototype of the subclass.
- * @param {Object} [classProps] Properties that will be added as static
- * properties to the subclass itself.
- * @return {Object} Subclass of `HttpAdapter`.
- */
-HttpAdapter.extend = jsData.utils.extend;
-
-jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   /**
    * @name HttpAdapter#afterDEL
    * @method
@@ -277,72 +240,83 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   beforePUT: jsDataAdapter.noop,
 
   _count: function _count(mapper, query, opts) {
-    var self = this;
-    return self.GET(self.getPath('count', mapper, opts.params, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this = this;
+
+    return this.GET(this.getPath('count', mapper, opts.params, opts), opts).then(function (response) {
+      return _this._end(mapper, opts, response);
     });
   },
   _create: function _create(mapper, props, opts) {
-    var self = this;
-    return self.POST(self.getPath('create', mapper, props, opts), self.serialize(mapper, props, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this2 = this;
+
+    return this.POST(this.getPath('create', mapper, props, opts), this.serialize(mapper, props, opts), opts).then(function (response) {
+      return _this2._end(mapper, opts, response);
     });
   },
   _createMany: function _createMany(mapper, props, opts) {
-    var self = this;
-    return self.POST(self.getPath('createMany', mapper, null, opts), self.serialize(mapper, props, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this3 = this;
+
+    return this.POST(this.getPath('createMany', mapper, null, opts), this.serialize(mapper, props, opts), opts).then(function (response) {
+      return _this3._end(mapper, opts, response);
     });
   },
   _destroy: function _destroy(mapper, id, opts) {
-    var self = this;
-    return self.DEL(self.getPath('destroy', mapper, id, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this4 = this;
+
+    return this.DEL(this.getPath('destroy', mapper, id, opts), opts).then(function (response) {
+      return _this4._end(mapper, opts, response);
     });
   },
   _destroyAll: function _destroyAll(mapper, query, opts) {
-    var self = this;
-    return self.DEL(self.getPath('destroyAll', mapper, null, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this5 = this;
+
+    return this.DEL(this.getPath('destroyAll', mapper, null, opts), opts).then(function (response) {
+      return _this5._end(mapper, opts, response);
     });
   },
   _end: function _end(mapper, opts, response) {
     return [this.deserialize(mapper, response, opts), response];
   },
   _find: function _find(mapper, id, opts) {
-    var self = this;
-    return self.GET(self.getPath('find', mapper, id, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this6 = this;
+
+    return this.GET(this.getPath('find', mapper, id, opts), opts).then(function (response) {
+      return _this6._end(mapper, opts, response);
     });
   },
   _findAll: function _findAll(mapper, query, opts) {
-    var self = this;
-    return self.GET(self.getPath('findAll', mapper, opts.params, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this7 = this;
+
+    return this.GET(this.getPath('findAll', mapper, opts.params, opts), opts).then(function (response) {
+      return _this7._end(mapper, opts, response);
     });
   },
   _sum: function _sum(mapper, field, query, opts) {
-    var self = this;
-    return self.GET(self.getPath('sum', mapper, opts.params, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this8 = this;
+
+    return this.GET(this.getPath('sum', mapper, opts.params, opts), opts).then(function (response) {
+      return _this8._end(mapper, opts, response);
     });
   },
   _update: function _update(mapper, id, props, opts) {
-    var self = this;
-    return self.PUT(self.getPath('update', mapper, id, opts), self.serialize(mapper, props, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this9 = this;
+
+    return this.PUT(this.getPath('update', mapper, id, opts), this.serialize(mapper, props, opts), opts).then(function (response) {
+      return _this9._end(mapper, opts, response);
     });
   },
   _updateAll: function _updateAll(mapper, props, query, opts) {
-    var self = this;
-    return self.PUT(self.getPath('updateAll', mapper, null, opts), self.serialize(mapper, props, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this10 = this;
+
+    return this.PUT(this.getPath('updateAll', mapper, null, opts), this.serialize(mapper, props, opts), opts).then(function (response) {
+      return _this10._end(mapper, opts, response);
     });
   },
   _updateMany: function _updateMany(mapper, records, opts) {
-    var self = this;
-    return self.PUT(self.getPath('updateMany', mapper, null, opts), self.serialize(mapper, records, opts), opts).then(function (response) {
-      return self._end(mapper, opts, response);
+    var _this11 = this;
+
+    return this.PUT(this.getPath('updateMany', mapper, null, opts), this.serialize(mapper, records, opts), opts).then(function (response) {
+      return _this11._end(mapper, opts, response);
     });
   },
 
@@ -360,16 +334,14 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   count: function count(mapper, query, opts) {
-    var self = this;
     query || (query = {});
     opts || (opts = {});
-    opts.params = self.getParams(opts);
+    opts.params = this.getParams(opts);
     opts.params.count = true;
-    opts.suffix = self.getSuffix(mapper, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
     jsData.utils.deepMixIn(opts.params, query);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-
-    return __super__.count.call(self, mapper, query, opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    return jsDataAdapter.Adapter.prototype.count.call(this, mapper, query, opts);
   },
 
 
@@ -386,13 +358,11 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   create: function create(mapper, props, opts) {
-    var self = this;
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.create.call(self, mapper, props, opts);
+    opts.params = this.getParams(opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.create.call(this, mapper, props, opts);
   },
 
 
@@ -409,13 +379,11 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   createMany: function createMany(mapper, props, opts) {
-    var self = this;
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.createMany.call(self, mapper, props, opts);
+    opts.params = this.getParams(opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.createMany.call(this, mapper, props, opts);
   },
 
 
@@ -431,7 +399,8 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   DEL: function DEL(url, config, opts) {
-    var self = this;
+    var _this12 = this;
+
     var op = void 0;
     config || (config = {});
     opts || (opts = {});
@@ -440,18 +409,17 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforeDEL lifecycle hook
     op = opts.op = 'beforeDEL';
-    return jsData.utils.resolve(self[op](url, config, opts)).then(function (_config) {
+    return jsData.utils.resolve(this[op](url, config, opts)).then(function (_config) {
       // Allow re-assignment from lifecycle hook
-      config = jsData.utils.isUndefined(_config) ? config : _config;
+      config = _config === undefined ? config : _config;
       op = opts.op = 'DEL';
-      self.dbg(op, url, config, opts);
-      return self.HTTP(config, opts);
+      _this12.dbg(op, url, config, opts);
+      return _this12.HTTP(config, opts);
     }).then(function (response) {
       // afterDEL lifecycle hook
       op = opts.op = 'afterDEL';
-      return jsData.utils.resolve(self[op](url, config, opts, response)).then(function (_response) {
-        // Allow re-assignment from lifecycle hook
-        return jsData.utils.isUndefined(_response) ? response : _response;
+      return jsData.utils.resolve(_this12[op](url, config, opts, response)).then(function (_response) {
+        return _response === undefined ? response : _response;
       });
     });
   },
@@ -496,13 +464,11 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   destroy: function destroy(mapper, id, opts) {
-    var self = this;
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.destroy.call(self, mapper, id, opts);
+    opts.params = this.getParams(opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.destroy.call(this, mapper, id, opts);
   },
 
 
@@ -519,15 +485,13 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   destroyAll: function destroyAll(mapper, query, opts) {
-    var self = this;
     query || (query = {});
     opts || (opts = {});
-    opts.params = self.getParams(opts);
+    opts.params = this.getParams(opts);
     jsData.utils.deepMixIn(opts.params, query);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.destroyAll.call(self, mapper, query, opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.destroyAll.call(this, mapper, query, opts);
   },
 
 
@@ -607,13 +571,11 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   find: function find(mapper, id, opts) {
-    var self = this;
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.find.call(self, mapper, id, opts);
+    opts.params = this.getParams(opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.find.call(this, mapper, id, opts);
   },
 
 
@@ -630,15 +592,13 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   findAll: function findAll(mapper, query, opts) {
-    var self = this;
     query || (query = {});
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.suffix = self.getSuffix(mapper, opts);
+    opts.params = this.getParams(opts);
+    opts.suffix = this.getSuffix(mapper, opts);
     jsData.utils.deepMixIn(opts.params, query);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-
-    return __super__.findAll.call(self, mapper, query, opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    return jsDataAdapter.Adapter.prototype.findAll.call(this, mapper, query, opts);
   },
 
 
@@ -653,7 +613,8 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   GET: function GET(url, config, opts) {
-    var self = this;
+    var _this13 = this;
+
     var op = void 0;
     config || (config = {});
     opts || (opts = {});
@@ -662,18 +623,17 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforeGET lifecycle hook
     op = opts.op = 'beforeGET';
-    return jsData.utils.resolve(self[op](url, config, opts)).then(function (_config) {
+    return jsData.utils.resolve(this[op](url, config, opts)).then(function (_config) {
       // Allow re-assignment from lifecycle hook
-      config = jsData.utils.isUndefined(_config) ? config : _config;
+      config = _config === undefined ? config : _config;
       op = opts.op = 'GET';
-      self.dbg(op, url, config, opts);
-      return self.HTTP(config, opts);
+      _this13.dbg(op, url, config, opts);
+      return _this13.HTTP(config, opts);
     }).then(function (response) {
       // afterGET lifecycle hook
       op = opts.op = 'afterGET';
-      return jsData.utils.resolve(self[op](url, config, opts, response)).then(function (_response) {
-        // Allow re-assignment from lifecycle hook
-        return jsData.utils.isUndefined(_response) ? response : _response;
+      return jsData.utils.resolve(_this13[op](url, config, opts, response)).then(function (_response) {
+        return _response === undefined ? response : _response;
       });
     });
   },
@@ -688,7 +648,8 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {string} Full path.
    */
   getEndpoint: function getEndpoint(mapper, id, opts) {
-    var self = this;
+    var _this14 = this;
+
     opts || (opts = {});
     opts.params = jsData.utils.isUndefined(opts.params) ? {} : opts.params;
     var relationList = mapper.relationList || [];
@@ -727,13 +688,13 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
               _opts[key] = value;
             });
             jsData.utils._(_opts, parentDef);
-            endpoint = makePath(self.getEndpoint(parentDef, parentId, _opts), parentId, endpoint);
+            endpoint = makePath(_this14.getEndpoint(parentDef, parentId, _opts), parentId, endpoint);
             return {
               v: false
             };
           }();
 
-          if ((typeof _ret === 'undefined' ? 'undefined' : babelHelpers.typeof(_ret)) === "object") return _ret.v;
+          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
         }
       }
     });
@@ -751,9 +712,8 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @param {Object} opts Configuration options.
    */
   getPath: function getPath(method, mapper, id, opts) {
-    var self = this;
     opts || (opts = {});
-    var args = [jsData.utils.isUndefined(opts.basePath) ? jsData.utils.isUndefined(mapper.basePath) ? self.basePath : mapper.basePath : opts.basePath, self.getEndpoint(mapper, jsData.utils.isString(id) || jsData.utils.isNumber(id) || method === 'create' ? id : null, opts)];
+    var args = [opts.basePath === undefined ? mapper.basePath === undefined ? this.basePath : mapper.basePath : opts.basePath, this.getEndpoint(mapper, jsData.utils.isString(id) || jsData.utils.isNumber(id) || method === 'create' ? id : null, opts)];
     if (method === 'find' || method === 'update' || method === 'destroy') {
       args.push(id);
     }
@@ -761,15 +721,15 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
   },
   getParams: function getParams(opts) {
     opts || (opts = {});
-    if (jsData.utils.isUndefined(opts.params)) {
+    if (opts.params === undefined) {
       return {};
     }
     return jsData.utils.copy(opts.params);
   },
   getSuffix: function getSuffix(mapper, opts) {
     opts || (opts = {});
-    if (jsData.utils.isUndefined(opts.suffix)) {
-      if (jsData.utils.isUndefined(mapper.suffix)) {
+    if (opts.suffix === undefined) {
+      if (mapper.suffix === undefined) {
         return this.suffix;
       }
       return mapper.suffix;
@@ -788,56 +748,57 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   HTTP: function HTTP(config, opts) {
-    var self = this;
+    var _this15 = this;
+
     var start = new Date();
     opts || (opts = {});
     var payload = config.data;
     var cache = config.cache;
     var timeout = config.timeout;
     config = jsData.utils.copy(config, null, null, null, ['data', 'cache', 'timeout']);
-    config = jsData.utils.deepMixIn(config, self.httpConfig);
+    config = jsData.utils.deepMixIn(config, this.httpConfig);
     config.data = payload;
     config.cache = cache;
     config.timeout = timeout;
-    if (self.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
+    if (this.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
       config.url += '/';
     }
     config.method = config.method.toUpperCase();
-    var suffix = config.suffix || opts.suffix || self.suffix;
+    var suffix = config.suffix || opts.suffix || this.suffix;
     if (suffix && config.url.substr(config.url.length - suffix.length) !== suffix) {
       config.url += suffix;
     }
 
-    function logResponse(data) {
+    var logResponse = function logResponse(data) {
       var str = start.toUTCString() + ' - ' + config.method.toUpperCase() + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
       if (data.status >= 200 && data.status < 300) {
-        if (self.log) {
-          self.dbg('debug', str, data);
+        if (_this15.log) {
+          _this15.dbg('debug', str, data);
         }
         return data;
       } else {
-        if (self.error) {
-          self.error('\'FAILED: ' + str, data);
+        if (_this15.error) {
+          _this15.error('\'FAILED: ' + str, data);
         }
         return jsData.utils.reject(data);
       }
-    }
+    };
 
-    if (!self.http) {
+    if (!this.http) {
       throw new Error('You have not configured this adapter with an http library!');
     }
 
-    return jsData.utils.resolve(self.beforeHTTP(config, opts)).then(function (_config) {
+    return jsData.utils.resolve(this.beforeHTTP(config, opts)).then(function (_config) {
       config = _config || config;
-      if (hasFetch && (self.useFetch || opts.useFetch || !self.http)) {
-        return self.fetch(config, opts).then(logResponse, logResponse);
+      if (hasFetch && (_this15.useFetch || opts.useFetch || !_this15.http)) {
+        return _this15.fetch(config, opts).then(logResponse, logResponse);
       }
-      return self.http(config).then(logResponse, logResponse).catch(function (err) {
-        return self.responseError(err, config, opts);
+      return _this15.http(config).then(logResponse, logResponse).catch(function (err) {
+        return _this15.responseError(err, config, opts);
       });
     }).then(function (response) {
-      return jsData.utils.resolve(self.afterHTTP(config, opts, response)).then(function (_response) {
-        return _response || response;
+      return jsData.utils.resolve(_this15.afterHTTP(config, opts, response)).then(function (_response) {
+        return _response === undefined ? response : _response;
       });
     });
   },
@@ -855,7 +816,8 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   POST: function POST(url, data, config, opts) {
-    var self = this;
+    var _this16 = this;
+
     var op = void 0;
     config || (config = {});
     opts || (opts = {});
@@ -865,18 +827,17 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforePOST lifecycle hook
     op = opts.op = 'beforePOST';
-    return jsData.utils.resolve(self[op](url, data, config, opts)).then(function (_config) {
+    return jsData.utils.resolve(this[op](url, data, config, opts)).then(function (_config) {
       // Allow re-assignment from lifecycle hook
-      config = jsData.utils.isUndefined(_config) ? config : _config;
+      config = _config === undefined ? config : _config;
       op = opts.op = 'POST';
-      self.dbg(op, url, data, config, opts);
-      return self.HTTP(config, opts);
+      _this16.dbg(op, url, data, config, opts);
+      return _this16.HTTP(config, opts);
     }).then(function (response) {
       // afterPOST lifecycle hook
       op = opts.op = 'afterPOST';
-      return jsData.utils.resolve(self[op](url, data, config, opts, response)).then(function (_response) {
-        // Allow re-assignment from lifecycle hook
-        return jsData.utils.isUndefined(_response) ? response : _response;
+      return jsData.utils.resolve(_this16[op](url, data, config, opts, response)).then(function (_response) {
+        return _response === undefined ? response : _response;
       });
     });
   },
@@ -894,7 +855,8 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   PUT: function PUT(url, data, config, opts) {
-    var self = this;
+    var _this17 = this;
+
     var op = void 0;
     config || (config = {});
     opts || (opts = {});
@@ -904,18 +866,17 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
 
     // beforePUT lifecycle hook
     op = opts.op = 'beforePUT';
-    return jsData.utils.resolve(self[op](url, data, config, opts)).then(function (_config) {
+    return jsData.utils.resolve(this[op](url, data, config, opts)).then(function (_config) {
       // Allow re-assignment from lifecycle hook
-      config = jsData.utils.isUndefined(_config) ? config : _config;
+      config = _config === undefined ? config : _config;
       op = opts.op = 'PUT';
-      self.dbg(op, url, data, config, opts);
-      return self.HTTP(config, opts);
+      _this17.dbg(op, url, data, config, opts);
+      return _this17.HTTP(config, opts);
     }).then(function (response) {
       // afterPUT lifecycle hook
       op = opts.op = 'afterPUT';
-      return jsData.utils.resolve(self[op](url, data, config, opts, response)).then(function (_response) {
-        // Allow re-assignment from lifecycle hook
-        return jsData.utils.isUndefined(_response) ? response : _response;
+      return jsData.utils.resolve(_this17[op](url, data, config, opts, response)).then(function (_response) {
+        return _response === undefined ? response : _response;
       });
     });
   },
@@ -997,19 +958,17 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   sum: function sum(mapper, field, query, opts) {
-    var self = this;
     query || (query = {});
     opts || (opts = {});
     if (!jsData.utils.utils.isString(field)) {
       throw new Error('field must be a string!');
     }
-    opts.params = self.getParams(opts);
+    opts.params = this.getParams(opts);
     opts.params.sum = field;
-    opts.suffix = self.getSuffix(mapper, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
     jsData.utils.deepMixIn(opts.params, query);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-
-    return __super__.sum.call(self, mapper, field, query, opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    return jsDataAdapter.Adapter.prototype.sum.call(this, mapper, field, query, opts);
   },
 
 
@@ -1025,13 +984,11 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   update: function update(mapper, id, props, opts) {
-    var self = this;
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.update.call(self, mapper, id, props, opts);
+    opts.params = this.getParams(opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.update.call(this, mapper, id, props, opts);
   },
 
 
@@ -1047,15 +1004,13 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   updateAll: function updateAll(mapper, props, query, opts) {
-    var self = this;
     query || (query = {});
     opts || (opts = {});
-    opts.params = self.getParams(opts);
+    opts.params = this.getParams(opts);
     jsData.utils.deepMixIn(opts.params, query);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.updateAll.call(self, mapper, props, query, opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.updateAll.call(this, mapper, props, query, opts);
   },
 
 
@@ -1077,13 +1032,11 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
    * @return {Promise}
    */
   updateMany: function updateMany(mapper, records, opts) {
-    var self = this;
     opts || (opts = {});
-    opts.params = self.getParams(opts);
-    opts.params = self.queryTransform(mapper, opts.params, opts);
-    opts.suffix = self.getSuffix(mapper, opts);
-
-    return __super__.updateMany.call(self, mapper, records, opts);
+    opts.params = this.getParams(opts);
+    opts.params = this.queryTransform(mapper, opts.params, opts);
+    opts.suffix = this.getSuffix(mapper, opts);
+    return jsDataAdapter.Adapter.prototype.updateMany.call(this, mapper, records, opts);
   }
 });
 
@@ -1132,7 +1085,7 @@ jsData.utils.addHiddenPropsToTarget(HttpAdapter.prototype, {
  */
 function addAction(name, opts) {
   if (!name || !jsData.utils.isString(name)) {
-    throw new TypeError('action(name[, opts]): Expected: string, Found: ' + (typeof name === 'undefined' ? 'undefined' : babelHelpers.typeof(name)));
+    throw new TypeError('action(name[, opts]): Expected: string, Found: ' + (typeof name === 'undefined' ? 'undefined' : _typeof(name)));
   }
   return function (mapper) {
     if (mapper[name]) {
@@ -1148,21 +1101,22 @@ function addAction(name, opts) {
       return jsData.utils.reject(err);
     };
     mapper[name] = function (id, _opts) {
-      var self = this;
+      var _this18 = this;
+
       if (jsData.utils.isObject(id)) {
         _opts = id;
       }
       _opts = _opts || {};
-      var adapter = self.getAdapter(opts.adapter || self.defaultAdapter || 'http');
+      var adapter = this.getAdapter(opts.adapter || this.defaultAdapter || 'http');
       var config = {};
       jsData.utils.fillIn(config, opts);
       if (!_opts.hasOwnProperty('endpoint') && config.endpoint) {
         _opts.endpoint = config.endpoint;
       }
       if (typeof _opts.getEndpoint === 'function') {
-        config.url = _opts.getEndpoint(self, _opts);
+        config.url = _opts.getEndpoint(this, _opts);
       } else {
-        var args = [_opts.basePath || self.basePath || adapter.basePath, adapter.getEndpoint(self, jsData.utils.isSorN(id) ? id : null, _opts)];
+        var args = [_opts.basePath || this.basePath || adapter.basePath, adapter.getEndpoint(this, jsData.utils.isSorN(id) ? id : null, _opts)];
         if (jsData.utils.isSorN(id)) {
           args.push(id);
         }
@@ -1170,13 +1124,13 @@ function addAction(name, opts) {
         config.url = makePath.apply(null, args);
       }
       config.method = config.method || 'GET';
-      config.mapper = self.name;
+      config.mapper = this.name;
       jsData.utils.deepMixIn(config, _opts);
       return jsData.utils.resolve(config).then(_opts.request || opts.request).then(function (config) {
         return adapter.HTTP(config);
       }).then(function (data) {
         if (data && data.config) {
-          data.config.mapper = self.name;
+          data.config.mapper = _this18.name;
         }
         return data;
       }).then(_opts.response || opts.response, _opts.responseError || opts.responseError);
@@ -1251,41 +1205,12 @@ function addActions(opts) {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  beta: 7,
-  full: '3.0.0-beta.7',
+  beta: 8,
+  full: '3.0.0-beta.8',
   major: 3,
   minor: 0,
   patch: 0
 };
-
-/**
- * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
- * that works on Node.js is registered in NPM as `js-data-http-node`. The build
- * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
- * as `js-data-fetch`.
- *
- * @example <caption>Script tag</caption>
- * var HttpAdapter = window.JSDataHttp.HttpAdapter
- * var adapter = new HttpAdapter()
- *
- * @example <caption>CommonJS</caption>
- * var HttpAdapter = require('js-data-Http').HttpAdapter
- * var adapter = new HttpAdapter()
- *
- * @example <caption>ES2015 Modules</caption>
- * import {HttpAdapter} from 'js-data-Http'
- * const adapter = new HttpAdapter()
- *
- * @example <caption>AMD</caption>
- * define('myApp', ['js-data-Http'], function (JSDataHttp) {
- *   var HttpAdapter = JSDataHttp.HttpAdapter
- *   var adapter = new HttpAdapter()
- *
- *   // ...
- * })
- *
- * @module js-data-http
- */
 
 exports.HttpAdapter = HttpAdapter;
 exports.addAction = addAction;
