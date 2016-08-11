@@ -1,6 +1,6 @@
 /*!
 * js-data-fetch
-* @version 3.0.0-beta.8 - Homepage <https://github.com/js-data/js-data-http>
+* @version 3.0.0-rc.1 - Homepage <https://github.com/js-data/js-data-http>
 * @copyright (c) 2014-2016 js-data-http project authors
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -962,6 +962,7 @@
 
       var record = void 0,
           op = void 0;
+      var meta = {};
       opts || (opts = {});
       opts.with || (opts.with = []);
 
@@ -972,14 +973,16 @@
         _this7.dbg(op, mapper, id, opts);
         return jsData.utils.resolve(_this7._find(mapper, id, opts));
       }).then(function (results) {
-        var _results6 = slicedToArray(results, 1);
+        var _results6 = slicedToArray(results, 2);
 
         var _record = _results6[0];
+        var _meta = _results6[1];
 
         if (!_record) {
           return;
         }
         record = _record;
+        meta = _meta;
         var tasks = [];
 
         jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
@@ -1004,7 +1007,7 @@
 
         return jsData.utils.Promise.all(tasks);
       }).then(function () {
-        var response = new Response(record, {}, 'find');
+        var response = new Response(record, meta, 'find');
         response.found = record ? 1 : 0;
         response = _this7.respond(response, opts);
 
@@ -1043,6 +1046,7 @@
       opts.with || (opts.with = []);
 
       var records = [];
+      var meta = {};
       var op = void 0;
       var activeWith = opts._activeWith;
 
@@ -1062,12 +1066,14 @@
         _this8.dbg(op, mapper, query, opts);
         return jsData.utils.resolve(_this8._findAll(mapper, query, opts));
       }).then(function (results) {
-        var _results7 = slicedToArray(results, 1);
+        var _results7 = slicedToArray(results, 2);
 
         var _records = _results7[0];
+        var _meta = _results7[1];
 
         _records || (_records = []);
         records = _records;
+        meta = _meta;
         var tasks = [];
         jsData.utils.forEachRelation(mapper, opts, function (def, __opts) {
           var task = void 0;
@@ -1090,7 +1096,7 @@
         });
         return jsData.utils.Promise.all(tasks);
       }).then(function () {
-        var response = new Response(records, {}, 'findAll');
+        var response = new Response(records, meta, 'findAll');
         response.found = records.length;
         response = _this8.respond(response, opts);
 
@@ -2780,8 +2786,7 @@
    * otherwise `false` if the current version is not beta.
    */
   var version = {
-  beta: 8,
-  full: '3.0.0-beta.8',
+  full: '3.0.0-rc.1',
   major: 3,
   minor: 0,
   patch: 0
