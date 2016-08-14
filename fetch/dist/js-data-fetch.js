@@ -1,6 +1,6 @@
 /*!
 * js-data-fetch
-* @version 3.0.0-rc.1 - Homepage <https://github.com/js-data/js-data-http>
+* @version 3.0.0-rc.2 - Homepage <https://github.com/js-data/js-data-http>
 * @copyright (c) 2014-2016 js-data-http project authors
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -175,7 +175,7 @@
    */
   function Adapter(opts) {
     jsData.utils.classCallCheck(this, Adapter);
-    jsData.Component.call(this);
+    jsData.Component.call(this, opts);
     opts || (opts = {});
     jsData.utils.fillIn(opts, DEFAULTS$1);
     jsData.utils.fillIn(this, opts);
@@ -1652,42 +1652,68 @@
   }
 
   var DEFAULTS = {
-    // Default and user-defined settings
     /**
+     * Set a base path in order to use absolute URLs instead of relative URLs.
+     *
+     * @example
+     * const httpAdapter = new HttpAdapter({
+     *   basePath: 'https://mydomain.com'
+     * })
+     *
      * @name HttpAdapter#basePath
      * @type {string}
+     * @since 3.0.0
      */
     basePath: '',
 
     /**
+     * Ensure that the request url has a trailing forward slash.
+     *
      * @name HttpAdapter#forceTrailingSlash
      * @type {boolean}
      * @default false
+     * @since 3.0.0
      */
     forceTrailingSlash: false,
 
     /**
+     * The HTTP function that actually makes the HTTP request. By default this is
+     * `axios`.
+     *
      * @name HttpAdapter#http
      * @type {Function}
+     * @since 3.0.0
+     * @see http://www.js-data.io/docs/js-data-http#using-a-custom-http-library
      */
     http: axios,
 
     /**
+     * Default configuration options to be mixed into the `config` argument passed
+     * to {@link HttpAdapter#http}.
+     *
      * @name HttpAdapter#httpConfig
      * @type {Object}
+     * @since 3.0.0
      */
     httpConfig: {},
 
     /**
+     * Add a suffix to the request url, e.g. ".json".
+     *
      * @name HttpAdapter#suffix
      * @type {string}
+     * @since 3.0.0
      */
     suffix: '',
 
     /**
+     * Use `window.fetch` if available.
+     *
      * @name HttpAdapter#useFetch
      * @type {boolean}
      * @default false
+     * @since 3.0.0
+     * @see http://www.js-data.io/docs/js-data-http#using-windowfetch
      */
     useFetch: false
   };
@@ -1695,16 +1721,34 @@
   /**
    * HttpAdapter class.
    *
+   * @example
+   * import { DataStore } from 'js-data';
+   * import { HttpAdapter } from 'js-data-http';
+   *
+   * const httpAdapter = new HttpAdapter();
+   * const store = new DataStore();
+   *
+   * store.registerAdapter('http', httpAdapter, { 'default': true });
+   *
+   * store.defineMapper('school');
+   * store.defineMapper('student');
+   *
+   * // GET /school/1
+   * store.find('school', 1).then((school) => {
+   *   console.log('school');
+   * });
+   *
    * @class HttpAdapter
    * @extends Adapter
    * @param {Object} [opts] Configuration options.
-   * @param {string} [opts.basePath=''] TODO
-   * @param {boolean} [opts.debug=false] TODO
-   * @param {boolean} [opts.forceTrailingSlash=false] TODO
-   * @param {Object} [opts.http=axios] TODO
-   * @param {Object} [opts.httpConfig={}] TODO
-   * @param {string} [opts.suffix=''] TODO
-   * @param {boolean} [opts.useFetch=false] TODO
+   * @param {string} [opts.basePath=''] See {@link HttpAdapter#basePath}.
+   * @param {boolean} [opts.debug=false]  See {@link HttpAdapter#debug}.
+   * @param {boolean} [opts.forceTrailingSlash=false]  See {@link HttpAdapter#forceTrailingSlash}.
+   * @param {Object} [opts.http=axios] See {@link HttpAdapter#http}.
+   * @param {Object} [opts.httpConfig={}] See {@link HttpAdapter#httpConfig}.
+   * @param {string} [opts.suffix=''] See {@link HttpAdapter#suffix}.
+   * @param {boolean} [opts.useFetch=false] See {@link HttpAdapter#useFetch}.
+   * @see http://www.js-data.io/docs/js-data-http
    */
   function HttpAdapter(opts) {
     jsData.utils.classCallCheck(this, HttpAdapter);
@@ -1910,8 +1954,8 @@
      * @param {Object} mapper The mapper.
      * @param {Object} query Selection query.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     count: function count(mapper, query, opts) {
@@ -1934,8 +1978,8 @@
      * @param {Object} mapper The mapper.
      * @param {Object} props Properties to send as the payload.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     create: function create(mapper, props, opts) {
@@ -1955,8 +1999,8 @@
      * @param {Object} mapper The mapper.
      * @param {Array} props Array of property objects to send as the payload.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     createMany: function createMany(mapper, props, opts) {
@@ -2040,8 +2084,8 @@
      * @param {Object} mapper The mapper.
      * @param {(string|number)} id Primary key of the record to destroy.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     destroy: function destroy(mapper, id, opts) {
@@ -2061,8 +2105,8 @@
      * @param {Object} mapper The mapper.
      * @param {Object} query Selection query.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     destroyAll: function destroyAll(mapper, query, opts) {
@@ -2147,8 +2191,8 @@
      * @param {Object} mapper The mapper.
      * @param {(string|number)} id Primary key of the record to retrieve.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     find: function find(mapper, id, opts) {
@@ -2168,8 +2212,8 @@
      * @param {Object} mapper The mapper.
      * @param {Object} query Selection query.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     findAll: function findAll(mapper, query, opts) {
@@ -2184,7 +2228,7 @@
 
 
     /**
-     * TODO
+     * Make a GET request.
      *
      * @name HttpAdapter#GET
      * @method
@@ -2223,9 +2267,9 @@
     /**
      * @name HttpAdapter#getEndpoint
      * @method
-     * @param {Object} mapper TODO
-     * @param {*} id TODO
-     * @param {boolean} opts TODO
+     * @param {Object} mapper The Mapper.
+     * @param {*} id The primary key, if any.
+     * @param {boolean} opts Configuration options.
      * @return {string} Full path.
      */
     getEndpoint: function getEndpoint(mapper, id, opts) {
@@ -2287,9 +2331,9 @@
     /**
      * @name HttpAdapter#getPath
      * @method
-     * @param {string} method TODO
-     * @param {Object} mapper TODO
-     * @param {(string|number)?} id TODO
+     * @param {string} method The method being executed.
+     * @param {Object} mapper The Mapper.
+     * @param {(string|number)?} id The primary key, if any.
      * @param {Object} opts Configuration options.
      */
     getPath: function getPath(method, mapper, id, opts) {
@@ -2354,7 +2398,7 @@
         var str = start.toUTCString() + ' - ' + config.method.toUpperCase() + ' ' + config.url + ' - ' + data.status + ' ' + (new Date().getTime() - start.getTime()) + 'ms';
         if (data.status >= 200 && data.status < 300) {
           if (_this15.log) {
-            _this15.dbg('debug', str, data);
+            _this15.dbg(str, data);
           }
           return data;
         } else {
@@ -2386,13 +2430,13 @@
 
 
     /**
-     * TODO
+     * Make a POST request.
      *
      * @name HttpAdapter#POST
      * @method
-     * @param {*} url TODO
-     * @param {Object} data TODO
-     * @param {Object} config TODO
+     * @param {*} url The url for the request.
+     * @param {Object} data Payload for the request.
+     * @param {Object} config Request configuration options.
      * @param {Object} [opts] Configuration options.
      * @return {Promise}
      */
@@ -2425,13 +2469,13 @@
 
 
     /**
-     * TODO
+     * Make a PUT request.
      *
      * @name HttpAdapter#PUT
      * @method
-     * @param {*} url TODO
-     * @param {Object} data TODO
-     * @param {Object} config TODO
+     * @param {*} url The url for the request.
+     * @param {Object} data Payload for the request.
+     * @param {Object} config Request configuration options.
      * @param {Object} [opts] Configuration options.
      * @return {Promise}
      */
@@ -2464,13 +2508,14 @@
 
 
     /**
-     * TODO
+     * Transform the querystring object before it is serialized. This doesn't do
+     * anything by default.
      *
      * @name HttpAdapter#queryTransform
      * @method
-     * @param {Object} mapper TODO
-     * @param {*} params TODO
-     * @param {*} opts TODO
+     * @param {Object} mapper The Mapper that triggered the request.
+     * @param {*} params The querystring object.
+     * @param {*} opts Configuration options
      * @return {*} Transformed params.
      */
     queryTransform: function queryTransform(mapper, params, opts) {
@@ -2504,13 +2549,13 @@
 
 
     /**
-     * TODO
+     * Serialize request data. This doesn't do anything by default.
      *
      * @name HttpAdapter#serialize
      * @method
-     * @param {Object} mapper TODO
-     * @param {Object} data TODO
-     * @param {*} opts TODO
+     * @param {Object} mapper The Mapper that triggered the request.
+     * @param {Object} data The request payload.
+     * @param {*} opts Configuration options.
      * @return {*} Serialized data.
      */
     serialize: function serialize(mapper, data, opts) {
@@ -2534,8 +2579,8 @@
      * @param {string} field The field to sum.
      * @param {Object} query Selection query.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     sum: function sum(mapper, field, query, opts) {
@@ -2554,13 +2599,13 @@
 
 
     /**
-     * TODO
+     * Perform an update. Makes a PUT request by default.
      *
      * @name HttpAdapter#update
      * @method
-     * @param {Object} mapper TODO
-     * @param {*} id TODO
-     * @param {*} props TODO
+     * @param {Object} mapper The Mapper for the request.
+     * @param {*} id The primary key of the record being updated.
+     * @param {*} props The update payload.
      * @param {Object} [opts] Configuration options.
      * @return {Promise}
      */
@@ -2574,13 +2619,14 @@
 
 
     /**
-     * TODO
+     * Perform an update against records that match the selection query. Makes a
+     * PUT request by default.
      *
      * @name HttpAdapter#updateAll
      * @method
-     * @param {Object} mapper TODO
-     * @param {Object} props TODO
-     * @param {Object} query TODO
+     * @param {Object} mapper The Mapper for the request.
+     * @param {Object} props The update payload.
+     * @param {Object} query The selection query. See {@link http://www.js-data.io/docs/query-syntax}.
      * @param {Object} [opts] Configuration options.
      * @return {Promise}
      */
@@ -2596,20 +2642,16 @@
 
 
     /**
-     * Update multiple records in batch.
-     *
-     * {@link HttpAdapter#beforeUpdateMany} will be called before calling
-     * {@link HttpAdapter#PUT}.
-     * {@link HttpAdapter#afterUpdateMany} will be called after calling
-     * {@link HttpAdapter#PUT}.
+     * Update multiple individual records in a batch.
      *
      * @name HttpAdapter#updateMany
      * @method
-     * @param {Object} mapper The mapper.
+     * @param {Object} mapper The Mapper for the request.
      * @param {Array} records Array of property objects to send as the payload.
+     * Each must contain the primary key of the record to be updated.
      * @param {Object} [opts] Configuration options.
-     * @param {string} [opts.params] TODO
-     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] TODO
+     * @param {string} [opts.params] Querystring parameters.
+     * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
      * @return {Promise}
      */
     updateMany: function updateMany(mapper, records, opts) {
@@ -2786,7 +2828,7 @@
    * otherwise `false` if the current version is not beta.
    */
   var version = {
-  full: '3.0.0-rc.1',
+  full: '3.0.0-rc.2',
   major: 3,
   minor: 0,
   patch: 0
