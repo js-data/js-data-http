@@ -1,7 +1,7 @@
 {
   "name": "js-data-http-node",
   "description": "Node.js HTTP adapter for js-data.",
-  "version": "3.0.0-rc.1",
+  "version": "3.0.0-rc.2",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -22,7 +22,7 @@
     "node.js"
   ],
   "dependencies": {
-    "js-data-adapter": "~0.8.0"
+    "js-data-adapter": "~0.8.1"
   },
   "peerDependencies": {
     "axios": "^0.13.1",

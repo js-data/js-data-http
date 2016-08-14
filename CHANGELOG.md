@@ -1,3 +1,12 @@
+##### 3.0.0-rc.2 - 13 August 2016
+
+###### Backwards compatible changes
+- Upgraded dependencies
+- Finish JSDoc comments
+
+###### Bug fixes
+- #55 - dist/js-data-http.d.ts is not complete
+
 ##### 3.0.0-rc.1 - 10 August 2016
 
 ###### Breaking changes
