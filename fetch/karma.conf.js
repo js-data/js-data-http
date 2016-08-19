@@ -52,6 +52,7 @@ module.exports = function (config) {
     browsers: browsers,
     files: [
       'node_modules/babel-polyfill/dist/polyfill.js',
+      'node_modules/whatwg-fetch/fetch.js',
       'node_modules/js-data/dist/js-data.js',
       'fetch/dist/js-data-fetch.js',
       'fetch/karma.start.js',

@@ -1,6 +1,4 @@
-/* global fetch:true Headers:true Request:true */
-
-import {utils} from 'js-data'
+import { utils } from 'js-data'
 import axios from '../node_modules/axios/dist/axios'
 import {
   Adapter,
@@ -53,7 +51,7 @@ function buildUrl (url, params) {
     }
 
     val.forEach(function (v) {
-      if (window.toString.call(v) === '[object Date]') {
+      if (toString.call(v) === '[object Date]') {
         v = v.toISOString()
       } else if (utils.isObject(v)) {
         v = utils.toJson(v)
@@ -76,7 +74,7 @@ const DEFAULTS = {
    * @example
    * const httpAdapter = new HttpAdapter({
    *   basePath: 'https://mydomain.com'
-   * })
+   * });
    *
    * @name HttpAdapter#basePath
    * @type {string}
@@ -99,7 +97,7 @@ const DEFAULTS = {
    * `axios`.
    *
    * @name HttpAdapter#http
-   * @type {Function}
+   * @type {function}
    * @since 3.0.0
    * @see http://www.js-data.io/docs/js-data-http#using-a-custom-http-library
    */
@@ -110,7 +108,7 @@ const DEFAULTS = {
    * to {@link HttpAdapter#http}.
    *
    * @name HttpAdapter#httpConfig
-   * @type {Object}
+   * @type {object}
    * @since 3.0.0
    */
   httpConfig: {},
@@ -158,12 +156,12 @@ const DEFAULTS = {
  *
  * @class HttpAdapter
  * @extends Adapter
- * @param {Object} [opts] Configuration options.
+ * @param {object} [opts] Configuration options.
  * @param {string} [opts.basePath=''] See {@link HttpAdapter#basePath}.
  * @param {boolean} [opts.debug=false]  See {@link HttpAdapter#debug}.
  * @param {boolean} [opts.forceTrailingSlash=false]  See {@link HttpAdapter#forceTrailingSlash}.
- * @param {Object} [opts.http=axios] See {@link HttpAdapter#http}.
- * @param {Object} [opts.httpConfig={}] See {@link HttpAdapter#httpConfig}.
+ * @param {object} [opts.http=axios] See {@link HttpAdapter#http}.
+ * @param {object} [opts.httpConfig={}] See {@link HttpAdapter#httpConfig}.
  * @param {string} [opts.suffix=''] See {@link HttpAdapter#suffix}.
  * @param {boolean} [opts.useFetch=false] See {@link HttpAdapter#useFetch}.
  * @see http://www.js-data.io/docs/js-data-http
@@ -189,9 +187,9 @@ Adapter.extend({
    * @name HttpAdapter#afterDEL
    * @method
    * @param {string} url
-   * @param {Object} config
-   * @param {Object} opts
-   * @param {Object} response
+   * @param {object} config
+   * @param {object} opts
+   * @param {object} response
    */
   afterDEL: noop2,
 
@@ -199,18 +197,18 @@ Adapter.extend({
    * @name HttpAdapter#afterGET
    * @method
    * @param {string} url
-   * @param {Object} config
-   * @param {Object} opts
-   * @param {Object} response
+   * @param {object} config
+   * @param {object} opts
+   * @param {object} response
    */
   afterGET: noop2,
 
   /**
    * @name HttpAdapter#afterHTTP
    * @method
-   * @param {Object} config
-   * @param {Object} opts
-   * @param {Object} response
+   * @param {object} config
+   * @param {object} opts
+   * @param {object} response
    */
   afterHTTP: noop2,
 
@@ -218,10 +216,10 @@ Adapter.extend({
    * @name HttpAdapter#afterPOST
    * @method
    * @param {string} url
-   * @param {Object} data
-   * @param {Object} config
-   * @param {Object} opts
-   * @param {Object} response
+   * @param {object} data
+   * @param {object} config
+   * @param {object} opts
+   * @param {object} response
    */
   afterPOST: noop2,
 
@@ -229,56 +227,56 @@ Adapter.extend({
    * @name HttpAdapter#afterPUT
    * @method
    * @param {string} url
-   * @param {Object} data
-   * @param {Object} config
-   * @param {Object} opts
-   * @param {Object} response
+   * @param {object} data
+   * @param {object} config
+   * @param {object} opts
+   * @param {object} response
    */
   afterPUT: noop2,
 
   /**
    * @name HttpAdapter#beforeDEL
    * @method
-   * @param {Object} url
-   * @param {Object} config
-   * @param {Object} opts
+   * @param {object} url
+   * @param {object} config
+   * @param {object} opts
    */
   beforeDEL: noop,
 
   /**
    * @name HttpAdapter#beforeGET
    * @method
-   * @param {Object} url
-   * @param {Object} config
-   * @param {Object} opts
+   * @param {object} url
+   * @param {object} config
+   * @param {object} opts
    */
   beforeGET: noop,
 
   /**
    * @name HttpAdapter#beforeHTTP
    * @method
-   * @param {Object} config
-   * @param {Object} opts
+   * @param {object} config
+   * @param {object} opts
    */
   beforeHTTP: noop,
 
   /**
    * @name HttpAdapter#beforePOST
    * @method
-   * @param {Object} url
-   * @param {Object} data
-   * @param {Object} config
-   * @param {Object} opts
+   * @param {object} url
+   * @param {object} data
+   * @param {object} config
+   * @param {object} opts
    */
   beforePOST: noop,
 
   /**
    * @name HttpAdapter#beforePUT
    * @method
-   * @param {Object} url
-   * @param {Object} data
-   * @param {Object} config
-   * @param {Object} opts
+   * @param {object} url
+   * @param {object} data
+   * @param {object} config
+   * @param {object} opts
    */
   beforePUT: noop,
 
@@ -373,9 +371,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#count
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} query Selection query.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} mapper The mapper.
+   * @param {object} query Selection query.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -396,9 +394,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#create
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} props Properties to send as the payload.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} mapper The mapper.
+   * @param {object} props Properties to send as the payload.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -416,9 +414,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#createMany
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Array} props Array of property objects to send as the payload.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} mapper The mapper.
+   * @param {array} props Array of property objects to send as the payload.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -437,9 +435,9 @@ Adapter.extend({
    * @name HttpAdapter#DEL
    * @method
    * @param {string} url Url for the request.
-   * @param {Object} [config] Http configuration that will be passed to
+   * @param {object} [config] Http configuration that will be passed to
    * {@link HttpAdapter#HTTP}.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   DEL (url, config, opts) {
@@ -473,10 +471,10 @@ Adapter.extend({
    *
    * @name HttpAdapter#deserialize
    * @method
-   * @param {Object} mapper The mapper used for the operation.
-   * @param {Object} response Response object from {@link HttpAdapter#HTTP}.
-   * @param {Object} opts Configuration options.
-   * @return {(Object|Array)} Deserialized data.
+   * @param {object} mapper The mapper used for the operation.
+   * @param {object} response Response object from {@link HttpAdapter#HTTP}.
+   * @param {object} opts Configuration options.
+   * @return {(object|array)} Deserialized data.
    */
   deserialize (mapper, response, opts) {
     opts || (opts = {})
@@ -497,9 +495,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#destroy
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to destroy.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -517,9 +515,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#destroyAll
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} query Selection query.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} mapper The mapper.
+   * @param {object} query Selection query.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -552,26 +550,25 @@ Adapter.extend({
    *
    * @name HttpAdapter#fetch
    * @method
-   * @param {Object} config Request configuration.
-   * @param {Object} config.data Payload for the request.
+   * @param {object} config Request configuration.
+   * @param {object} config.data Payload for the request.
    * @param {string} config.method Http method for the request.
-   * @param {Object} config.headers Headers for the request.
-   * @param {Object} config.params Querystring for the request.
+   * @param {object} config.headers Headers for the request.
+   * @param {object} config.params Querystring for the request.
    * @param {string} config.url Url for the request.
-   * @param {Object} [opts] Configuration options.
    */
-  fetch (config, opts) {
+  fetch (config) {
     const requestConfig = {
       method: config.method,
       // turn the plain headers object into the Fetch Headers object
-      headers: new Headers(config.headers)
+      headers: new Headers(config.headers || {})
     }
 
     if (config.data) {
       requestConfig.body = utils.toJson(config.data)
     }
 
-    return fetch(new Request(buildUrl(config.url, config.params), requestConfig))
+    return fetch(buildUrl(config.url, config.params), requestConfig)
       .then((response) => {
         response.config = {
           method: config.method,
@@ -590,9 +587,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#find
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {(string|number)} id Primary key of the record to retrieve.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -610,9 +607,9 @@ Adapter.extend({
    *
    * @name HttpAdapter#findAll
    * @method
-   * @param {Object} mapper The mapper.
-   * @param {Object} query Selection query.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} mapper The mapper.
+   * @param {object} query Selection query.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -633,8 +630,8 @@ Adapter.extend({
    * @name HttpAdapter#GET
    * @method
    * @param {string} url The url for the request.
-   * @param {Object} config Request configuration options.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} config Request configuration options.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   GET (url, config, opts) {
@@ -665,7 +662,7 @@ Adapter.extend({
   /**
    * @name HttpAdapter#getEndpoint
    * @method
-   * @param {Object} mapper The Mapper.
+   * @param {object} mapper The Mapper.
    * @param {*} id The primary key, if any.
    * @param {boolean} opts Configuration options.
    * @return {string} Full path.
@@ -721,9 +718,9 @@ Adapter.extend({
    * @name HttpAdapter#getPath
    * @method
    * @param {string} method The method being executed.
-   * @param {Object} mapper The Mapper.
+   * @param {object} mapper The Mapper.
    * @param {(string|number)?} id The primary key, if any.
-   * @param {Object} opts Configuration options.
+   * @param {object} opts Configuration options.
    */
   getPath (method, mapper, id, opts) {
     opts || (opts = {})
@@ -761,8 +758,8 @@ Adapter.extend({
    *
    * @name HttpAdapter#HTTP
    * @method
-   * @param {Object} config Request configuration options.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} config Request configuration options.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   HTTP (config, opts) {
@@ -825,9 +822,9 @@ Adapter.extend({
    * @name HttpAdapter#POST
    * @method
    * @param {*} url The url for the request.
-   * @param {Object} data Payload for the request.
-   * @param {Object} config Request configuration options.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} data Payload for the request.
+   * @param {object} config Request configuration options.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   POST (url, data, config, opts) {
@@ -862,9 +859,9 @@ Adapter.extend({
    * @name HttpAdapter#PUT
    * @method
    * @param {*} url The url for the request.
-   * @param {Object} data Payload for the request.
-   * @param {Object} config Request configuration options.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} data Payload for the request.
+   * @param {object} config Request configuration options.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   PUT (url, data, config, opts) {
@@ -899,7 +896,7 @@ Adapter.extend({
    *
    * @name HttpAdapter#queryTransform
    * @method
-   * @param {Object} mapper The Mapper that triggered the request.
+   * @param {object} mapper The Mapper that triggered the request.
    * @param {*} params The querystring object.
    * @param {*} opts Configuration options
    * @return {*} Transformed params.
@@ -924,7 +921,7 @@ Adapter.extend({
    * @name HttpAdapter#responseError
    * @method
    * @param {*} err The error that {@link HttpAdapter#http} rejected with.
-   * @param {Object} config The `config` argument that was passed to {@link HttpAdapter#HTTP}.
+   * @param {object} config The `config` argument that was passed to {@link HttpAdapter#HTTP}.
    * @param {*} opts The `opts` argument that was passed to {@link HttpAdapter#HTTP}.
    * @return {Promise}
    */
@@ -937,8 +934,8 @@ Adapter.extend({
    *
    * @name HttpAdapter#serialize
    * @method
-   * @param {Object} mapper The Mapper that triggered the request.
-   * @param {Object} data The request payload.
+   * @param {object} mapper The Mapper that triggered the request.
+   * @param {object} data The request payload.
    * @param {*} opts Configuration options.
    * @return {*} Serialized data.
    */
@@ -958,10 +955,10 @@ Adapter.extend({
    *
    * @name HttpAdapter#sum
    * @method
-   * @param {Object} mapper The mapper.
+   * @param {object} mapper The mapper.
    * @param {string} field The field to sum.
-   * @param {Object} query Selection query.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} query Selection query.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -969,7 +966,7 @@ Adapter.extend({
   sum (mapper, field, query, opts) {
     query || (query = {})
     opts || (opts = {})
-    if (!utils.utils.isString(field)) {
+    if (!utils.isString(field)) {
       throw new Error('field must be a string!')
     }
     opts.params = this.getParams(opts)
@@ -985,10 +982,10 @@ Adapter.extend({
    *
    * @name HttpAdapter#update
    * @method
-   * @param {Object} mapper The Mapper for the request.
+   * @param {object} mapper The Mapper for the request.
    * @param {*} id The primary key of the record being updated.
    * @param {*} props The update payload.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   update (mapper, id, props, opts) {
@@ -1005,10 +1002,10 @@ Adapter.extend({
    *
    * @name HttpAdapter#updateAll
    * @method
-   * @param {Object} mapper The Mapper for the request.
-   * @param {Object} props The update payload.
-   * @param {Object} query The selection query. See {@link http://www.js-data.io/docs/query-syntax}.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} mapper The Mapper for the request.
+   * @param {object} props The update payload.
+   * @param {object} query The selection query. See {@link http://www.js-data.io/docs/query-syntax}.
+   * @param {object} [opts] Configuration options.
    * @return {Promise}
    */
   updateAll (mapper, props, query, opts) {
@@ -1026,10 +1023,10 @@ Adapter.extend({
    *
    * @name HttpAdapter#updateMany
    * @method
-   * @param {Object} mapper The Mapper for the request.
-   * @param {Array} records Array of property objects to send as the payload.
+   * @param {object} mapper The Mapper for the request.
+   * @param {array} records Array of property objects to send as the payload.
    * Each must contain the primary key of the record to be updated.
-   * @param {Object} [opts] Configuration options.
+   * @param {object} [opts] Configuration options.
    * @param {string} [opts.params] Querystring parameters.
    * @param {string} [opts.suffix={@link HttpAdapter#suffix}] See {@link HttpAdapter#suffix}.
    * @return {Promise}
@@ -1048,42 +1045,45 @@ Adapter.extend({
  *
  * @example
  * // CommonJS
- * var JSData = require('js-data')
+ * var JSData = require('js-data');
  * // It is recommended to use DataStore in the browser
- * var DataStore = JSData.DataStore
+ * var DataStore = JSData.DataStore;
  *
- * var JSDataHttp = require('js-data-http')
- * var HttpAdapter = JSDataHttp.HttpAdapter
- * var addAction = JSDataHttp.addAction
+ * var JSDataHttp = require('js-data-http');
+ * var HttpAdapter = JSDataHttp.HttpAdapter;
+ * var addAction = JSDataHttp.addAction;
  *
- * var adapter = new HttpAdapter()
- * var store = new DataStore()
+ * var httpAdapter = new HttpAdapter();
+ * var store = new DataStore();
  *
- * store.registerAdapter('http', adapter, { default: true })
- * store.defineMapper('school')
+ * store.registerAdapter('http', httpAdapter, { 'default': true });
+ * store.defineMapper('school');
  *
  * // GET /reports/schools/:school_id/teachers
  * addAction('getTeacherReports', {
- *   basePath: 'reports/schools',
+ *   endpoint: 'reports/schools',
  *   pathname: 'teachers',
  *   method: 'GET'
- * })(store.getMapper('school'))
+ * })(store.getMapper('school'));
  *
  * // /reports/schools/1234/teachers
- * store.getMapper('school').getTeacherReports(1234).then(function (response) {
+ * store.getMapper('school').getTeacherReports(1234).then((response) => {
  *   // ...
- * })
+ * });
  *
  * @name module:js-data-http.addAction
  * @method
  * @param {string} name Name of the new action.
- * @param {Object} [opts] Action configuration
- * @param {string} [opts.adapter]
- * @param {string} [opts.pathname]
- * @param {Function} [opts.request]
- * @param {Function} [opts.response]
- * @param {Function} [opts.responseError]
- * @return {Function} Decoration function, which should be passed the mapper to
+ * @param {object} [opts] Action configuration
+ * @param {string} [opts.adapter="http"] The name of the adapter to use.
+ * @param {string} [opts.pathname] Set the action's pathname.
+ * @param {function} [opts.request] Specify a request handler to be executed
+ * before the request is made.
+ * @param {function} [opts.response] Specify a response handler to be executed
+ * after the response is received.
+ * @param {function} [opts.responseError] Specify an error handler to be
+ * executed on error.
+ * @return {function} Decoration function, which should be passed the mapper to
  * decorate when invoked.
  */
 export function addAction (name, opts) {
@@ -1098,22 +1098,22 @@ export function addAction (name, opts) {
     opts.response = opts.response || function (response) { return response }
     opts.responseError = opts.responseError || function (err) { return utils.reject(err) }
     mapper[name] = function (id, _opts) {
+      _opts = _opts || {}
       if (utils.isObject(id)) {
         _opts = id
       }
-      _opts = _opts || {}
-      let adapter = this.getAdapter(opts.adapter || this.defaultAdapter || 'http')
-      let config = {}
-      utils.fillIn(config, opts)
-      if (!_opts.hasOwnProperty('endpoint') && config.endpoint) {
-        _opts.endpoint = config.endpoint
-      }
+      utils.fillIn(_opts, opts)
+      let adapter = this.getAdapter(_opts.adapter || this.defaultAdapter || 'http')
+      const config = {}
+      config.mapper = this.name
+      utils.deepMixIn(config, _opts)
+      config.method = config.method || 'GET'
       if (typeof _opts.getEndpoint === 'function') {
         config.url = _opts.getEndpoint(this, _opts)
       } else {
         let args = [
           _opts.basePath || this.basePath || adapter.basePath,
-          adapter.getEndpoint(this, utils.isSorN(id) ? id : null, _opts)
+          adapter.getEndpoint(this, id, _opts)
         ]
         if (utils.isSorN(id)) {
           args.push(id)
@@ -1121,11 +1121,8 @@ export function addAction (name, opts) {
         args.push(opts.pathname || name)
         config.url = makePath.apply(null, args)
       }
-      config.method = config.method || 'GET'
-      config.mapper = this.name
-      utils.deepMixIn(config, _opts)
       return utils.resolve(config)
-        .then(_opts.request || opts.request)
+        .then(_opts.request)
         .then((config) => adapter.HTTP(config))
         .then((data) => {
           if (data && data.config) {
@@ -1133,7 +1130,7 @@ export function addAction (name, opts) {
           }
           return data
         })
-        .then(_opts.response || opts.response, _opts.responseError || opts.responseError)
+        .then(_opts.response, _opts.responseError)
     }
     return mapper
   }
@@ -1145,19 +1142,19 @@ export function addAction (name, opts) {
  *
  * @example
  * // CommonJS
- * var JSData = require('js-data')
+ * var JSData = require('js-data');
  * // It is recommended to use DataStore in the browser
- * var DataStore = JSData.DataStore
+ * var DataStore = JSData.DataStore;
  *
- * var JSDataHttp = require('js-data-http')
- * var HttpAdapter = JSDataHttp.HttpAdapter
- * var addActions = JSDataHttp.addActions
+ * var JSDataHttp = require('js-data-http');
+ * var HttpAdapter = JSDataHttp.HttpAdapter;
+ * var addActions = JSDataHttp.addActions;
  *
- * var adapter = new HttpAdapter()
- * var store = new DataStore()
+ * var httpAdapter = new HttpAdapter();
+ * var store = new DataStore();
  *
- * store.registerAdapter('http', adapter, { default: true })
- * store.defineMapper('school')
+ * store.registerAdapter('http', httpAdapter, { 'default': true });
+ * store.defineMapper('school');
  *
  * addActions({
  *   // GET /reports/schools/:school_id/teachers
@@ -1166,18 +1163,18 @@ export function addAction (name, opts) {
  *     pathname: 'teachers',
  *     method: 'GET'
  *   }
- * })(store.getMapper('school'))
+ * })(store.getMapper('school'));
  *
  * // /reports/schools/1234/teachers
- * store.getMapper('school').getTeacherReports(1234).then(function (response) {
+ * store.getMapper('school').getTeacherReports(1234).then((response) => {
  *   // ...
- * })
+ * });
  *
  * @name module:js-data-http.addActions
  * @method
- * @param {Object.<string, Object>} opts Object where the key is an action name
+ * @param {object.<string, object>} opts Object where the key is an action name
  * and the value is the configuration for the action.
- * @return {Function} Decoration function, which should be passed the mapper to
+ * @return {function} Decoration function, which should be passed the mapper to
  * decorate when invoked.
  */
 export function addActions (opts) {
@@ -1194,7 +1191,7 @@ export function addActions (opts) {
  * Details of the current version of the `js-data-http` module.
  *
  * @name module:js-data-http.version
- * @type {Object}
+ * @type {object}
  * @property {string} version.full The full semver value.
  * @property {number} version.major The major version number.
  * @property {number} version.minor The minor version number.
@@ -1213,24 +1210,24 @@ export const version = '<%= version %>'
  * as `js-data-fetch`.
  *
  * @example <caption>Script tag</caption>
- * var HttpAdapter = window.JSDataHttp.HttpAdapter
- * var adapter = new HttpAdapter()
+ * var HttpAdapter = window.JSDataHttp.HttpAdapter;
+ * var httpAdapter = new HttpAdapter();
  *
  * @example <caption>CommonJS</caption>
- * var HttpAdapter = require('js-data-Http').HttpAdapter
- * var adapter = new HttpAdapter()
+ * var HttpAdapter = require('js-data-Http').HttpAdapter;
+ * var httpAdapter = new HttpAdapter();
  *
  * @example <caption>ES2015 Modules</caption>
- * import {HttpAdapter} from 'js-data-Http'
- * const adapter = new HttpAdapter()
+ * import { HttpAdapter } from 'js-data-Http';
+ * const httpAdapter = new HttpAdapter();
  *
  * @example <caption>AMD</caption>
  * define('myApp', ['js-data-Http'], function (JSDataHttp) {
- *   var HttpAdapter = JSDataHttp.HttpAdapter
- *   var adapter = new HttpAdapter()
+ *   var HttpAdapter = JSDataHttp.HttpAdapter;
+ *   var httpAdapter = new HttpAdapter();
  *
  *   // ...
- * })
+ * });
  *
  * @module js-data-http
  */
@@ -1238,53 +1235,53 @@ export const version = '<%= version %>'
 /**
  * Create a subclass of this HttpAdapter:
  * @example <caption>HttpAdapter.extend</caption>
- * // Normally you would do: import {HttpAdapter} from 'js-data-http'
- * // or: import {HttpAdapter} from 'js-data-http-node'
- * const JSDataHttp = require('js-data-http-node@3.0.0-beta.8')
- * const {HttpAdapter} = JSDataHttp
- * console.log('Using JSDataHttp v' + JSDataHttp.version.full)
+ * // Normally you would do: import { HttpAdapter } from 'js-data-http';
+ * // or: import { HttpAdapter } from 'js-data-http-node';
+ * const JSDataHttp = require('js-data-http-node');
+ * const { HttpAdapter } = JSDataHttp;
+ * console.log('Using JSDataHttp v' + JSDataHttp.version.full);
  *
  * // Extend the class using ES2015 class syntax.
  * class CustomHttpAdapterClass extends HttpAdapter {
- *   foo () { return 'bar' }
- *   static beep () { return 'boop' }
+ *   foo () { return 'bar'; }
+ *   static beep () { return 'boop'; }
  * }
- * const customHttpAdapter = new CustomHttpAdapterClass()
- * console.log(customHttpAdapter.foo())
- * console.log(CustomHttpAdapterClass.beep())
+ * const customHttpAdapter = new CustomHttpAdapterClass();
+ * console.log(customHttpAdapter.foo());
+ * console.log(CustomHttpAdapterClass.beep());
  *
  * // Extend the class using alternate method.
  * const OtherHttpAdapterClass = HttpAdapter.extend({
- *   foo () { return 'bar' }
+ *   foo () { return 'bar'; }
  * }, {
- *   beep () { return 'boop' }
+ *   beep () { return 'boop'; }
  * })
- * const otherHttpAdapter = new OtherHttpAdapterClass()
- * console.log(otherHttpAdapter.foo())
- * console.log(OtherHttpAdapterClass.beep())
+ * const otherHttpAdapter = new OtherHttpAdapterClass();
+ * console.log(otherHttpAdapter.foo());
+ * console.log(OtherHttpAdapterClass.beep());
  *
  * // Extend the class, providing a custom constructor.
  * function AnotherHttpAdapterClass () {
- *   HttpAdapter.call(this)
- *   this.created_at = new Date().getTime()
+ *   HttpAdapter.call(this);
+ *   this.created_at = new Date().getTime();
  * }
  * HttpAdapter.extend({
  *   constructor: AnotherHttpAdapterClass,
- *   foo () { return 'bar' }
+ *   foo () { return 'bar'; }
  * }, {
- *   beep () { return 'boop' }
+ *   beep () { return 'boop'; }
  * })
- * const anotherHttpAdapter = new AnotherHttpAdapterClass()
- * console.log(anotherHttpAdapter.created_at)
- * console.log(anotherHttpAdapter.foo())
- * console.log(AnotherHttpAdapterClass.beep())
+ * const anotherHttpAdapter = new AnotherHttpAdapterClass();
+ * console.log(anotherHttpAdapter.created_at);
+ * console.log(anotherHttpAdapter.foo());
+ * console.log(AnotherHttpAdapterClass.beep());
  *
  * @method HttpAdapter.extend
- * @param {Object} [props={}] Properties to add to the prototype of the
+ * @param {object} [props={}] Properties to add to the prototype of the
  * subclass.
- * @param {Object} [props.constructor] Provide a custom constructor function
+ * @param {object} [props.constructor] Provide a custom constructor function
  * to be used as the subclass itself.
- * @param {Object} [classProps={}] Static properties to add to the subclass.
+ * @param {object} [classProps={}] Static properties to add to the subclass.
  * @returns {Constructor} Subclass of this HttpAdapter class.
  * @since 3.0.0
  */
