@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP (XHR) adapter for js-data in the browser.",
-  "version": "3.0.0-rc.2",
+  "version": "3.0.0-rc.3",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
@@ -24,6 +24,7 @@
     "rest",
     "adapter",
     "http",
+    "fetch",
     "browser",
     "xhr"
   ],
@@ -74,7 +75,7 @@
     "release": "npm test && npm run doc && repo-tools updates && repo-tools changelog && repo-tools authors"
   },
   "dependencies": {
-    "js-data-adapter": "~0.8.1"
+    "js-data-adapter": "~0.8.2"
   },
   "peerDependencies": {
     "js-data": "^3.0.0-rc.4"
@@ -95,7 +96,7 @@
     "phantomjs-prebuilt": "2.1.12",
     "rollup-plugin-commonjs": "3.3.1",
     "rollup-plugin-replace": "1.1.1",
-    "uglify-js": "2.7.0",
-    "whatwg-fetch": "^1.0.0"
+    "uglify-js": "2.7.3",
+    "whatwg-fetch": "1.0.0"
   }
 }

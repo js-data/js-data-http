@@ -1,3 +1,8 @@
+##### 3.0.0-rc.3 - 18 August 2016
+
+###### Backwards compatible changes
+- #56 - Test Coverage (fetch, updateMany/createMany, addAction(s)) by @pik
+
 ##### 3.0.0-rc.2 - 13 August 2016
 
 ###### Backwards compatible changes
