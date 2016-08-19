@@ -95,6 +95,7 @@
     "phantomjs-prebuilt": "2.1.12",
     "rollup-plugin-commonjs": "3.3.1",
     "rollup-plugin-replace": "1.1.1",
-    "uglify-js": "2.7.0"
+    "uglify-js": "2.7.0",
+    "whatwg-fetch": "^1.0.0"
   }
 }

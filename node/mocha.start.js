@@ -18,7 +18,13 @@ before(function () {
   }
   Test.sinon = require('sinon')
   Test.JSData = require('js-data')
+  Test.addAction = require('./dist/js-data-http-node').addAction
+  Test.addActions = require('./dist/js-data-http-node').addActions
   Test.HttpAdapter = require('./dist/js-data-http-node').HttpAdapter
+  Test.store = new Test.JSData.DataStore()
+  Test.adapter = new Test.HttpAdapter()
+  Test.store.registerAdapter('http', Test.adapter, { default: true })
+
   Test.User = new Test.JSData.Mapper({
     name: 'user'
   })
@@ -28,15 +34,13 @@ before(function () {
     basePath: 'api'
   })
 
+  Test.User.registerAdapter('http', Test.adapter, { default: true })
+  Test.Post.registerAdapter('http', Test.adapter, { default: true })
   console.log('Testing against js-data ' + Test.JSData.version.full)
 })
 
 beforeEach(function () {
   var Test = this
-  Test.adapter = new Test.HttpAdapter()
-  Test.User.registerAdapter('http', Test.adapter, { default: true })
-  Test.Post.registerAdapter('http', Test.adapter, { default: true })
-
   Test.p1 = { author: 'John', age: 30, id: 5 }
   Test.p2 = { author: 'Sally', age: 31, id: 6 }
   Test.p3 = { author: 'Mike', age: 32, id: 7 }
