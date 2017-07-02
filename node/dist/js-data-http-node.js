@@ -8,7 +8,7 @@ var jsDataAdapter = require('js-data-adapter');
 var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
   return typeof obj;
 } : function (obj) {
-  return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj;
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
 var axios = require('axios');
@@ -31,7 +31,7 @@ function makePath() {
   }
 
   var result = join(args, '/');
-  return result.replace(/([^:\/]|^)\/{2,}/g, '$1/');
+  return result.replace(/([^:/]|^)\/{2,}/g, '$1/');
 }
 
 function encode(val) {
@@ -95,6 +95,8 @@ var DEFAULTS = {
    */
   forceTrailingSlash: false,
 
+  hasFetch: hasFetch,
+
   /**
    * The HTTP function that actually makes the HTTP request. By default this is
    * `axios`.
@@ -135,41 +137,40 @@ var DEFAULTS = {
    * @see http://www.js-data.io/docs/js-data-http#using-windowfetch
    */
   useFetch: false
-};
 
-/**
- * HttpAdapter class.
- *
- * @example
- * import { DataStore } from 'js-data';
- * import { HttpAdapter } from 'js-data-http';
- *
- * const httpAdapter = new HttpAdapter();
- * const store = new DataStore();
- *
- * store.registerAdapter('http', httpAdapter, { 'default': true });
- *
- * store.defineMapper('school');
- * store.defineMapper('student');
- *
- * // GET /school/1
- * store.find('school', 1).then((school) => {
- *   console.log('school');
- * });
- *
- * @class HttpAdapter
- * @extends Adapter
- * @param {object} [opts] Configuration options.
- * @param {string} [opts.basePath=''] See {@link HttpAdapter#basePath}.
- * @param {boolean} [opts.debug=false]  See {@link HttpAdapter#debug}.
- * @param {boolean} [opts.forceTrailingSlash=false]  See {@link HttpAdapter#forceTrailingSlash}.
- * @param {object} [opts.http=axios] See {@link HttpAdapter#http}.
- * @param {object} [opts.httpConfig={}] See {@link HttpAdapter#httpConfig}.
- * @param {string} [opts.suffix=''] See {@link HttpAdapter#suffix}.
- * @param {boolean} [opts.useFetch=false] See {@link HttpAdapter#useFetch}.
- * @see http://www.js-data.io/docs/js-data-http
- */
-function HttpAdapter(opts) {
+  /**
+   * HttpAdapter class.
+   *
+   * @example
+   * import { DataStore } from 'js-data';
+   * import { HttpAdapter } from 'js-data-http';
+   *
+   * const httpAdapter = new HttpAdapter();
+   * const store = new DataStore();
+   *
+   * store.registerAdapter('http', httpAdapter, { 'default': true });
+   *
+   * store.defineMapper('school');
+   * store.defineMapper('student');
+   *
+   * // GET /school/1
+   * store.find('school', 1).then((school) => {
+   *   console.log('school');
+   * });
+   *
+   * @class HttpAdapter
+   * @extends Adapter
+   * @param {object} [opts] Configuration options.
+   * @param {string} [opts.basePath=''] See {@link HttpAdapter#basePath}.
+   * @param {boolean} [opts.debug=false]  See {@link HttpAdapter#debug}.
+   * @param {boolean} [opts.forceTrailingSlash=false]  See {@link HttpAdapter#forceTrailingSlash}.
+   * @param {object} [opts.http=axios] See {@link HttpAdapter#http}.
+   * @param {object} [opts.httpConfig={}] See {@link HttpAdapter#httpConfig}.
+   * @param {string} [opts.suffix=''] See {@link HttpAdapter#suffix}.
+   * @param {boolean} [opts.useFetch=false] See {@link HttpAdapter#useFetch}.
+   * @see http://www.js-data.io/docs/js-data-http
+   */
+};function HttpAdapter(opts) {
   jsData.utils.classCallCheck(this, HttpAdapter);
 
   opts || (opts = {});
@@ -724,20 +725,14 @@ jsDataAdapter.Adapter.extend({
         }
 
         if (parentId) {
-          var _ret = function () {
-            delete opts.endpoint;
-            var _opts = {};
-            jsData.utils.forOwn(opts, function (value, key) {
-              _opts[key] = value;
-            });
-            jsData.utils._(_opts, parentDef);
-            endpoint = makePath(_this14.getEndpoint(parentDef, parentId, _opts), parentId, endpoint);
-            return {
-              v: false
-            };
-          }();
-
-          if ((typeof _ret === 'undefined' ? 'undefined' : _typeof(_ret)) === "object") return _ret.v;
+          delete opts.endpoint;
+          var _opts = {};
+          jsData.utils.forOwn(opts, function (value, key) {
+            _opts[key] = value;
+          });
+          jsData.utils._(_opts, parentDef);
+          endpoint = makePath(_this14.getEndpoint(parentDef, parentId, _opts), parentId, endpoint);
+          return false;
         }
       }
     });
@@ -802,7 +797,9 @@ jsDataAdapter.Adapter.extend({
     config = jsData.utils.deepMixIn(config, this.httpConfig);
     config.data = payload;
     config.cache = cache;
-    config.timeout = timeout;
+    if (timeout !== undefined) {
+      config.timeout = timeout;
+    }
     if (this.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
       config.url += '/';
     }
@@ -828,7 +825,13 @@ jsDataAdapter.Adapter.extend({
     };
 
     if (!this.http) {
-      throw new Error('You have not configured this adapter with an http library!');
+      if (this.useFetch || opts.useFetch) {
+        if (!hasFetch) {
+          throw new Error('Attempting to use window.fetch, but it is not available!');
+        }
+      } else {
+        throw new Error('You have not configured this adapter with an http library!');
+      }
     }
 
     return jsData.utils.resolve(this.beforeHTTP(config, opts)).then(function (_config) {
@@ -836,7 +839,9 @@ jsDataAdapter.Adapter.extend({
       if (hasFetch && (_this15.useFetch || opts.useFetch || !_this15.http)) {
         return _this15.fetch(config, opts).then(logResponse, logResponse);
       }
-      return _this15.http(config).then(logResponse, logResponse).catch(function (err) {
+      var httpConfig = jsData.utils.plainCopy(config);
+      delete httpConfig.adapter;
+      return _this15.http(httpConfig).then(logResponse, logResponse).catch(function (err) {
         return _this15.responseError(err, config, opts);
       });
     }).then(function (response) {
@@ -1246,11 +1251,94 @@ function addActions(opts) {
  * otherwise `false` if the current version is not beta.
  */
 var version = {
-  full: '3.0.0-rc.3',
+  full: '3.0.0',
   major: 3,
   minor: 0,
   patch: 0
 };
+
+/**
+ * Registered as `js-data-http` in NPM and Bower. The build of `js-data-http`
+ * that works on Node.js is registered in NPM as `js-data-http-node`. The build
+ * of `js-data-http` that does not bundle `axios` is registered in NPM and Bower
+ * as `js-data-fetch`.
+ *
+ * @example <caption>Script tag</caption>
+ * var HttpAdapter = window.JSDataHttp.HttpAdapter;
+ * var httpAdapter = new HttpAdapter();
+ *
+ * @example <caption>CommonJS</caption>
+ * var HttpAdapter = require('js-data-Http').HttpAdapter;
+ * var httpAdapter = new HttpAdapter();
+ *
+ * @example <caption>ES2015 Modules</caption>
+ * import { HttpAdapter } from 'js-data-Http';
+ * const httpAdapter = new HttpAdapter();
+ *
+ * @example <caption>AMD</caption>
+ * define('myApp', ['js-data-Http'], function (JSDataHttp) {
+ *   var HttpAdapter = JSDataHttp.HttpAdapter;
+ *   var httpAdapter = new HttpAdapter();
+ *
+ *   // ...
+ * });
+ *
+ * @module js-data-http
+ */
+
+/**
+ * Create a subclass of this HttpAdapter:
+ * @example <caption>HttpAdapter.extend</caption>
+ * // Normally you would do: import { HttpAdapter } from 'js-data-http';
+ * // or: import { HttpAdapter } from 'js-data-http-node';
+ * const JSDataHttp = require('js-data-http-node');
+ * const { HttpAdapter } = JSDataHttp;
+ * console.log('Using JSDataHttp v' + JSDataHttp.version.full);
+ *
+ * // Extend the class using ES2015 class syntax.
+ * class CustomHttpAdapterClass extends HttpAdapter {
+ *   foo () { return 'bar'; }
+ *   static beep () { return 'boop'; }
+ * }
+ * const customHttpAdapter = new CustomHttpAdapterClass();
+ * console.log(customHttpAdapter.foo());
+ * console.log(CustomHttpAdapterClass.beep());
+ *
+ * // Extend the class using alternate method.
+ * const OtherHttpAdapterClass = HttpAdapter.extend({
+ *   foo () { return 'bar'; }
+ * }, {
+ *   beep () { return 'boop'; }
+ * })
+ * const otherHttpAdapter = new OtherHttpAdapterClass();
+ * console.log(otherHttpAdapter.foo());
+ * console.log(OtherHttpAdapterClass.beep());
+ *
+ * // Extend the class, providing a custom constructor.
+ * function AnotherHttpAdapterClass () {
+ *   HttpAdapter.call(this);
+ *   this.created_at = new Date().getTime();
+ * }
+ * HttpAdapter.extend({
+ *   constructor: AnotherHttpAdapterClass,
+ *   foo () { return 'bar'; }
+ * }, {
+ *   beep () { return 'boop'; }
+ * })
+ * const anotherHttpAdapter = new AnotherHttpAdapterClass();
+ * console.log(anotherHttpAdapter.created_at);
+ * console.log(anotherHttpAdapter.foo());
+ * console.log(AnotherHttpAdapterClass.beep());
+ *
+ * @method HttpAdapter.extend
+ * @param {object} [props={}] Properties to add to the prototype of the
+ * subclass.
+ * @param {object} [props.constructor] Provide a custom constructor function
+ * to be used as the subclass itself.
+ * @param {object} [classProps={}] Static properties to add to the subclass.
+ * @returns {Constructor} Subclass of this HttpAdapter class.
+ * @since 3.0.0
+ */
 
 exports.HttpAdapter = HttpAdapter;
 exports.addAction = addAction;
