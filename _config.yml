@@ -1,0 +1,8 @@
+title: js-data-http
+description: Http adapter for js-data
+google_analytics: UA-55528236-2
+show_downloads: true
+theme: jekyll-theme-minimal
+
+gems:
+  - jekyll-mentions
