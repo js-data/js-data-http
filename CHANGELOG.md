@@ -1,3 +1,11 @@
+##### 3.0.0 - 02 July 2017
+
+**v3 stable release**
+
+###### Bug fixes
+- #65 - axios as devDependency
+- #68 - Impossible to set timeout globally
+
 ##### 3.0.0-rc.3 - 18 August 2016
 
 ###### Backwards compatible changes

@@ -2,7 +2,7 @@
 
 before(function () {
   var Test = this
-  Test.TEST_FETCH = true
+  Test.TEST_FETCH = window.navigator.userAgent.indexOf('MSIE 9.0') === -1
   Test.fail = function (msg) {
     if (msg instanceof Error) {
       console.log(msg.stack)
@@ -49,6 +49,7 @@ beforeEach(function () {
 
   Test.requests = []
 
+  Test.adapter.isFetch = true
   Test.adapter.http = function (config) {
     config.headers || (config.headers = {})
     config.headers.Accept = 'application/json, text/plain, */*'

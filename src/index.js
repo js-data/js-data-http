@@ -21,7 +21,7 @@ function join (items, separator) {
 }
 function makePath (...args) {
   let result = join(args, '/')
-  return result.replace(/([^:\/]|^)\/{2,}/g, '$1/')
+  return result.replace(/([^:/]|^)\/{2,}/g, '$1/')
 }
 
 function encode (val) {
@@ -91,6 +91,8 @@ const DEFAULTS = {
    * @since 3.0.0
    */
   forceTrailingSlash: false,
+
+  hasFetch: hasFetch,
 
   /**
    * The HTTP function that actually makes the HTTP request. By default this is
@@ -772,7 +774,9 @@ Adapter.extend({
     config = utils.deepMixIn(config, this.httpConfig)
     config.data = payload
     config.cache = cache
-    config.timeout = timeout
+    if (timeout !== undefined) {
+      config.timeout = timeout
+    }
     if (this.forceTrailingSlash && config.url[config.url.length - 1] !== '/') {
       config.url += '/'
     }
@@ -798,7 +802,13 @@ Adapter.extend({
     }
 
     if (!this.http) {
-      throw new Error('You have not configured this adapter with an http library!')
+      if ((this.useFetch || opts.useFetch)) {
+        if (!hasFetch) {
+          throw new Error('Attempting to use window.fetch, but it is not available!')
+        }
+      } else {
+        throw new Error('You have not configured this adapter with an http library!')
+      }
     }
 
     return utils.resolve(this.beforeHTTP(config, opts))
@@ -807,7 +817,9 @@ Adapter.extend({
         if (hasFetch && (this.useFetch || opts.useFetch || !this.http)) {
           return this.fetch(config, opts).then(logResponse, logResponse)
         }
-        return this.http(config).then(logResponse, logResponse)
+        const httpConfig = utils.plainCopy(config)
+        delete httpConfig.adapter
+        return this.http(httpConfig).then(logResponse, logResponse)
           .catch((err) => this.responseError(err, config, opts))
       })
       .then((response) => {

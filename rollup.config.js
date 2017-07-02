@@ -1,9 +1,11 @@
-var babel = require('rollup-plugin-babel')
-var commonjs = require('rollup-plugin-commonjs')
+import babel from 'rollup-plugin-babel'
+import commonjs from 'rollup-plugin-commonjs'
 
-module.exports = {
+export default {
   moduleName: 'JSDataHttp',
-  moduleId: 'js-data-http',
+  amd: {
+    id: 'js-data-http'
+  },
   external: [
     'js-data'
   ],
@@ -16,8 +18,16 @@ module.exports = {
     }),
     babel({
       babelrc: false,
+      plugins: [
+        'external-helpers'
+      ],
       presets: [
-        'es2015-rollup'
+        [
+          'es2015',
+          {
+            modules: false
+          }
+        ]
       ],
       exclude: 'node_modules/axios/**'
     })
