@@ -1,9 +1,11 @@
-var babel = require('rollup-plugin-babel')
-var replace = require('rollup-plugin-replace')
+import babel from 'rollup-plugin-babel'
+import replace from 'rollup-plugin-replace'
 
-module.exports = {
+export default {
   moduleName: 'JSDataHttp',
-  moduleId: 'js-data-fetch',
+  amd: {
+    id: 'js-data-fetch'
+  },
   external: [
     'js-data'
   ],
@@ -16,9 +18,18 @@ module.exports = {
     }),
     babel({
       babelrc: false,
+      plugins: [
+        'external-helpers'
+      ],
       presets: [
-        'es2015-rollup'
-      ]
+        [
+          'es2015',
+          {
+            modules: false
+          }
+        ]
+      ],
+      exclude: 'node_modules/axios/**'
     })
   ]
 }

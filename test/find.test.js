@@ -42,14 +42,23 @@ describe('find', function () {
         Test.assert.equal(1, Test.requests.length)
         Test.assert.equal(Test.requests[0].url, 'api/posts/1?test=test')
         Test.assert.equal(Test.requests[0].method, 'GET')
-        Test.assert.deepEqual({
+        var testHeaders = {
           Authorization: 'test',
           Accept: 'application/json, text/plain, */*'
-        }, Test.requests[0].requestHeaders)
+        }
+        if (!Test.adapter.isFetch && !Test.adapter.isNode) {
+          testHeaders['Content-Type'] = 'text/plain;charset=utf-8'
+        }
+        Test.assert.deepEqual(testHeaders, Test.requests[0].requestHeaders)
         Test.assert.deepEqual(data, Test.p1, 'post should have been found')
 
-        delete Test.adapter.httpConfig.params
-        delete Test.adapter.httpConfig.headers
+        delete Test.adapter.httpConfig.params.test
+        delete Test.adapter.httpConfig.headers.Authorization
+      })
+      .catch(function (err) {
+        delete Test.adapter.httpConfig.params.test
+        delete Test.adapter.httpConfig.headers.Authorization
+        return Promise.reject(err)
       })
   })
 

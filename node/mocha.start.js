@@ -49,6 +49,7 @@ beforeEach(function () {
 
   Test.requests = []
 
+  Test.adapter.isNode = true
   Test.adapter.http = function (config) {
     config.headers || (config.headers = {})
     config.headers.Accept = 'application/json, text/plain, */*'
