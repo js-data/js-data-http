@@ -108,10 +108,10 @@ class DSHttpAdapter {
     let _this = this
     options || (options = {})
     if (isString(options.urlPath)) {
-      return makePath.apply(DSUtils, [options.basePath || _this.defaults.basePath || resourceConfig.basePath, options.urlPath])
+      return makePath.apply(DSUtils, [options.basePath || resourceConfig.basePath || _this.defaults.basePath, options.urlPath])
     } else {
       let args = [
-        options.basePath || _this.defaults.basePath || resourceConfig.basePath,
+        options.basePath || resourceConfig.basePath || _this.defaults.basePath,
         this.getEndpoint(resourceConfig, (isString(id) || isNumber(id) || method === 'create') ? id : null, options)
       ]
       if (method === 'find' || method === 'update' || method === 'destroy') {
