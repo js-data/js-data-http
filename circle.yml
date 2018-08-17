@@ -6,7 +6,7 @@ jobs:
     steps:
       - checkout
       - run: npm install
-      - run: npm i codecov js-data@3
+      - run: sudo npm i -g codecov
       - run:
           name: Test
           command: npm test
