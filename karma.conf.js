@@ -1,39 +1,57 @@
+var browsers = ['PhantomJS']
+
 var customLaunchers = {
-  bs_ie9_windows7: {
-    base: 'BrowserStack',
-    browser: 'ie',
-    browser_version: '9.0',
-    os: 'Windows',
-    os_version: '7'
+  sl_chrome: {
+    base: 'SauceLabs',
+    browserName: 'chrome',
+    platform: 'Windows 10',
+    version: 'latest'
   },
-  bs_safari7_osxmavericks: {
-    base: 'BrowserStack',
-    browser: 'safari',
-    browser_version: '7.1',
-    os: 'OS X',
-    os_version: 'Mavericks'
+  sl_firefox: {
+    base: 'SauceLabs',
+    browserName: 'firefox',
+    platform: 'Windows 10',
+    version: 'latest'
   },
-  bs_firefox41_windows7: {
-    base: 'BrowserStack',
-    browser: 'firefox',
-    browser_version: '41.0',
-    os: 'Windows',
-    os_version: '7'
+  sl_safari_9: {
+    base: 'SauceLabs',
+    browserName: 'safari',
+    platform: 'OS X 10.11',
+    version: '9.0'
   },
-  bs_chrome46_windows7: {
-    base: 'BrowserStack',
-    browser: 'chrome',
-    browser_version: '46.0',
-    os: 'Windows',
-    os_version: '7'
+  sl_edge: {
+    base: 'SauceLabs',
+    browserName: 'microsoftedge',
+    platform: 'Windows 10',
+    version: 'latest'
+  },
+  sl_ie_11: {
+    base: 'SauceLabs',
+    browserName: 'internet explorer',
+    platform: 'Windows 8.1',
+    version: '11'
+  },
+  sl_ie_10: {
+    base: 'SauceLabs',
+    browserName: 'internet explorer',
+    platform: 'Windows 2012',
+    version: '10'
+  },
+  sl_ie_9: {
+    base: 'SauceLabs',
+    browserName: 'internet explorer',
+    platform: 'Windows 2008',
+    version: '9'
+  },
+  sl_android_5: {
+    base: 'SauceLabs',
+    browserName: 'android',
+    platform: 'Linux',
+    version: '5.1'
   }
 }
 
-var browsers = ['PhantomJS']
-if (
-  process.env.BROWSERSTACK_USERNAME &&
-  process.env.BROWSERSTACK_ACCESS_KEY
-) {
+if (process.env.SAUCE_USERNAME && process.env.SAUCE_ACCESS_KEY) {
   browsers = browsers.concat(Object.keys(customLaunchers))
 }
 
@@ -46,7 +64,7 @@ module.exports = function (config) {
       'karma-mocha',
       'karma-chai',
       'karma-phantomjs-launcher',
-      'karma-browserstack-launcher'
+      'karma-sauce-launcher'
     ],
     autoWatch: false,
     browsers: browsers,
@@ -57,9 +75,12 @@ module.exports = function (config) {
       'karma.start.js',
       'test/*.test.js'
     ],
-    browserStack: {
-      username: process.env.BROWSERSTACK_USERNAME,
-      accessKey: process.env.BROWSERSTACK_ACCESS_KEY
+    sauceLabs: {
+      testName: 'JSDataHttp Tests',
+      public: 'public',
+      recordVideo: false,
+      recordScreenshots: false,
+      build: process.env.CIRCLE_BUILD_NUM ? ('circle-' + process.env.CIRCLE_BUILD_NUM) : ('local-' + new Date().getTime())
     },
     customLaunchers: customLaunchers,
     reporters: ['dots'],

@@ -1,19 +1,24 @@
-general:
-  branches:
-    ignore:
-      - gh-pages
-machine:
-  node:
-    version: 5.7.0
-dependencies:
-  pre:
-    - npm i -g npm
-    - npm i -g codecov
-    - npm i js-data@rc
-test:
-  post:
-    - cat ./coverage/lcov.info | codecov
-general:
-  artifacts:
-    - "dist"
-    - "fetch/dist"
+version: 2
+jobs:
+  test:
+    docker:
+      - image: circleci/node:8
+    steps:
+      - checkout
+      - run: npm install
+      - run: sudo npm i -g codecov
+      - run:
+          name: Test
+          command: npm test
+      - run:
+          name: Generate code coverage
+          command: cat ./coverage/lcov.info | codecov
+      - store_artifacts:
+          path: dist
+          destination: fetch/dist
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - test
