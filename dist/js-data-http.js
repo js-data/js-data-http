@@ -1,6 +1,6 @@
 /*!
 * js-data-http
-* @version 2.2.2 - Homepage <https://github.com/js-data/js-data-http>
+* @version 2.2.3 - Homepage <https://github.com/js-data/js-data-http>
 * @copyright (c) 2014-2016 js-data-http project authors
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -64,7 +64,7 @@ return /******/ (function(modules) { // webpackBootstrap
 
 	'use strict';
 	
-	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
+	var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 	
 	var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 	
@@ -80,12 +80,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	} catch (e) {}
 	
 	var DSUtils = JSData.DSUtils;
-	var deepMixIn = DSUtils.deepMixIn;
-	var removeCircular = DSUtils.removeCircular;
-	var copy = DSUtils.copy;
-	var makePath = DSUtils.makePath;
-	var isString = DSUtils.isString;
-	var isNumber = DSUtils.isNumber;
+	var deepMixIn = DSUtils.deepMixIn,
+	    removeCircular = DSUtils.removeCircular,
+	    copy = DSUtils.copy,
+	    makePath = DSUtils.makePath,
+	    isString = DSUtils.isString,
+	    isNumber = DSUtils.isNumber;
 	
 	
 	function isUndefined(value) {
@@ -166,8 +166,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	      }) : {});
 	
 	      DSUtils.forOwn(parents, function (parent, parentName) {
-	        var _this2 = this;
-	
 	        var item = void 0;
 	        var parentKey = parent.key;
 	        var parentField = parent.field;
@@ -192,14 +190,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	          }
 	
 	          if (parentId) {
-	            (function () {
-	              delete options.endpoint;
-	              var _options = {};
-	              DSUtils.forOwn(options, function (value, key) {
-	                _options[key] = value;
-	              });
-	              endpoint = DSUtils.makePath(_this2.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint);
-	            })();
+	            delete options.endpoint;
+	            var _options = {};
+	            DSUtils.forOwn(options, function (value, key) {
+	              _options[key] = value;
+	            });
+	            endpoint = DSUtils.makePath(this.getEndpoint(parentDef, parentId, DSUtils._(parentDef, _options)), parentId, endpoint);
 	          }
 	        }
 	      }, this);
@@ -212,9 +208,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var _this = this;
 	      options || (options = {});
 	      if (isString(options.urlPath)) {
-	        return makePath.apply(DSUtils, [options.basePath || _this.defaults.basePath || resourceConfig.basePath, options.urlPath]);
+	        return makePath.apply(DSUtils, [options.basePath || resourceConfig.basePath || _this.defaults.basePath, options.urlPath]);
 	      } else {
-	        var args = [options.basePath || _this.defaults.basePath || resourceConfig.basePath, this.getEndpoint(resourceConfig, isString(id) || isNumber(id) || method === 'create' ? id : null, options)];
+	        var args = [options.basePath || resourceConfig.basePath || _this.defaults.basePath, this.getEndpoint(resourceConfig, isString(id) || isNumber(id) || method === 'create' ? id : null, options)];
 	        if (method === 'find' || method === 'update' || method === 'destroy') {
 	          args.push(id);
 	        }
@@ -429,10 +425,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	
 	DSHttpAdapter.version = {
-	  full: '2.2.2',
+	  full: '2.2.3',
 	  major: parseInt('2', 10),
 	  minor: parseInt('2', 10),
-	  patch: parseInt('2', 10),
+	  patch: parseInt('3', 10),
 	  alpha:  true ? 'false' : false,
 	  beta:  true ? 'false' : false
 	};
@@ -942,14 +938,103 @@ return /******/ (function(modules) { // webpackBootstrap
 /***/ function(module, exports) {
 
 	// shim for using process in browser
-	
 	var process = module.exports = {};
+	
+	// cached from whatever global is present so that test runners that stub it
+	// don't break things.  But we need to wrap it in a try catch in case it is
+	// wrapped in strict mode code which doesn't define any globals.  It's inside a
+	// function because try/catches deoptimize in certain engines.
+	
+	var cachedSetTimeout;
+	var cachedClearTimeout;
+	
+	function defaultSetTimout() {
+	    throw new Error('setTimeout has not been defined');
+	}
+	function defaultClearTimeout () {
+	    throw new Error('clearTimeout has not been defined');
+	}
+	(function () {
+	    try {
+	        if (typeof setTimeout === 'function') {
+	            cachedSetTimeout = setTimeout;
+	        } else {
+	            cachedSetTimeout = defaultSetTimout;
+	        }
+	    } catch (e) {
+	        cachedSetTimeout = defaultSetTimout;
+	    }
+	    try {
+	        if (typeof clearTimeout === 'function') {
+	            cachedClearTimeout = clearTimeout;
+	        } else {
+	            cachedClearTimeout = defaultClearTimeout;
+	        }
+	    } catch (e) {
+	        cachedClearTimeout = defaultClearTimeout;
+	    }
+	} ())
+	function runTimeout(fun) {
+	    if (cachedSetTimeout === setTimeout) {
+	        //normal enviroments in sane situations
+	        return setTimeout(fun, 0);
+	    }
+	    // if setTimeout wasn't available but was latter defined
+	    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+	        cachedSetTimeout = setTimeout;
+	        return setTimeout(fun, 0);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedSetTimeout(fun, 0);
+	    } catch(e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+	            return cachedSetTimeout.call(null, fun, 0);
+	        } catch(e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+	            return cachedSetTimeout.call(this, fun, 0);
+	        }
+	    }
+	
+	
+	}
+	function runClearTimeout(marker) {
+	    if (cachedClearTimeout === clearTimeout) {
+	        //normal enviroments in sane situations
+	        return clearTimeout(marker);
+	    }
+	    // if clearTimeout wasn't available but was latter defined
+	    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+	        cachedClearTimeout = clearTimeout;
+	        return clearTimeout(marker);
+	    }
+	    try {
+	        // when when somebody has screwed with setTimeout but no I.E. maddness
+	        return cachedClearTimeout(marker);
+	    } catch (e){
+	        try {
+	            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+	            return cachedClearTimeout.call(null, marker);
+	        } catch (e){
+	            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+	            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+	            return cachedClearTimeout.call(this, marker);
+	        }
+	    }
+	
+	
+	
+	}
 	var queue = [];
 	var draining = false;
 	var currentQueue;
 	var queueIndex = -1;
 	
 	function cleanUpNextTick() {
+	    if (!draining || !currentQueue) {
+	        return;
+	    }
 	    draining = false;
 	    if (currentQueue.length) {
 	        queue = currentQueue.concat(queue);
@@ -965,7 +1050,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    if (draining) {
 	        return;
 	    }
-	    var timeout = setTimeout(cleanUpNextTick);
+	    var timeout = runTimeout(cleanUpNextTick);
 	    draining = true;
 	
 	    var len = queue.length;
@@ -982,7 +1067,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    currentQueue = null;
 	    draining = false;
-	    clearTimeout(timeout);
+	    runClearTimeout(timeout);
 	}
 	
 	process.nextTick = function (fun) {
@@ -994,7 +1079,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	    }
 	    queue.push(new Item(fun, args));
 	    if (queue.length === 1 && !draining) {
-	        setTimeout(drainQueue, 0);
+	        runTimeout(drainQueue);
 	    }
 	};
 	
@@ -1022,6 +1107,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	process.removeListener = noop;
 	process.removeAllListeners = noop;
 	process.emit = noop;
+	process.prependListener = noop;
+	process.prependOnceListener = noop;
+	
+	process.listeners = function (name) { return [] }
 	
 	process.binding = function (name) {
 	    throw new Error('process.binding is not supported');

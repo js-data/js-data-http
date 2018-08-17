@@ -1,3 +1,8 @@
+##### 2.2.3 - 18 August 2018
+
+###### Backwards compatible bug fixes
+- #70 Adapter default basePath is taken instead of definition basePath
+
 ##### 2.2.2 - 18 March 2016
 
 ###### Backwards compatible bug fixes

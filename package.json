@@ -1,7 +1,7 @@
 {
   "name": "js-data-http",
   "description": "HTTP adapter for js-data.",
-  "version": "2.2.2",
+  "version": "2.2.3",
   "homepage": "https://github.com/js-data/js-data-http",
   "repository": {
     "type": "git",
