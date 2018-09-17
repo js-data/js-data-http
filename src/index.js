@@ -129,7 +129,9 @@ class DSHttpAdapter {
     let payload = config.data
     let cache = config.cache
     let timeout = config.timeout
-    config = copy(config, null, null, null, ['data', 'cache', 'timeout'])
+    let params = config.params
+    config = copy(config, null, null, null, ['data', 'cache', 'timeout', 'params']) // params could have data, cache, timeout
+    config.params = copy(params)
     config = deepMixIn(config, _this.defaults.httpConfig)
     config.data = payload
     config.cache = cache
