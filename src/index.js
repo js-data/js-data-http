@@ -770,7 +770,9 @@ Adapter.extend({
     const payload = config.data
     const cache = config.cache
     const timeout = config.timeout
-    config = utils.copy(config, null, null, null, ['data', 'cache', 'timeout'])
+    const params = config.params
+    config = utils.copy(config, null, null, null, ['data', 'cache', 'timeout', 'params']) // params could have data, cache, timeout
+    config.params = utils.copy(params)
     config = utils.deepMixIn(config, this.httpConfig)
     config.data = payload
     config.cache = cache
