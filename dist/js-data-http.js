@@ -1,6 +1,6 @@
 /*!
 * js-data-http
-* @version 2.2.3 - Homepage <https://github.com/js-data/js-data-http>
+* @version 2.2.4 - Homepage <https://github.com/js-data/js-data-http>
 * @copyright (c) 2014-2016 js-data-http project authors
 * @license MIT <https://github.com/js-data/js-data-http/blob/master/LICENSE>
 *
@@ -227,7 +227,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	      var payload = config.data;
 	      var cache = config.cache;
 	      var timeout = config.timeout;
-	      config = copy(config, null, null, null, ['data', 'cache', 'timeout']);
+	      var params = config.params;
+	      config = copy(config, null, null, null, ['data', 'cache', 'timeout', 'params']); // params could have data, cache, timeout
+	      config.params = copy(params);
 	      config = deepMixIn(config, _this.defaults.httpConfig);
 	      config.data = payload;
 	      config.cache = cache;
@@ -425,10 +427,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	}();
 	
 	DSHttpAdapter.version = {
-	  full: '2.2.3',
+	  full: '2.2.4',
 	  major: parseInt('2', 10),
 	  minor: parseInt('2', 10),
-	  patch: parseInt('3', 10),
+	  patch: parseInt('4', 10),
 	  alpha:  true ? 'false' : false,
 	  beta:  true ? 'false' : false
 	};
