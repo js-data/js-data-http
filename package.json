@@ -72,6 +72,9 @@
   "peerDependencies": {
     "js-data": ">= 3.0.0"
   },
+  "dependencies": {
+    "js-data-adapter": "1.x.x"
+  },
   "devDependencies": {
     "axios": "0.16.2",
     "babel-eslint": "^7.2.3",
@@ -84,8 +87,6 @@
     "chai": "^4.0.2",
     "ink-docstrap": "git+https://github.com/js-data/docstrap.git#cfbe45fa313e1628c493076d5e15d2b855dfbf2c",
     "istanbul": "0.4.5",
-    "js-data": "3.x.x",
-    "js-data-adapter": "1.x.x",
     "js-data-repo-tools": "1.0.0",
     "jsdoc": "^3.4.3",
     "karma": "^1.7.0",
